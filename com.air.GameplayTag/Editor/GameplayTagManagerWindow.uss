@@ -1,0 +1,352 @@
+/* ============================================
+   Gameplay Tag Manager - Compatible UI Styles
+   ============================================ */
+
+/* 数据库选择区域 */
+.database-section {
+    background-color: rgb(64, 64, 64);
+    border-bottom-width: 1px;
+    border-bottom-color: rgb(35, 35, 35);
+    padding: 10px 12px;
+}
+
+.database-row {
+    flex-direction: row;
+    align-items: center;
+}
+
+.database-label {
+    min-width: 90px;
+    -unity-font-style: bold;
+    font-size: 13px;
+}
+
+.database-field {
+    flex-grow: 1;
+    margin-right: 8px;
+}
+
+.create-new-button {
+    width: 100px;
+    background-color: rgb(70, 120, 180);
+    border-radius: 4px;
+    color: white;
+}
+
+.create-new-button:hover {
+    background-color: rgb(90, 150, 220);
+}
+
+/* 工具栏 */
+.toolbar {
+    flex-direction: row;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-left: 12px;
+    padding-right: 12px;
+    background-color: rgb(60, 60, 60);
+    border-bottom-width: 1px;
+    border-bottom-color: rgb(35, 35, 35);
+    min-height: 36px;
+}
+
+.toolbar-label {
+    -unity-font-style: bold;
+    font-size: 13px;
+    color: rgb(220, 220, 220);
+    margin-left: 5px;
+    margin-right: 15px;
+}
+
+.toolbar-button {
+    margin-left: 6px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    padding-left: 14px;
+    padding-right: 14px;
+    min-width: 90px;
+    height: 26px;
+    background-color: rgb(70, 70, 70);
+    border-radius: 4px;
+    border-width: 1px;
+    border-color: rgb(45, 45, 45);
+    color: rgb(220, 220, 220);
+}
+
+.toolbar-button:hover {
+    background-color: rgb(90, 130, 180);
+    border-color: rgb(100, 150, 220);
+}
+
+/* 保存按钮特殊样式 */
+.save-button {
+    background-color: rgb(70, 140, 90);
+    border-color: rgb(50, 120, 70);
+    color: rgb(220, 255, 220);
+    -unity-font-style: bold;
+}
+
+.save-button:hover {
+    background-color: rgb(90, 180, 110);
+    border-color: rgb(110, 200, 130);
+}
+
+.save-button:disabled {
+    background-color: rgb(60, 60, 60);
+    border-color: rgb(45, 45, 45);
+    color: rgb(120, 120, 120);
+}
+
+/* 搜索栏 */
+.search-container {
+    flex-direction: row;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 12px;
+    padding-right: 12px;
+    background-color: rgb(56, 56, 56);
+    border-bottom-width: 1px;
+    border-bottom-color: rgb(40, 40, 40);
+}
+
+.search-label {
+    margin-right: 8px;
+    width: 60px;
+    color: rgb(200, 200, 200);
+    font-size: 12px;
+}
+
+.search-field {
+    flex-grow: 1;
+    margin-right: 8px;
+}
+
+.clear-button {
+    width: 70px;
+    height: 26px;
+    background-color: rgb(70, 70, 70);
+    border-radius: 4px;
+    border-width: 1px;
+    border-color: rgb(45, 45, 45);
+    color: rgb(200, 200, 200);
+}
+
+.clear-button:hover {
+    background-color: rgb(90, 90, 90);
+}
+
+/* 提示 */
+.tips-label {
+    padding-top: 6px;
+    padding-bottom: 6px;
+    padding-left: 12px;
+    padding-right: 12px;
+    font-size: 11px;
+    color: rgb(150, 150, 150);
+    -unity-font-style: italic;
+    background-color: rgb(52, 52, 52);
+    border-bottom-width: 1px;
+    border-bottom-color: rgb(40, 40, 40);
+}
+
+/* 树形视图 */
+.tree-scroll-view {
+    flex-grow: 1;
+    background-color: rgb(48, 48, 48);
+}
+
+.tree-container {
+    flex-grow: 1;
+    padding: 8px;
+}
+
+/* 标签项 */
+.tag-item {
+    margin-bottom: 3px;
+}
+
+.tag-item-container {
+    flex-direction: row;
+    align-items: center;
+    min-height: 36px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-radius: 5px;
+    background-color: rgb(56, 56, 56);
+    border-width: 1px;
+    border-color: rgb(42, 42, 42);
+}
+
+.tag-item-container:hover {
+    background-color: rgb(65, 65, 70);
+    border-color: rgb(80, 120, 160);
+}
+
+/* 折叠按钮 */
+.foldout-button {
+    width: 24px;
+    height: 24px;
+    margin-right: 4px;
+    border-width: 0;
+    border-radius: 4px;
+    background-color: transparent;
+    font-size: 14px;
+    color: rgb(180, 180, 180);
+}
+
+.foldout-button:hover {
+    background-color: rgb(70, 110, 150);
+    color: rgb(220, 220, 220);
+}
+
+.foldout-spacer {
+    width: 24px;
+    height: 24px;
+    margin-right: 4px;
+}
+
+/* 名称容器 */
+.name-container {
+    flex-grow: 1;
+    flex-direction: column;
+    margin-left: 8px;
+    margin-right: 12px;
+    min-width: 200px;
+}
+
+.name-label {
+    padding-top: 2px;
+    padding-bottom: 2px;
+    color: rgb(230, 230, 230);
+    font-size: 14px;
+}
+
+.name-label:hover {
+    color: rgb(180, 210, 255);
+}
+
+.name-label.has-children {
+    -unity-font-style: bold;
+    font-size: 15px;
+    color: rgb(180, 210, 255);
+}
+
+.name-label.has-children:hover {
+    color: rgb(200, 230, 255);
+}
+
+.name-field {
+    flex-grow: 1;
+    min-width: 120px;
+}
+
+/* 路径提示 */
+.path-hint {
+    margin-top: 2px;
+    font-size: 10px;
+    color: rgb(120, 120, 120);
+    -unity-font-style: italic;
+}
+
+/* 按钮容器 */
+.button-container {
+    flex-direction: row;
+    margin-left: auto;
+}
+
+.action-button {
+    width: 28px;
+    height: 28px;
+    margin-left: 4px;
+    font-size: 16px;
+    border-radius: 5px;
+    border-width: 1px;
+}
+
+/* 添加按钮 */
+.add-button {
+    background-color: rgb(70, 130, 90);
+    border-color: rgb(50, 110, 70);
+    color: rgb(220, 255, 220);
+    font-size: 18px;
+}
+
+.add-button:hover {
+    background-color: rgb(90, 170, 110);
+    border-color: rgb(110, 190, 130);
+}
+
+/* 删除按钮 */
+.delete-button {
+    background-color: rgb(140, 70, 70);
+    border-color: rgb(120, 50, 50);
+    color: rgb(255, 220, 220);
+    font-size: 20px;
+}
+
+.delete-button:hover {
+    background-color: rgb(190, 90, 90);
+    border-color: rgb(220, 110, 110);
+}
+
+/* 状态栏 */
+.status-label {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-left: 12px;
+    padding-right: 12px;
+    font-size: 11px;
+    background-color: rgb(55, 55, 55);
+    border-top-width: 1px;
+    border-top-color: rgb(35, 35, 35);
+    color: rgb(180, 180, 180);
+}
+
+/* 空状态 */
+.empty-label {
+    padding-top: 40px;
+    padding-bottom: 40px;
+    padding-left: 20px;
+    padding-right: 20px;
+    color: rgb(140, 140, 140);
+    -unity-font-style: italic;
+    font-size: 13px;
+    background-color: rgba(255, 255, 255, 0.02);
+    border-radius: 8px;
+    margin: 20px;
+}
+
+/* 无数据库 */
+.no-database-container {
+    flex-grow: 1;
+    align-items: center;
+    justify-content: center;
+    padding: 60px;
+    background-color: rgb(48, 48, 48);
+}
+
+.warning-label {
+    font-size: 18px;
+    -unity-font-style: bold;
+    color: rgb(255, 200, 100);
+    margin-bottom: 30px;
+}
+
+.create-database-button {
+    min-width: 180px;
+    height: 40px;
+    font-size: 14px;
+    -unity-font-style: bold;
+    background-color: rgb(70, 120, 180);
+    border-radius: 6px;
+    border-width: 2px;
+    border-color: rgb(90, 150, 220);
+    color: rgb(255, 255, 255);
+}
+
+.create-database-button:hover {
+    background-color: rgb(90, 150, 220);
+    border-color: rgb(110, 170, 240);
+}

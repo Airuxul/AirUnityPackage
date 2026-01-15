@@ -1,0 +1,12 @@
+{
+    "name": "com.air.gameplay-tag",
+    "displayName": "Gameplay Tag",
+    "version": "1.1.0",
+    "unity": "2020.3",
+    "description": "UE4-style Gameplay Tag system with UIToolkit editor",
+    "keywords": [
+        "Tag",
+        "Gameplay"
+    ],
+    "category": "Unity"
+}

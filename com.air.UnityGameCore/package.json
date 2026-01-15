@@ -1,0 +1,11 @@
+{
+    "name": "com.air.untiy-game-core",
+    "displayName": "Unity Game Core",
+    "version": "1.0.1",
+    "unity": "2020.3",
+    "description": "Unity Game Core",
+    "keywords": [
+        "GameFramework"
+    ],
+    "category": "Unity"
+}
