@@ -5,6 +5,7 @@
 * com.air.GameCore 通用游戏代码，不依赖Unity，纯c#代码逻辑
 * com.air.UnityGameCore 通用Unity代码
 * com.air.GameplayTag 游戏Tag，仿UE GameplayTag
+* com.air.UI 游戏UI框架 
 
 ## 引用包
 * com.alelievr.NodeGraphProcessor 节点
