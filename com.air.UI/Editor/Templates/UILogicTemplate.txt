@@ -1,0 +1,46 @@
+using UnityEngine;
+using UnityEngine.UI;
+using AirUI.Core;
+
+namespace AirUI.Generated
+{
+    /// <summary>
+    /// 自动生成的#CLASSNAME# UI组件
+    /// </summary>
+    public partial class #CLASSNAME# : UIComponent
+    {
+        protected override void Awake()
+        {
+            base.Awake();
+            InitComponent();
+        }
+
+        public override void OnInit()
+        {
+            base.OnInit();
+            // TODO: Initialize logic here
+        }
+
+        public override void OnShow()
+        {
+            base.OnShow();
+            // TODO: Show logic here
+        }
+
+        public override void OnHide()
+        {
+            base.OnHide();
+            // TODO: Hide logic here
+        }
+
+        private void InitEventListeners()
+        {
+            // TODO: Add event listeners here
+        }
+
+        private void RemoveEventListeners()
+        {
+            // TODO: Remove event listeners here
+        }
+    }
+}
