@@ -37,7 +37,7 @@ namespace Air.UnityGameCore.Editor.AssetDependency
             ReverseDependencies
         }
 
-        [MenuItem("Tools/资源依赖查询工具")]
+        [MenuItem("Tools/资源依赖/资源依赖查询工具")]
         public static void ShowWindow()
         {
             AssetDependencyWindow window = GetWindow<AssetDependencyWindow>();

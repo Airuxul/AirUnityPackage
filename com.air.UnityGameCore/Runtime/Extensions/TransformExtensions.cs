@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace UnityGameCore.Runtime.Extensions {
+namespace Air.UnityGameCore.Runtime.Extensions {
     public static class TransformExtensions {
         /// <summary>
         /// Check if the transform is within a certain distance and optionally within a certain angle (FOV) from the target transform.

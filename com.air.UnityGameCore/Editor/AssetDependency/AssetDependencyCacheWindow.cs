@@ -13,7 +13,7 @@ namespace Air.UnityGameCore.Editor.AssetDependency
         private float _buildProgress;
         private string _buildStatus;
 
-        [MenuItem("Tools/资源依赖缓存管理")]
+        [MenuItem("Tools/资源依赖/资源依赖缓存管理")]
         public static void ShowWindow()
         {
             AssetDependencyCacheWindow window = GetWindow<AssetDependencyCacheWindow>();

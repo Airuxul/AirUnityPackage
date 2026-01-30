@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace UnityGameCore.Runtime.Extensions {
+namespace Air.UnityGameCore.Runtime.Extensions {
     public static class Vector2Extensions {
         /// <summary>
         /// Adds to any x y values of a Vector2

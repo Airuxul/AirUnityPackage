@@ -1,0 +1,19 @@
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace Air.UnityGameCore.Generated
+{
+    /// <summary>
+    /// #CLASSNAME#的设计器部分，包含UI组件字段定义
+    /// </summary>
+    public partial class #CLASSNAME#
+    {
+#FIELDS#
+
+        private void InitComponent()
+        {
+            // Auto-generated component initialization
+            // Fields will be automatically bound after compilation
+        }
+    }
+}

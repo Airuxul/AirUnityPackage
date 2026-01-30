@@ -21,7 +21,7 @@ namespace Air.UnityGameCore.Editor.AssetDependency
         private int _maxDepth = 5;
         private bool _showFileSize = true;
 
-        [MenuItem("Tools/资源依赖树形视图")]
+        [MenuItem("Tools/资源依赖/资源依赖树形视图")]
         public static void ShowWindow()
         {
             AssetDependencyTreeWindow window = GetWindow<AssetDependencyTreeWindow>();

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace UnityGameCore.Runtime.Singleton
+namespace Air.UnityGameCore.Runtime.Singleton
 {
     public abstract class PersistentSingleton<T> : MonoBehaviour where T : Component
     {

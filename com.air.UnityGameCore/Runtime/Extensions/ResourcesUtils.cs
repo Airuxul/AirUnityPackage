@@ -1,9 +1,9 @@
-﻿using UnityEngine;
+using UnityEngine;
 #if ENABLED_UNITY_URP
 using UnityEngine.Rendering;
 #endif
 
-namespace UnityGameCore.Runtime.Extensions {
+namespace Air.UnityGameCore.Runtime.Extensions {
     public static class ResourcesUtils {
 #if ENABLED_UNITY_URP
         /// <summary>

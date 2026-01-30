@@ -3,7 +3,7 @@ using UnityEngine.Profiling;
 
 // See UnityEngine.TestTools.Constraints.AllocatingGCMemoryConstraint
 // and https://maingauche.games/devlog/20230504-counting-allocations-in-unity/
-namespace UntiyGameCore.Runtime {
+namespace Air.UnityGameCore.Runtime {
     public class AllocCounter {
         UnityEngine.Profiling.Recorder rec;
 

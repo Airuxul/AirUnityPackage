@@ -2,7 +2,7 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-namespace UnityGameCore.Editor.Utils
+namespace Air.UnityGameCore.Editor.Utils
 {
     public static class EditorUtils
     {

@@ -1,9 +1,9 @@
-﻿using UnityEngine;
+using UnityEngine;
 #if ENABLED_UNITY_MATHEMATICS
 using Unity.Mathematics;
 #endif
 
-namespace UnityGameCore.Runtime.Extensions {
+namespace Air.UnityGameCore.Runtime.Extensions {
     public static class NumberExtensions {
         public static float PercentageOf(this int part, int whole) {
             if (whole == 0) return 0; // Handling division by zero

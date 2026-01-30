@@ -1,4 +1,4 @@
-namespace StateMachine
+namespace Air.GameCore.StateMachine
 {
     public interface IStateTransition
     {

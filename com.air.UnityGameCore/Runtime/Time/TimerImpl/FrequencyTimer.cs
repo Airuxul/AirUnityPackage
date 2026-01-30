@@ -1,6 +1,6 @@
 using System;
 
-namespace UnityGameCore.Runtime.Time {
+namespace Air.UnityGameCore.Runtime.Time {
     /// <summary>
     /// Timer that ticks at a specific frequency. (N times per second)
     /// </summary>

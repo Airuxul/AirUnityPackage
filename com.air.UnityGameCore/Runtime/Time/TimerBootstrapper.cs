@@ -2,9 +2,9 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.LowLevel;
 using UnityEngine.PlayerLoop;
-using UnityGameCore.Runtime.Utils;
+using Air.UnityGameCore.Runtime.Utils;
 
-namespace UnityGameCore.Runtime.Time {
+namespace Air.UnityGameCore.Runtime.Time {
     internal static class TimerBootstrapper {
         static PlayerLoopSystem timerSystem;
         

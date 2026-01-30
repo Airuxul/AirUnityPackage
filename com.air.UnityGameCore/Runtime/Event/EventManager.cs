@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using CodiceApp.EventTracking.Plastic;
 
-namespace UntiyGameCore.Runtime.Event
+namespace Air.UnityGameCore.Runtime.Event
 {
     public interface IEvent
     {

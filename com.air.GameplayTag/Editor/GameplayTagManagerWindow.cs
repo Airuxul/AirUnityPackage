@@ -2,9 +2,7 @@ using UnityEngine;
 using UnityEditor;
 using UnityEngine.UIElements;
 using UnityEditor.UIElements;
-using Air.GameplayTag;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Air.GameplayTag.Editor
 {
@@ -13,28 +11,92 @@ namespace Air.GameplayTag.Editor
     /// </summary>
     public class GameplayTagManagerWindow : EditorWindow
     {
-        private GameplayTagDatabase database; // 原始数据库
-        private GameplayTagDatabase workingCopy; // 工作副本
-        private bool hasUnsavedChanges = false;
+        private GameplayTagDatabase _database; // 原始数据库
+        private GameplayTagDatabase _workingCopy; // 工作副本
+        private bool _hasUnsavedChanges;
         
-        private VisualElement root;
-        private ObjectField databaseField;
-        private ScrollView treeScrollView;
-        private VisualElement treeContainer;
-        private TextField searchField;
-        private Label statusLabel;
-        private Button saveButton;
-        private Button revertButton;
+        private VisualElement _root;
+        private ObjectField _databaseField;
+        private ScrollView _treeScrollView;
+        private VisualElement _treeContainer;
+        private TextField _searchField;
+        private Label _statusLabel;
+        private Button _saveButton;
+        private Button _revertButton;
         
-        private string searchQuery = "";
-        private TagTreeItem renamingItem = null;
+        private string _searchQuery = "";
+        private TagTreeItem _renamingItem;
 
-        [MenuItem("Window/Gameplay Tag Manager")]
+        [MenuItem("Tools/Gameplay Tag Manager")]
         public static void ShowWindow()
         {
             var window = GetWindow<GameplayTagManagerWindow>("Gameplay Tag Manager");
             window.minSize = new Vector2(600, 450);
             window.Show();
+        }
+        
+        /// <summary>
+        /// 初始化默认数据库，自动查找项目中的GameplayTagDatabase
+        /// </summary>
+        private void InitializeDefaultDatabase()
+        {
+            // 如果已经有加载的数据库，跳过
+            if (_database != null)
+            {
+                return;
+            }
+            
+            // 查找项目中所有的GameplayTagDatabase资源
+            string[] guids = AssetDatabase.FindAssets("t:GameplayTagDatabase");
+            
+            if (guids.Length == 0)
+            {
+                // 没有找到数据库
+                _statusLabel.text = "⚠️ No GameplayTagDatabase found in project. Create one from Assets/Create/Gameplay/Gameplay Tag Database";
+                return;
+            }
+            
+            if (guids.Length > 1)
+            {
+                // 找到多个数据库，弹窗提示用户
+                string[] paths = new string[guids.Length];
+                for (int i = 0; i < guids.Length; i++)
+                {
+                    paths[i] = AssetDatabase.GUIDToAssetPath(guids[i]);
+                }
+                
+                string message = $"Found {guids.Length} GameplayTagDatabase assets in the project:\n\n";
+                for (int i = 0; i < paths.Length; i++)
+                {
+                    message += $"{i + 1}. {paths[i]}\n";
+                }
+                message += "\nPlease manually select which one to use from the Database field above.";
+                
+                EditorUtility.DisplayDialog(
+                    "Multiple GameplayTagDatabase Found",
+                    message,
+                    "OK"
+                );
+                
+                _statusLabel.text = $"⚠️ Found {guids.Length} databases. Please select one manually.";
+                return;
+            }
+            
+            // 只找到一个数据库，自动加载
+            string assetPath = AssetDatabase.GUIDToAssetPath(guids[0]);
+            GameplayTagDatabase database = AssetDatabase.LoadAssetAtPath<GameplayTagDatabase>(assetPath);
+            
+            if (database != null)
+            {
+                _database = database;
+                _databaseField.value = database;
+                LoadDatabase(database);
+                Debug.Log($"[GameplayTagManager] Auto-loaded database: {assetPath}");
+            }
+            else
+            {
+                _statusLabel.text = "⚠️ Failed to load database";
+            }
         }
 
         private void CreateGUI()
@@ -44,8 +106,8 @@ namespace Air.GameplayTag.Editor
 
         private void BuildUI()
         {
-            root = rootVisualElement;
-            root.style.flexGrow = 1;
+            _root = rootVisualElement;
+            _root.style.flexGrow = 1;
 
             // 加载样式
             LoadStyleSheet();
@@ -59,24 +121,27 @@ namespace Air.GameplayTag.Editor
             // 提示标签
             var tipsLabel = new Label("💡 Drag a Database above | Double-click to rename | Manual Save");
             tipsLabel.AddToClassList("tips-label");
-            root.Add(tipsLabel);
+            _root.Add(tipsLabel);
 
             // 树形视图
-            treeScrollView = new ScrollView(ScrollViewMode.Vertical);
-            treeScrollView.AddToClassList("tree-scroll-view");
+            _treeScrollView = new ScrollView(ScrollViewMode.Vertical);
+            _treeScrollView.AddToClassList("tree-scroll-view");
             
-            treeContainer = new VisualElement();
-            treeContainer.AddToClassList("tree-container");
-            treeScrollView.Add(treeContainer);
+            _treeContainer = new VisualElement();
+            _treeContainer.AddToClassList("tree-container");
+            _treeScrollView.Add(_treeContainer);
             
-            root.Add(treeScrollView);
+            _root.Add(_treeScrollView);
 
             // 状态栏
-            statusLabel = new Label();
-            statusLabel.AddToClassList("status-label");
-            root.Add(statusLabel);
+            _statusLabel = new Label();
+            _statusLabel.AddToClassList("status-label");
+            _root.Add(_statusLabel);
 
             RefreshTree();
+            
+            // 初始化并查找默认的GameplayTagDatabase
+            InitializeDefaultDatabase();
         }
 
         private void BuildDatabaseSection()
@@ -97,18 +162,18 @@ namespace Air.GameplayTag.Editor
             label.style.fontSize = 13;
             section.Add(label);
 
-            databaseField = new ObjectField();
-            databaseField.objectType = typeof(GameplayTagDatabase);
-            databaseField.style.flexGrow = 1;
-            databaseField.RegisterValueChangedCallback(OnDatabaseChanged);
-            section.Add(databaseField);
+            _databaseField = new ObjectField();
+            _databaseField.objectType = typeof(GameplayTagDatabase);
+            _databaseField.style.flexGrow = 1;
+            _databaseField.RegisterValueChangedCallback(OnDatabaseChanged);
+            section.Add(_databaseField);
 
             var createButton = new Button(CreateNewDatabase) { text = "Create New" };
             createButton.style.marginLeft = 8;
             createButton.style.width = 100;
             section.Add(createButton);
 
-            root.Add(section);
+            _root.Add(section);
         }
 
         private void BuildToolbar()
@@ -124,16 +189,16 @@ namespace Air.GameplayTag.Editor
             spacer.style.flexGrow = 1;
             toolbar.Add(spacer);
 
-            saveButton = new Button(SaveChanges) { text = "💾 Save" };
-            saveButton.AddToClassList("toolbar-button");
-            saveButton.AddToClassList("save-button");
-            saveButton.SetEnabled(false);
-            toolbar.Add(saveButton);
+            _saveButton = new Button(SaveChanges) { text = "💾 Save" };
+            _saveButton.AddToClassList("toolbar-button");
+            _saveButton.AddToClassList("save-button");
+            _saveButton.SetEnabled(false);
+            toolbar.Add(_saveButton);
 
-            revertButton = new Button(RevertChanges) { text = "↺ Revert" };
-            revertButton.AddToClassList("toolbar-button");
-            revertButton.SetEnabled(false);
-            toolbar.Add(revertButton);
+            _revertButton = new Button(RevertChanges) { text = "↺ Revert" };
+            _revertButton.AddToClassList("toolbar-button");
+            _revertButton.SetEnabled(false);
+            toolbar.Add(_revertButton);
 
             // 搜索栏
             var searchContainer = new VisualElement();
@@ -143,31 +208,31 @@ namespace Air.GameplayTag.Editor
             searchLabel.AddToClassList("search-label");
             searchContainer.Add(searchLabel);
 
-            searchField = new TextField();
-            searchField.AddToClassList("search-field");
-            searchField.RegisterValueChangedCallback(evt =>
+            _searchField = new TextField();
+            _searchField.AddToClassList("search-field");
+            _searchField.RegisterValueChangedCallback(evt =>
             {
-                searchQuery = evt.newValue;
+                _searchQuery = evt.newValue;
                 RefreshTree();
             });
-            searchContainer.Add(searchField);
+            searchContainer.Add(_searchField);
 
             var clearButton = new Button(() => 
             {
-                searchField.value = "";
-                searchQuery = "";
+                _searchField.value = "";
+                _searchQuery = "";
                 RefreshTree();
             }) { text = "Clear" };
             clearButton.AddToClassList("clear-button");
             searchContainer.Add(clearButton);
 
-            root.Add(toolbar);
-            root.Add(searchContainer);
+            _root.Add(toolbar);
+            _root.Add(searchContainer);
         }
 
         private void OnDatabaseChanged(ChangeEvent<UnityEngine.Object> evt)
         {
-            if (hasUnsavedChanges)
+            if (_hasUnsavedChanges)
             {
                 if (EditorUtility.DisplayDialog("Unsaved Changes",
                     "⚠️ You have unsaved changes!\n\nDo you want to discard them and switch database?",
@@ -177,7 +242,7 @@ namespace Air.GameplayTag.Editor
                 }
                 else
                 {
-                    databaseField.SetValueWithoutNotify(database);
+                    _databaseField.SetValueWithoutNotify(_database);
                 }
             }
             else
@@ -188,75 +253,75 @@ namespace Air.GameplayTag.Editor
 
         private void LoadDatabase(GameplayTagDatabase db)
         {
-            database = db;
+            _database = db;
             
-            if (database != null)
+            if (_database != null)
             {
                 CreateWorkingCopy();
-                hasUnsavedChanges = false;
+                _hasUnsavedChanges = false;
                 UpdateButtonStates();
                 RefreshTree();
             }
             else
             {
-                workingCopy = null;
+                _workingCopy = null;
                 RefreshTree();
             }
         }
 
         private void CreateWorkingCopy()
         {
-            if (database == null)
+            if (_database == null)
             {
-                workingCopy = null;
+                _workingCopy = null;
                 return;
             }
 
-            string json = EditorJsonUtility.ToJson(database);
-            workingCopy = ScriptableObject.CreateInstance<GameplayTagDatabase>();
-            EditorJsonUtility.FromJsonOverwrite(json, workingCopy);
+            string json = EditorJsonUtility.ToJson(_database);
+            _workingCopy = ScriptableObject.CreateInstance<GameplayTagDatabase>();
+            EditorJsonUtility.FromJsonOverwrite(json, _workingCopy);
         }
 
         private void MarkAsModified()
         {
-            hasUnsavedChanges = true;
+            _hasUnsavedChanges = true;
             UpdateButtonStates();
             UpdateStatus();
         }
 
         private void UpdateButtonStates()
         {
-            if (saveButton != null)
-                saveButton.SetEnabled(hasUnsavedChanges && database != null);
+            if (_saveButton != null)
+                _saveButton.SetEnabled(_hasUnsavedChanges && _database != null);
             
-            if (revertButton != null)
-                revertButton.SetEnabled(hasUnsavedChanges && database != null);
+            if (_revertButton != null)
+                _revertButton.SetEnabled(_hasUnsavedChanges && _database != null);
         }
 
         private void SaveChanges()
         {
-            if (database == null || workingCopy == null)
+            if (_database == null || _workingCopy == null)
                 return;
 
-            string json = EditorJsonUtility.ToJson(workingCopy);
-            EditorJsonUtility.FromJsonOverwrite(json, database);
+            string json = EditorJsonUtility.ToJson(_workingCopy);
+            EditorJsonUtility.FromJsonOverwrite(json, _database);
             
-            EditorUtility.SetDirty(database);
+            EditorUtility.SetDirty(_database);
             AssetDatabase.SaveAssets();
             
-            hasUnsavedChanges = false;
+            _hasUnsavedChanges = false;
             UpdateButtonStates();
             UpdateStatus();
             
-            Debug.Log($"✓ Changes saved to: {AssetDatabase.GetAssetPath(database)}");
+            Debug.Log($"✓ Changes saved to: {AssetDatabase.GetAssetPath(_database)}");
             EditorUtility.DisplayDialog("Saved", 
-                $"✅ All changes saved successfully!\n\nTotal Tags: {database.GetAllTags().Count}", 
+                $"✅ All changes saved successfully!\n\nTotal Tags: {_database.GetAllTags().Count}", 
                 "OK");
         }
 
         private void RevertChanges()
         {
-            if (!hasUnsavedChanges)
+            if (!_hasUnsavedChanges)
                 return;
 
             if (EditorUtility.DisplayDialog("Revert Changes",
@@ -264,7 +329,7 @@ namespace Air.GameplayTag.Editor
                 "Revert", "Cancel"))
             {
                 CreateWorkingCopy();
-                hasUnsavedChanges = false;
+                _hasUnsavedChanges = false;
                 UpdateButtonStates();
                 RefreshTree();
                 Debug.Log("✓ Changes reverted");
@@ -288,7 +353,7 @@ namespace Air.GameplayTag.Editor
             AssetDatabase.CreateAsset(newDatabase, path);
             AssetDatabase.SaveAssets();
             
-            databaseField.value = newDatabase;
+            _databaseField.value = newDatabase;
             LoadDatabase(newDatabase);
             
             EditorGUIUtility.PingObject(newDatabase);
@@ -297,28 +362,28 @@ namespace Air.GameplayTag.Editor
 
         public void RefreshTree()
         {
-            treeContainer.Clear();
+            _treeContainer.Clear();
             
-            if (workingCopy == null)
+            if (_workingCopy == null)
             {
                 var emptyLabel = new Label("📝 No database selected.\n\nDrag a GameplayTagDatabase above or click 'Create New'.");
                 emptyLabel.AddToClassList("empty-label");
-                treeContainer.Add(emptyLabel);
+                _treeContainer.Add(emptyLabel);
                 UpdateStatus();
                 return;
             }
 
-            var rootNodes = workingCopy.GetRootNodes();
+            var rootNodes = _workingCopy.GetRootNodes();
             
             if (rootNodes.Count == 0)
             {
                 var emptyLabel = new Label("📝 No tags defined.\n\nClick '+ Add Root Tag' to create your first tag.");
                 emptyLabel.AddToClassList("empty-label");
-                treeContainer.Add(emptyLabel);
+                _treeContainer.Add(emptyLabel);
             }
             else
             {
-                BuildTreeItems(rootNodes, "", 0, treeContainer);
+                BuildTreeItems(rootNodes, "", 0, _treeContainer);
             }
 
             UpdateStatus();
@@ -335,8 +400,8 @@ namespace Air.GameplayTag.Editor
                     ? node.tagName 
                     : parentPath + "." + node.tagName;
 
-                bool matchesFilter = string.IsNullOrEmpty(searchQuery) || 
-                                   fullPath.IndexOf(searchQuery, System.StringComparison.OrdinalIgnoreCase) >= 0;
+                bool matchesFilter = string.IsNullOrEmpty(_searchQuery) || 
+                                   fullPath.IndexOf(_searchQuery, System.StringComparison.OrdinalIgnoreCase) >= 0;
 
                 if (!matchesFilter && !HasMatchingChildren(node, fullPath))
                     continue;
@@ -353,13 +418,13 @@ namespace Air.GameplayTag.Editor
 
         private bool HasMatchingChildren(GameplayTagDatabase.TagNode node, string parentPath)
         {
-            if (string.IsNullOrEmpty(searchQuery))
+            if (string.IsNullOrEmpty(_searchQuery))
                 return false;
 
             foreach (var child in node.children)
             {
                 string fullPath = parentPath + "." + child.tagName;
-                if (fullPath.IndexOf(searchQuery, System.StringComparison.OrdinalIgnoreCase) >= 0)
+                if (fullPath.IndexOf(_searchQuery, System.StringComparison.OrdinalIgnoreCase) >= 0)
                     return true;
 
                 if (HasMatchingChildren(child, fullPath))
@@ -371,38 +436,38 @@ namespace Air.GameplayTag.Editor
 
         private void UpdateStatus()
         {
-            if (workingCopy == null)
+            if (_workingCopy == null)
             {
-                statusLabel.text = "❌ No database loaded";
+                _statusLabel.text = "❌ No database loaded";
                 return;
             }
 
-            var allTags = workingCopy.GetAllTags();
-            string dbName = database != null ? database.name : "Working Copy";
-            string status = hasUnsavedChanges ? " | ⚠️ Unsaved Changes" : " | ✅ Saved";
-            statusLabel.text = $"📊 Total Tags: {allTags.Count}  |  📁 {dbName}{status}";
+            var allTags = _workingCopy.GetAllTags();
+            string dbName = _database != null ? _database.name : "Working Copy";
+            string status = _hasUnsavedChanges ? " | ⚠️ Unsaved Changes" : " | ✅ Saved";
+            _statusLabel.text = $"📊 Total Tags: {allTags.Count}  |  📁 {dbName}{status}";
         }
 
         public void StartRenaming(TagTreeItem item)
         {
-            if (renamingItem != null && renamingItem != item)
+            if (_renamingItem != null && _renamingItem != item)
             {
-                renamingItem.CancelRename();
+                _renamingItem.CancelRename();
             }
-            renamingItem = item;
+            _renamingItem = item;
         }
 
         public void FinishRenaming(TagTreeItem item, string newName)
         {
-            if (renamingItem == item)
+            if (_renamingItem == item)
             {
-                renamingItem = null;
+                _renamingItem = null;
             }
         }
 
         public void ShowAddTagDialog(string parentPath)
         {
-            if (workingCopy == null)
+            if (_workingCopy == null)
             {
                 EditorUtility.DisplayDialog("Error", "No database loaded!", "OK");
                 return;
@@ -419,8 +484,8 @@ namespace Air.GameplayTag.Editor
                     return;
 
                 bool success = string.IsNullOrEmpty(parentPath)
-                    ? workingCopy.AddChildTag("", tagName)
-                    : workingCopy.AddChildTag(parentPath, tagName);
+                    ? _workingCopy.AddChildTag("", tagName)
+                    : _workingCopy.AddChildTag(parentPath, tagName);
 
                 if (success)
                 {
@@ -436,7 +501,7 @@ namespace Air.GameplayTag.Editor
 
         public void DeleteTag(string fullPath, bool hasChildren)
         {
-            if (workingCopy == null)
+            if (_workingCopy == null)
                 return;
 
             string message = hasChildren
@@ -445,7 +510,7 @@ namespace Air.GameplayTag.Editor
             
             if (EditorUtility.DisplayDialog("Delete Tag", message, "Delete", "Cancel"))
             {
-                if (workingCopy.RemoveTag(fullPath))
+                if (_workingCopy.RemoveTag(fullPath))
                 {
                     MarkAsModified();
                     RefreshTree();
@@ -455,7 +520,7 @@ namespace Air.GameplayTag.Editor
 
         public GameplayTagDatabase GetDatabase()
         {
-            return workingCopy;
+            return _workingCopy;
         }
 
         private void LoadStyleSheet()
@@ -467,7 +532,7 @@ namespace Air.GameplayTag.Editor
                 var styleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>(path);
                 if (styleSheet != null)
                 {
-                    root.styleSheets.Add(styleSheet);
+                    _root.styleSheets.Add(styleSheet);
                 }
             }
         }

@@ -1,6 +1,6 @@
 using System;
 
-namespace StateMachine
+namespace Air.GameCore.StateMachine
 {
     public class StateMachine
     {

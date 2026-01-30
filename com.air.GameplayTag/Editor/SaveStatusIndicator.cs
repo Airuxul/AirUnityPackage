@@ -1,4 +1,3 @@
-using UnityEngine;
 using UnityEditor;
 
 namespace Air.GameplayTag.Editor
@@ -9,8 +8,8 @@ namespace Air.GameplayTag.Editor
     [InitializeOnLoad]
     public static class SaveStatusIndicator
     {
-        private static double lastSaveTime;
-        private static string lastSavedTag = "";
+        private static double _lastSaveTime;
+        private static string _lastSavedTag = "";
 
         static SaveStatusIndicator()
         {
@@ -19,14 +18,14 @@ namespace Air.GameplayTag.Editor
 
         public static void NotifySaved(string tagInfo)
         {
-            lastSaveTime = EditorApplication.timeSinceStartup;
-            lastSavedTag = tagInfo;
+            _lastSaveTime = EditorApplication.timeSinceStartup;
+            _lastSavedTag = tagInfo;
         }
 
         private static void OnEditorUpdate()
         {
             // 在保存后的3秒内显示提示
-            if (EditorApplication.timeSinceStartup - lastSaveTime < 3.0 && !string.IsNullOrEmpty(lastSavedTag))
+            if (EditorApplication.timeSinceStartup - _lastSaveTime < 3.0 && !string.IsNullOrEmpty(_lastSavedTag))
             {
                 // 这个会在 Scene 视图显示
                 SceneView.RepaintAll();

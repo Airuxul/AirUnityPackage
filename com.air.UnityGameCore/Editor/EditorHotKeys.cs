@@ -5,7 +5,7 @@ using UnityEditor.SceneManagement;
 using UnityEditor.ShortcutManagement;
 using UnityEngine;
 
-namespace UnityGameCore.Editor
+namespace Air.UnityGameCore.Editor
 {
     public static class EditorHotKeys
     {

@@ -1,6 +1,6 @@
 using System;
 
-namespace UnityGameCore.Runtime.Time {
+namespace Air.UnityGameCore.Runtime.Time {
     /// <summary>
     /// Countdown timer that fires an event every interval until completion.
     /// </summary>

@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.UIElements;
-using Air.GameplayTag;
 
 namespace Air.GameplayTag.Editor
 {
@@ -10,29 +9,29 @@ namespace Air.GameplayTag.Editor
     /// </summary>
     public class TagTreeItem : VisualElement
     {
-        private GameplayTagDatabase.TagNode node;
-        private string fullPath;
-        private int depth;
-        private GameplayTagManagerWindow window;
-        private Label nameLabel;
-        private TextField nameField;
-        private Button foldoutButton;
-        private bool isExpanded;
-        private bool isRenaming = false;
-        private Label pathLabel;
-        private VisualElement buttonContainer;
+        private readonly GameplayTagDatabase.TagNode _node;
+        private readonly string _fullPath;
+        private int _depth;
+        private readonly GameplayTagManagerWindow _window;
+        private Label _nameLabel;
+        private TextField _nameField;
+        private Button _foldoutButton;
+        private bool _isExpanded;
+        private bool _isRenaming;
+        private Label _pathLabel;
+        private VisualElement _buttonContainer;
 
         private const string ExpandedKey = "TagExpanded_";
 
-        public bool IsExpanded => isExpanded;
+        public bool IsExpanded => _isExpanded;
 
         public TagTreeItem(GameplayTagDatabase.TagNode node, string fullPath, int depth, GameplayTagManagerWindow window)
         {
-            this.node = node;
-            this.fullPath = fullPath;
-            this.depth = depth;
-            this.window = window;
-            this.isExpanded = EditorPrefs.GetBool(ExpandedKey + fullPath, true);
+            _node = node;
+            _fullPath = fullPath;
+            _depth = depth;
+            _window = window;
+            _isExpanded = EditorPrefs.GetBool(ExpandedKey + fullPath, true);
 
             AddToClassList("tag-item");
             style.paddingLeft = depth * 20;
@@ -45,13 +44,13 @@ namespace Air.GameplayTag.Editor
             var container = new VisualElement();
             container.AddToClassList("tag-item-container");
 
-            bool hasChildren = node.children.Count > 0;
+            bool hasChildren = _node.children.Count > 0;
             if (hasChildren)
             {
-                foldoutButton = new Button(ToggleFoldout);
-                foldoutButton.AddToClassList("foldout-button");
-                foldoutButton.text = isExpanded ? "▼" : "▶";
-                container.Add(foldoutButton);
+                _foldoutButton = new Button(ToggleFoldout);
+                _foldoutButton.AddToClassList("foldout-button");
+                _foldoutButton.text = _isExpanded ? "▼" : "▶";
+                container.Add(_foldoutButton);
             }
             else
             {
@@ -63,61 +62,62 @@ namespace Air.GameplayTag.Editor
             var nameContainer = new VisualElement();
             nameContainer.AddToClassList("name-container");
 
-            nameLabel = new Label(node.tagName);
-            nameLabel.AddToClassList("name-label");
+            _nameLabel = new Label(_node.tagName);
+            _nameLabel.AddToClassList("name-label");
             if (hasChildren)
             {
-                nameLabel.AddToClassList("has-children");
+                _nameLabel.AddToClassList("has-children");
             }
-            nameContainer.Add(nameLabel);
+            nameContainer.Add(_nameLabel);
 
-            nameField = new TextField();
-            nameField.AddToClassList("name-field");
-            nameField.style.display = DisplayStyle.None;
-            nameField.RegisterCallback<BlurEvent>(evt => SaveRename());
-            nameField.RegisterCallback<KeyDownEvent>(evt =>
+            _nameField = new TextField();
+            _nameField.AddToClassList("name-field");
+            _nameField.style.display = DisplayStyle.None;
+            _nameField.RegisterCallback<BlurEvent>(_ => SaveRename());
+            _nameField.RegisterCallback<KeyDownEvent>(evt =>
             {
-                if (evt.keyCode == KeyCode.Return || evt.keyCode == KeyCode.KeypadEnter)
+                switch (evt.keyCode)
                 {
-                    SaveRename();
-                    evt.StopPropagation();
-                }
-                else if (evt.keyCode == KeyCode.Escape)
-                {
-                    CancelRename();
-                    evt.StopPropagation();
+                    case KeyCode.Return or KeyCode.KeypadEnter:
+                        SaveRename();
+                        evt.StopPropagation();
+                        break;
+                    case KeyCode.Escape:
+                        CancelRename();
+                        evt.StopPropagation();
+                        break;
                 }
             });
-            nameContainer.Add(nameField);
+            nameContainer.Add(_nameField);
 
-            pathLabel = new Label(fullPath);
-            pathLabel.AddToClassList("path-hint");
-            nameContainer.Add(pathLabel);
+            _pathLabel = new Label(_fullPath);
+            _pathLabel.AddToClassList("path-hint");
+            nameContainer.Add(_pathLabel);
 
             container.Add(nameContainer);
 
-            buttonContainer = new VisualElement();
-            buttonContainer.AddToClassList("button-container");
+            _buttonContainer = new VisualElement();
+            _buttonContainer.AddToClassList("button-container");
 
-            var addButton = new Button(() => window.ShowAddTagDialog(fullPath));
+            var addButton = new Button(() => _window.ShowAddTagDialog(_fullPath));
             addButton.AddToClassList("action-button");
             addButton.AddToClassList("add-button");
             addButton.text = "+";
             addButton.tooltip = "Add child tag";
-            buttonContainer.Add(addButton);
+            _buttonContainer.Add(addButton);
 
-            var deleteButton = new Button(() => window.DeleteTag(fullPath, node.children.Count > 0));
+            var deleteButton = new Button(() => _window.DeleteTag(_fullPath, _node.children.Count > 0));
             deleteButton.AddToClassList("action-button");
             deleteButton.AddToClassList("delete-button");
             deleteButton.text = "×";
             deleteButton.tooltip = "Delete tag";
-            buttonContainer.Add(deleteButton);
+            _buttonContainer.Add(deleteButton);
 
-            container.Add(buttonContainer);
+            container.Add(_buttonContainer);
 
             Add(container);
 
-            nameLabel.RegisterCallback<MouseDownEvent>(evt =>
+            _nameLabel.RegisterCallback<MouseDownEvent>(evt =>
             {
                 if (evt.clickCount == 2 && evt.button == 0)
                 {
@@ -128,73 +128,73 @@ namespace Air.GameplayTag.Editor
 
             this.RegisterCallback<ContextualMenuPopulateEvent>(evt =>
             {
-                evt.menu.AppendAction("Add Child Tag", a => window.ShowAddTagDialog(fullPath));
-                evt.menu.AppendAction("Rename", a => StartRename());
+                evt.menu.AppendAction("Add Child Tag", _ => _window.ShowAddTagDialog(_fullPath));
+                evt.menu.AppendAction("Rename", _ => StartRename());
                 evt.menu.AppendSeparator();
-                evt.menu.AppendAction("Copy Full Path", a => 
+                evt.menu.AppendAction("Copy Full Path", _ => 
                 {
-                    EditorGUIUtility.systemCopyBuffer = fullPath;
-                    Debug.Log($"Copied to clipboard: {fullPath}");
+                    EditorGUIUtility.systemCopyBuffer = _fullPath;
+                    Debug.Log($"Copied to clipboard: {_fullPath}");
                 });
                 evt.menu.AppendSeparator();
                 
-                string deleteLabel = node.children.Count > 0 ? "Delete (with children)" : "Delete";
-                evt.menu.AppendAction(deleteLabel, a => window.DeleteTag(fullPath, node.children.Count > 0));
+                string deleteLabel = _node.children.Count > 0 ? "Delete (with children)" : "Delete";
+                evt.menu.AppendAction(deleteLabel, _ => _window.DeleteTag(_fullPath, _node.children.Count > 0));
             });
         }
 
         private void ToggleFoldout()
         {
-            isExpanded = !isExpanded;
-            EditorPrefs.SetBool(ExpandedKey + fullPath, isExpanded);
-            foldoutButton.text = isExpanded ? "▼" : "▶";
-            window.RefreshTree();
+            _isExpanded = !_isExpanded;
+            EditorPrefs.SetBool(ExpandedKey + _fullPath, _isExpanded);
+            _foldoutButton.text = _isExpanded ? "▼" : "▶";
+            _window.RefreshTree();
         }
 
         private void StartRename()
         {
-            if (isRenaming)
+            if (_isRenaming)
                 return;
 
-            isRenaming = true;
-            window.StartRenaming(this);
+            _isRenaming = true;
+            _window.StartRenaming(this);
 
-            nameLabel.style.display = DisplayStyle.None;
-            nameField.style.display = DisplayStyle.Flex;
-            nameField.value = node.tagName;
-            nameField.Focus();
-            nameField.SelectAll();
+            _nameLabel.style.display = DisplayStyle.None;
+            _nameField.style.display = DisplayStyle.Flex;
+            _nameField.value = _node.tagName;
+            _nameField.Focus();
+            _nameField.SelectAll();
         }
 
         public void CancelRename()
         {
-            if (!isRenaming)
+            if (!_isRenaming)
                 return;
 
-            isRenaming = false;
-            nameLabel.style.display = DisplayStyle.Flex;
-            nameField.style.display = DisplayStyle.None;
-            window.FinishRenaming(this, null);
+            _isRenaming = false;
+            _nameLabel.style.display = DisplayStyle.Flex;
+            _nameField.style.display = DisplayStyle.None;
+            _window.FinishRenaming(this, null);
         }
 
         private void SaveRename()
         {
-            if (!isRenaming)
+            if (!_isRenaming)
                 return;
 
-            string newName = nameField.value;
-            if (string.IsNullOrEmpty(newName) || newName == node.tagName)
+            string newName = _nameField.value;
+            if (string.IsNullOrEmpty(newName) || newName == _node.tagName)
             {
                 CancelRename();
                 return;
             }
 
-            var database = window.GetDatabase();
-            if (database.RenameTag(fullPath, newName))
+            var database = _window.GetDatabase();
+            if (database.RenameTag(_fullPath, newName))
             {
-                isRenaming = false;
-                window.FinishRenaming(this, newName);
-                window.RefreshTree();
+                _isRenaming = false;
+                _window.FinishRenaming(this, newName);
+                _window.RefreshTree();
             }
             else
             {

@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEditor;
-using Air.GameplayTag;
 
 namespace Air.GameplayTag.Editor
 {
