@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Air.UnityGameCore.Runtime.UI
 {
@@ -19,23 +18,31 @@ namespace Air.UnityGameCore.Runtime.UI
         }
 
         [SerializeField]
-        protected List<UIComponent> childs;
+        protected List<UIComponent> childs = new();
+
+        public List<UIComponent> Childs
+        {
+            get => childs;
+            set => childs = value;
+        }
 
         public bool IsInit { get; set; }
         public bool IsDestoryed { get; set; }
-        public UIConfig UIConfig { get; set; }
+
         public UIShowParam UIShowParam { get; set; }
 
         #region UI生命周期
-
         public void Init()
         {
             if (IsInit) return;
             IsInit = true;
             IsDestoryed = false;
-            foreach (var child in childs)
+            if (childs != null)
             {
-                child.Init();   
+                foreach (var child in Childs)
+                {
+                    child?.Init();
+                }
             }
             OnUIInit();
         }
@@ -43,9 +50,12 @@ namespace Air.UnityGameCore.Runtime.UI
         public void Show(UIShowParam param)
         {
             UIShowParam = param;
-            foreach (var child in childs)
+            if (childs != null)
             {
-                child.Show(param);
+                foreach (var child in Childs)
+                {
+                    child?.Show(param);
+                }
             }
             OnUIShow(param);
         }
@@ -53,9 +63,12 @@ namespace Air.UnityGameCore.Runtime.UI
         public void Hide()
         {
             OnUIHide();
-            foreach (var child in childs)
+            if (childs != null)
             {
-                child.Hide();
+                foreach (var child in Childs)
+                {
+                    child?.Hide();
+                }
             }
         }
 
@@ -64,9 +77,12 @@ namespace Air.UnityGameCore.Runtime.UI
             OnUIDestory();
             IsInit = false;
             IsDestoryed = true;
-            foreach (var child in childs)
+            if (childs != null)
             {
-                child.Destory();
+                foreach (var child in Childs)
+                {
+                    child?.Destory();
+                }
             }
         }
 

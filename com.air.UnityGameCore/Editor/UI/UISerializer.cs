@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using UnityEditor;
@@ -103,10 +104,19 @@ namespace Air.UnityGameCore.Editor.UI
             foreach (var field in fields)
             {
                 if (field.GetCustomAttribute<SerializeField>() == null) continue;
-                // 只清空引用类型字段（Component派生类）
-                if (!typeof(Component).IsAssignableFrom(field.FieldType)) continue;
-                field.SetValue(uiComponent, null);
-                clearedCount++;
+                
+                // 清空Component类型字段
+                if (typeof(Component).IsAssignableFrom(field.FieldType))
+                {
+                    field.SetValue(uiComponent, null);
+                    clearedCount++;
+                }
+                // 清空List<UIComponent>类型字段
+                else if (IsListOfUIComponent(field.FieldType))
+                {
+                    field.SetValue(uiComponent, null);
+                    clearedCount++;
+                }
             }
             
             Debug.Log($"Cleared {clearedCount} field references from {uiComponent.GetType().Name}");
@@ -141,10 +151,51 @@ namespace Air.UnityGameCore.Editor.UI
                 }
             }
 
+            // 绑定UIComponent基类的childs字段
+            BindBaseChildsField(uiComponent);
+
             uiComponent.BindParentUIComponent();
             
             Debug.Log($"Binding complete for {componentType.Name}: {boundCount} bound, {failedCount} failed");
             EditorUtility.SetDirty(uiComponent);
+        }
+        
+        /// <summary>
+        /// 绑定UIComponent基类的childs字段
+        /// </summary>
+        /// <param name="uiComponent">UI组件实例</param>
+        private static void BindBaseChildsField(UIComponent uiComponent)
+        {
+            // 获取基类UIComponent中的childs字段
+            FieldInfo childsField = typeof(UIComponent).GetField("childs", 
+                BindingFlags.NonPublic | BindingFlags.Instance);
+            
+            if (childsField == null)
+            {
+                Debug.LogWarning("Could not find childs field in UIComponent base class");
+                return;
+            }
+            
+            // 收集所有直接子UIComponent
+            List<UIComponent> childsList = new List<UIComponent>();
+            Transform transform = uiComponent.transform;
+            
+            for (int i = 0; i < transform.childCount; i++)
+            {
+                Transform child = transform.GetChild(i);
+                if (child.TryGetComponent<UIComponent>(out var childUIComponent))
+                {
+                    childsList.Add(childUIComponent);
+                }
+            }
+            
+            // 设置childs字段值
+            childsField.SetValue(uiComponent, childsList);
+            
+            if (childsList.Count > 0)
+            {
+                Debug.Log($"Bound base childs field with {childsList.Count} child UIComponents");
+            }
         }
 
         public static EBindStatus BindUIComponentField(this UIComponent uiComponent, FieldInfo fieldInfo)
@@ -156,6 +207,12 @@ namespace Air.UnityGameCore.Editor.UI
                 
             string fieldName = fieldInfo.Name;
             Type fieldType = fieldInfo.FieldType;
+            
+            // 跳过Childs列表字段，这些字段会在绑定UIComponent字段时自动处理
+            if (fieldName.EndsWith("Childs") && IsListOfUIComponent(fieldType))
+            {
+                return EBindStatus.Skip;
+            }
                     
             // 只处理Component类型的字段
             if (!typeof(Component).IsAssignableFrom(fieldType))
@@ -178,13 +235,76 @@ namespace Air.UnityGameCore.Editor.UI
             fieldInfo.SetValue(uiComponent, foundComponent);
             Debug.Log($"Bound field {fieldName} ({fieldType.Name}) to {foundComponent.name}");
                             
-            // 如果绑定的是UIComponent类型，设置其parent字段为当前组件
+            // 如果绑定的是UIComponent类型，设置其parent字段为当前组件，并处理Childs列表
             if (foundComponent is UIComponent childUIComponent)
             {
                 SetParentField(childUIComponent, uiComponent);
+                
+                // 查找并绑定对应的Childs列表字段
+                BindChildsListField(uiComponent, fieldName, childUIComponent);
             }
 
             return EBindStatus.Success;
+        }
+        
+        /// <summary>
+        /// 检查类型是否为List&lt;UIComponent&gt;
+        /// </summary>
+        private static bool IsListOfUIComponent(Type fieldType)
+        {
+            if (!fieldType.IsGenericType) return false;
+            if (fieldType.GetGenericTypeDefinition() != typeof(List<>)) return false;
+            
+            Type genericArg = fieldType.GetGenericArguments()[0];
+            return genericArg == typeof(UIComponent) || genericArg.IsSubclassOf(typeof(UIComponent));
+        }
+        
+        /// <summary>
+        /// 绑定UIComponent的Childs列表字段
+        /// </summary>
+        /// <param name="parentComponent">父组件</param>
+        /// <param name="uiComponentFieldName">UIComponent字段名</param>
+        /// <param name="childUIComponent">子UIComponent实例</param>
+        private static void BindChildsListField(UIComponent parentComponent, string uiComponentFieldName, UIComponent childUIComponent)
+        {
+            // 查找对应的Childs字段（命名规则：uiComponentFieldName + "Childs"）
+            string childsFieldName = uiComponentFieldName + "Childs";
+            
+            Type parentType = parentComponent.GetType();
+            FieldInfo childsField = parentType.GetField(childsFieldName, BindingFlags.NonPublic | BindingFlags.Instance);
+            
+            if (childsField == null)
+            {
+                // 没有对应的Childs字段，跳过
+                return;
+            }
+            
+            if (!IsListOfUIComponent(childsField.FieldType))
+            {
+                Debug.LogWarning($"Field {childsFieldName} is not of type List<UIComponent>");
+                return;
+            }
+            
+            // 收集子UIComponent的所有直接子UIComponent
+            List<UIComponent> childsList = new List<UIComponent>();
+            Transform childTransform = childUIComponent.transform;
+            
+            for (int i = 0; i < childTransform.childCount; i++)
+            {
+                Transform grandChild = childTransform.GetChild(i);
+                if (grandChild.TryGetComponent<UIComponent>(out var grandChildUIComponent))
+                {
+                    childsList.Add(grandChildUIComponent);
+                }
+            }
+            
+            // 设置Childs字段值
+            childsField.SetValue(parentComponent, childsList);
+            
+            if (childsList.Count > 0)
+            {
+                Debug.Log($"Bound {childsFieldName} with {childsList.Count} child UIComponents");
+            }
         }
         
         public static void BindParentUIComponent(this UIComponent uiComponent)

@@ -34,11 +34,6 @@ namespace Air.UnityGameCore.Editor.AssetDependency
                         hasChanges = true;
                     }
                 }
-                
-                if (importedAssets.Length > 0)
-                {
-                    Debug.Log($"[AssetDependencyCache] 增量更新: {importedAssets.Length} 个导入资源");
-                }
             }
             
             // 处理删除的资源
@@ -49,8 +44,6 @@ namespace Air.UnityGameCore.Editor.AssetDependency
                     AssetDependencyCache.Instance.RemoveAsset(assetPath);
                     hasChanges = true;
                 }
-                
-                Debug.Log($"[AssetDependencyCache] 移除: {deletedAssets.Length} 个已删除资源");
             }
             
             // 处理移动的资源
@@ -72,8 +65,6 @@ namespace Air.UnityGameCore.Editor.AssetDependency
                     
                     hasChanges = true;
                 }
-                
-                Debug.Log($"[AssetDependencyCache] 移动: {movedAssets.Length} 个资源");
             }
             
             // 保存缓存
@@ -116,15 +107,6 @@ namespace Air.UnityGameCore.Editor.AssetDependency
     {
         static AssetDependencyCacheInitializer()
         {
-            // 延迟初始化，避免阻塞编辑器启动
-            EditorApplication.delayCall += () =>
-            {
-                if (AssetDependencyCache.Instance.IsInitialized)
-                {
-                    Debug.Log("[AssetDependencyCache] 缓存系统已初始化");
-                }
-            };
-            
             // 编辑器退出时保存缓存
             EditorApplication.quitting += () =>
             {

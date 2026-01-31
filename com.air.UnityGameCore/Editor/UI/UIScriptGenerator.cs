@@ -356,7 +356,7 @@ namespace Air.UnityGameCore.Editor.UI
         private static string GetLogicTemplatePath(UIType uiType)
         {
             var info = UITypeConfig.GetInfo(uiType);
-            return Path.Combine("Packages/com.air.UnityGameCore/Editor/UI/Templates/", info.TemplateFileName);
+            return FindTemplateFile(info.TemplateFileName);
         }
 
         /// <summary>
@@ -365,7 +365,29 @@ namespace Air.UnityGameCore.Editor.UI
         /// <returns>设计器脚本模板文件路径</returns>
         private static string GetDesignerTemplatePath()
         {
-            return Path.Combine("Packages/com.air.UnityGameCore/Editor/UI/Templates/", "UIDesignerTemplate.txt");
+            return FindTemplateFile("UIDesignerTemplate.txt");
+        }
+        
+        /// <summary>
+        /// 查找模板文件的实际路径
+        /// </summary>
+        /// <param name="templateFileName">模板文件名</param>
+        /// <returns>模板文件的完整路径</returns>
+        private static string FindTemplateFile(string templateFileName)
+        {
+            // 使用AssetDatabase查找模板文件
+            string[] guids = AssetDatabase.FindAssets(Path.GetFileNameWithoutExtension(templateFileName) + " t:TextAsset");
+            
+            foreach (string guid in guids)
+            {
+                string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+                if (assetPath.Contains("Templates") && assetPath.EndsWith(templateFileName))
+                {
+                    return Path.GetFullPath(assetPath);
+                }
+            }
+            
+            throw new FileNotFoundException($"Could not find template file: {templateFileName}. Please ensure the template exists in the Templates folder.");
         }
 
         /// <summary>

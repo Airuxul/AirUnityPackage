@@ -276,7 +276,6 @@ namespace Air.UnityGameCore.Editor.AssetDependency
             // 确保缓存已初始化
             if (_database.AssetCache.Count == 0)
             {
-                Debug.Log("[AssetDependencyCache] 缓存为空，跳过增量更新");
                 return;
             }
             
