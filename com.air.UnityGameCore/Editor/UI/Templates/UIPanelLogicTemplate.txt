@@ -9,37 +9,5 @@ namespace Air.UnityGameCore.Generated.Panel
     /// </summary>
     public partial class #CLASSNAME# : UIPanel
     {
-        protected override void Awake()
-        {
-            base.Awake();
-        }
-
-        public override void OnInit()
-        {
-            base.OnInit();
-            // TODO: Initialize logic here
-        }
-
-        public override void OnShow()
-        {
-            base.OnShow();
-            // TODO: Show logic here
-        }
-
-        public override void OnHide()
-        {
-            base.OnHide();
-            // TODO: Hide logic here
-        }
-
-        private void InitEventListeners()
-        {
-            // TODO: Add event listeners here
-        }
-
-        private void RemoveEventListeners()
-        {
-            // TODO: Remove event listeners here
-        }
     }
 }

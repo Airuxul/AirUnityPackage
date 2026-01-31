@@ -268,11 +268,6 @@ namespace Air.UnityGameCore.Runtime.Pool
             return instance;
         }
 
-        public void Release(T instance)
-        {
-            base.Release(instance);
-        }
-
         void IComponentPool.Release(Component component)
         {
             if (component == null) return;
@@ -306,11 +301,11 @@ namespace Air.UnityGameCore.Runtime.Pool
 
     public static class PoolManager
     {
-        private static readonly Dictionary<string, IPool> _objectPools = new();
-        private static readonly Dictionary<PoolKey, GameObjectPool> _gameObjectPools = new();
-        private static readonly Dictionary<int, GameObjectPool> _gameObjectInstanceToPool = new();
-        private static readonly Dictionary<PoolKey, IComponentPool> _componentPools = new();
-        private static readonly Dictionary<int, IComponentPool> _componentInstanceToPool = new();
+        private static readonly Dictionary<string, IPool> ObjectPools = new();
+        private static readonly Dictionary<PoolKey, GameObjectPool> GameObjectPools = new();
+        private static readonly Dictionary<int, GameObjectPool> GameObjectInstanceToPool = new();
+        private static readonly Dictionary<PoolKey, IComponentPool> ComponentPools = new();
+        private static readonly Dictionary<int, IComponentPool> ComponentInstanceToPool = new();
 
         public static ObjectPool<T> GetOrCreatePool<T>(
             string key = null,
@@ -323,12 +318,12 @@ namespace Air.UnityGameCore.Runtime.Pool
             bool collectionCheck = false)
         {
             var poolKey = BuildKey<T>(key);
-            if (_objectPools.TryGetValue(poolKey, out var pool))
+            if (ObjectPools.TryGetValue(poolKey, out var pool))
                 return (ObjectPool<T>)pool;
 
             createFunc ??= GetDefaultFactory<T>();
             var newPool = new ObjectPool<T>(createFunc, onGet, onRelease, onDestroy, defaultCapacity, maxSize, collectionCheck);
-            _objectPools[poolKey] = newPool;
+            ObjectPools[poolKey] = newPool;
             return newPool;
         }
 
@@ -343,7 +338,7 @@ namespace Air.UnityGameCore.Runtime.Pool
             var poolKey = BuildKey<T>(key);
             ObjectPool<T> pool;
 
-            if (_objectPools.TryGetValue(poolKey, out var existing))
+            if (ObjectPools.TryGetValue(poolKey, out var existing))
             {
                 pool = (ObjectPool<T>)existing;
             }
@@ -368,7 +363,7 @@ namespace Air.UnityGameCore.Runtime.Pool
         {
             if (instance == null) return;
 
-            if (_gameObjectInstanceToPool.TryGetValue(instance.GetInstanceID(), out var pool))
+            if (GameObjectInstanceToPool.TryGetValue(instance.GetInstanceID(), out var pool))
             {
                 pool.ReleaseInstance(instance);
             }
@@ -389,7 +384,7 @@ namespace Air.UnityGameCore.Runtime.Pool
         {
             if (component == null) return;
 
-            if (_componentInstanceToPool.TryGetValue(component.GetInstanceID(), out var pool))
+            if (ComponentInstanceToPool.TryGetValue(component.GetInstanceID(), out var pool))
             {
                 pool.Release(component);
             }
@@ -402,20 +397,20 @@ namespace Air.UnityGameCore.Runtime.Pool
 
         public static void ClearAll()
         {
-            foreach (var pool in _objectPools.Values)
+            foreach (var pool in ObjectPools.Values)
                 pool.Clear();
 
-            foreach (var pool in _gameObjectPools.Values)
+            foreach (var pool in GameObjectPools.Values)
                 pool.Clear();
 
-            foreach (var pool in _componentPools.Values)
+            foreach (var pool in ComponentPools.Values)
                 pool.Clear();
 
-            _objectPools.Clear();
-            _gameObjectPools.Clear();
-            _componentPools.Clear();
-            _gameObjectInstanceToPool.Clear();
-            _componentInstanceToPool.Clear();
+            ObjectPools.Clear();
+            GameObjectPools.Clear();
+            ComponentPools.Clear();
+            GameObjectInstanceToPool.Clear();
+            ComponentInstanceToPool.Clear();
         }
 
         private static string BuildKey<T>(string key)
@@ -428,11 +423,11 @@ namespace Air.UnityGameCore.Runtime.Pool
             if (prefab == null) throw new ArgumentNullException(nameof(prefab));
 
             var key = new PoolKey(prefab.GetInstanceID(), parent == null ? 0 : parent.GetInstanceID());
-            if (_gameObjectPools.TryGetValue(key, out var pool))
+            if (GameObjectPools.TryGetValue(key, out var pool))
                 return pool;
 
             var newPool = new GameObjectPool(prefab, parent, RegisterGameObjectInstance, ForgetGameObjectInstance, defaultCapacity, maxSize, collectionCheck);
-            _gameObjectPools[key] = newPool;
+            GameObjectPools[key] = newPool;
             return newPool;
         }
 
@@ -441,36 +436,36 @@ namespace Air.UnityGameCore.Runtime.Pool
             if (prefab == null) throw new ArgumentNullException(nameof(prefab));
 
             var key = new PoolKey(prefab.GetInstanceID(), parent == null ? 0 : parent.GetInstanceID());
-            if (_componentPools.TryGetValue(key, out var pool))
+            if (ComponentPools.TryGetValue(key, out var pool))
                 return (ComponentPool<T>)pool;
 
             var newPool = new ComponentPool<T>(prefab, parent, RegisterComponentInstance, ForgetComponentInstance, defaultCapacity, maxSize, collectionCheck);
-            _componentPools[key] = newPool;
+            ComponentPools[key] = newPool;
             return newPool;
         }
 
         private static void RegisterGameObjectInstance(GameObject instance, GameObjectPool pool)
         {
             if (instance == null || pool == null) return;
-            _gameObjectInstanceToPool[instance.GetInstanceID()] = pool;
+            GameObjectInstanceToPool[instance.GetInstanceID()] = pool;
         }
 
         private static void ForgetGameObjectInstance(GameObject instance, GameObjectPool pool)
         {
             if (instance == null) return;
-            _gameObjectInstanceToPool.Remove(instance.GetInstanceID());
+            GameObjectInstanceToPool.Remove(instance.GetInstanceID());
         }
 
         private static void RegisterComponentInstance(Component component, IComponentPool pool)
         {
             if (component == null || pool == null) return;
-            _componentInstanceToPool[component.GetInstanceID()] = pool;
+            ComponentInstanceToPool[component.GetInstanceID()] = pool;
         }
 
         private static void ForgetComponentInstance(Component component, IComponentPool pool)
         {
             if (component == null) return;
-            _componentInstanceToPool.Remove(component.GetInstanceID());
+            ComponentInstanceToPool.Remove(component.GetInstanceID());
         }
 
         private static Func<T> GetDefaultFactory<T>()

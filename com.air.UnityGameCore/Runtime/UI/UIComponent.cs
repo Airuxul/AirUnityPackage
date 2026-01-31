@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Air.UnityGameCore.Runtime.UI
 {
@@ -7,65 +9,78 @@ namespace Air.UnityGameCore.Runtime.UI
     /// </summary>
     public abstract class UIComponent : MonoBehaviour
     {
-        /// <summary>
-        /// 组件是否已初始化
-        /// </summary>
-        protected bool IsInitialized { get; private set; }
-
-        [SerializeField] private UIComponent parent;
+        [SerializeField] 
+        private UIComponent parent;
 
         public UIComponent Parent
         {
             set => parent = value;
             get => parent;
         }
-        
-        #region Unity生命周期
 
-        protected virtual void Awake()
-        {
-            // 子类可以重写此方法进行初始化
-            OnInit();
-        }
+        [SerializeField]
+        protected List<UIComponent> childs;
 
-        protected virtual void Start()
-        {
-            // 子类可以重写此方法进行启动逻辑
-        }
-
-        protected virtual void OnEnable()
-        {
-            // 子类可以重写此方法进行启用逻辑
-        }
-
-        protected virtual void OnDisable()
-        {
-            // 子类可以重写此方法进行禁用逻辑
-        }
-
-        protected virtual void OnDestroy()
-        {
-            // 子类可以重写此方法进行清理逻辑
-        }
-
-        #endregion
+        public bool IsInit { get; set; }
+        public bool IsDestoryed { get; set; }
+        public UIConfig UIConfig { get; set; }
+        public UIShowParam UIShowParam { get; set; }
 
         #region UI生命周期
+
+        public void Init()
+        {
+            if (IsInit) return;
+            IsInit = true;
+            IsDestoryed = false;
+            foreach (var child in childs)
+            {
+                child.Init();   
+            }
+            OnUIInit();
+        }
+
+        public void Show(UIShowParam param)
+        {
+            UIShowParam = param;
+            foreach (var child in childs)
+            {
+                child.Show(param);
+            }
+            OnUIShow(param);
+        }
+
+        public void Hide()
+        {
+            OnUIHide();
+            foreach (var child in childs)
+            {
+                child.Hide();
+            }
+        }
+
+        public void Destory()
+        {
+            OnUIDestory();
+            IsInit = false;
+            IsDestoryed = true;
+            foreach (var child in childs)
+            {
+                child.Destory();
+            }
+        }
 
         /// <summary>
         /// 初始化UI组件
         /// </summary>
-        public virtual void OnInit()
+        protected virtual void OnUIInit()
         {
-            if (IsInitialized) return;
-            // 子类可以重写此方法进行初始化逻辑
-            IsInitialized = true;
         }
 
         /// <summary>
         /// 显示UI组件
         /// </summary>
-        public virtual void OnShow()
+        protected virtual void OnUIShow(UIShowParam param)
         {
             // 子类可以重写此方法进行显示逻辑
         }
@@ -73,11 +88,18 @@ namespace Air.UnityGameCore.Runtime.UI
         /// <summary>
         /// 隐藏UI组件
         /// </summary>
-        public virtual void OnHide()
+        protected virtual void OnUIHide()
         {
             // 子类可以重写此方法进行隐藏逻辑
         }
 
+        /// <summary>
+        /// 销毁UI组件
+        /// </summary>
+        protected virtual void OnUIDestory()
+        {
+            
+        }
         #endregion
     }
 }

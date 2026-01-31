@@ -339,7 +339,7 @@ namespace Air.UnityGameCore.Editor.UI
                 foreach (ComponentField field in fields)
                 {
                     // 为字段生成标准格式
-                    fieldsBuilder.AppendLine($"        [SerializeField] private {field.fieldType} {field.fieldName};");
+                    fieldsBuilder.AppendLine($"\t\t[SerializeField] private {field.fieldType} {field.fieldName};");
                 }
 
                 template = template.Replace("#FIELDS#", fieldsBuilder.ToString().TrimEnd());
@@ -356,7 +356,7 @@ namespace Air.UnityGameCore.Editor.UI
         private static string GetLogicTemplatePath(UIType uiType)
         {
             var info = UITypeConfig.GetInfo(uiType);
-            return Path.Combine("Packages/com.air.unity-game-core/Editor/UI/Templates/", info.TemplateFileName);
+            return Path.Combine("Packages/com.air.UnityGameCore/Editor/UI/Templates/", info.TemplateFileName);
         }
 
         /// <summary>
@@ -365,7 +365,7 @@ namespace Air.UnityGameCore.Editor.UI
         /// <returns>设计器脚本模板文件路径</returns>
         private static string GetDesignerTemplatePath()
         {
-            return Path.Combine("Packages/com.air.unity-game-core/Editor/UI/Templates/", "UIDesignerTemplate.txt");
+            return Path.Combine("Packages/com.air.UnityGameCore/Editor/UI/Templates/", "UIDesignerTemplate.txt");
         }
 
         /// <summary>

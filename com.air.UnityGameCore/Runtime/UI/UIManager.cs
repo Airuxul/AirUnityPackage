@@ -6,7 +6,7 @@ namespace Air.UnityGameCore.Runtime.UI
     {
         private Stack<UIPanel> _uiStack;
 
-        public void ShowPanel<T>() where T : UIPanel
+        public void ShowPanel<T>(UIConfig uiConfig) where T : UIPanel
         {
             
         }
