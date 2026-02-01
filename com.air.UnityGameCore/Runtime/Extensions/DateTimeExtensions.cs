@@ -1,6 +1,6 @@
 using System;
 
-namespace Air.UnityGameCore.Runtime.Extensions {
+namespace Extensions {
     public static class DateTimeExtensions {
         /// <summary>
         /// Thanks, Adam, for refactoring this code

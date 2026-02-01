@@ -1,7 +1,7 @@
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
-namespace Air.UnityGameCore.Runtime.Extensions {
+namespace Extensions {
     public static class QuaternionConversionExtensions {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Quaternion ToUnityQuaternion(this System.Numerics.Quaternion quaternion) {

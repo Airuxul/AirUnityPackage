@@ -1,7 +1,7 @@
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
-namespace Air.UnityGameCore.Runtime.Extensions {
+namespace Extensions {
     public static class VectorConversionExtensions {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector2 ToUnityVector(this System.Numerics.Vector2 vector) {

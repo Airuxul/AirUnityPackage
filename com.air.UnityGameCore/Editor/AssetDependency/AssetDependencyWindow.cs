@@ -6,7 +6,7 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Air.UnityGameCore.Editor.AssetDependency
+namespace Editor.AssetDependency
 {
     /// <summary>
     /// 资源依赖查询窗口
@@ -27,15 +27,7 @@ namespace Air.UnityGameCore.Editor.AssetDependency
         private ScrollView _resultScrollView;
         private Label _resultCountLabel;
         
-        private DependencyMode _currentMode = DependencyMode.None;
-        private List<string> _currentResults = new List<string>();
-
-        private enum DependencyMode
-        {
-            None,
-            Dependencies,
-            ReverseDependencies
-        }
+        private List<string> _currentResults = new();
 
         [MenuItem("Tools/资源依赖/资源依赖查询工具")]
         public static void ShowWindow()
@@ -113,14 +105,13 @@ namespace Air.UnityGameCore.Editor.AssetDependency
             foreach (string guid in guids)
             {
                 string assetPath = AssetDatabase.GUIDToAssetPath(guid);
-                if (assetPath.Contains("AssetDependency"))
+                if (!assetPath.Contains("AssetDependency")) continue;
+                string directory = Path.GetDirectoryName(assetPath);
+                if (directory == null) continue;
+                var targetPath = Path.Combine(directory, fileName).Replace("\\", "/");
+                if (File.Exists(targetPath))
                 {
-                    string directory = Path.GetDirectoryName(assetPath);
-                    string targetPath = Path.Combine(directory, fileName).Replace("\\", "/");
-                    if (File.Exists(targetPath))
-                    {
-                        return targetPath;
-                    }
+                    return targetPath;
                 }
             }
             
@@ -225,13 +216,11 @@ namespace Air.UnityGameCore.Editor.AssetDependency
                 EditorUtility.DisplayDialog("提示", "请先选择一个资源", "确定");
                 return;
             }
-
-            _currentMode = DependencyMode.Dependencies;
             
             bool recursive = _recursiveToggle != null && _recursiveToggle.value;
             _currentResults = AssetDependencyAnalyzer.GetDependencies(_targetAssetPath, recursive);
             
-            DisplayResults($"{_targetAsset.name} 的依赖项");
+            DisplayResults();
         }
 
         /// <summary>
@@ -244,15 +233,13 @@ namespace Air.UnityGameCore.Editor.AssetDependency
                 EditorUtility.DisplayDialog("提示", "请先选择一个资源", "确定");
                 return;
             }
-
-            _currentMode = DependencyMode.ReverseDependencies;
             
             EditorUtility.DisplayProgressBar("分析中", "正在查找反向依赖...", 0.5f);
             
             try
             {
                 _currentResults = AssetDependencyAnalyzer.GetReverseDependencies(_targetAssetPath);
-                DisplayResults($"依赖 {_targetAsset.name} 的资源");
+                DisplayResults();
             }
             finally
             {
@@ -263,8 +250,7 @@ namespace Air.UnityGameCore.Editor.AssetDependency
         /// <summary>
         /// 显示结果
         /// </summary>
-        /// <param name="title">结果标题</param>
-        private void DisplayResults(string title)
+        private void DisplayResults()
         {
             if (_resultScrollView == null || _resultCountLabel == null)
                 return;
@@ -382,7 +368,6 @@ namespace Air.UnityGameCore.Editor.AssetDependency
         /// </summary>
         private void ClearResults()
         {
-            _currentMode = DependencyMode.None;
             _currentResults.Clear();
             
             if (_resultScrollView != null)

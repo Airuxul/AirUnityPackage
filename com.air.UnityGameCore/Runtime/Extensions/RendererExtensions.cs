@@ -1,7 +1,10 @@
 using UnityEngine;
 
-namespace Air.UnityGameCore.Runtime.Extensions {
+namespace Extensions {
     public static class RendererExtensions {
+        private static readonly int ColorStr = Shader.PropertyToID("_Color");
+        private static readonly int ZWriteStr = Shader.PropertyToID("_ZWrite");
+
         /// <summary>
         /// Enables ZWrite for materials in this Renderer that have a '_Color' property. This will allow the materials 
         /// to write to the Z buffer, which could be used to affect how subsequent rendering is handled, 
@@ -9,8 +12,8 @@ namespace Air.UnityGameCore.Runtime.Extensions {
         /// </summary>    
         public static void EnableZWrite(this Renderer renderer) {
             foreach (Material material in renderer.materials) {
-                if (material.HasProperty("_Color")) {
-                    material.SetInt("_ZWrite", 1);
+                if (material.HasProperty(ColorStr)) {
+                    material.SetInt(ZWriteStr, 1);
                     material.renderQueue = (int) UnityEngine.Rendering.RenderQueue.Transparent;
                 }
             }
@@ -23,8 +26,8 @@ namespace Air.UnityGameCore.Runtime.Extensions {
         /// </summary>
         public static void DisableZWrite(this Renderer renderer) {
             foreach (Material material in renderer.materials) {
-                if (material.HasProperty("_Color")) {
-                    material.SetInt("_ZWrite", 0);
+                if (material.HasProperty(ColorStr)) {
+                    material.SetInt(ZWriteStr, 0);
                     material.renderQueue = (int) UnityEngine.Rendering.RenderQueue.Transparent + 100;
                 }
             }

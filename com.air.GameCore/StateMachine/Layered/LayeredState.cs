@@ -1,7 +1,6 @@
 using System.Collections.Generic;
-using Air.GameCore.StateMachine;
 
-namespace Air.GameCore.StateMachine.Layered
+namespace StateMachine.Layered
 {
     public abstract class LayeredState : State
     {

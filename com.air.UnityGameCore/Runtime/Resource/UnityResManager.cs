@@ -1,7 +1,7 @@
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Air.UnityGameCore.Runtime.Resource
+namespace Resource
 {
     /// <summary>
     /// Unity Resources 资源管理器

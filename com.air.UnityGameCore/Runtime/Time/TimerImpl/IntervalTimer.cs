@@ -1,18 +1,18 @@
 using System;
 
-namespace Air.UnityGameCore.Runtime.Time {
+namespace Time.TimerImpl {
     /// <summary>
     /// Countdown timer that fires an event every interval until completion.
     /// </summary>
     public class IntervalTimer : Timer {
-        readonly float interval;
-        float nextInterval;
+        private readonly float _interval;
+        private float _nextInterval;
 
         public Action OnInterval = delegate { };
 
         public IntervalTimer(float totalTime, float intervalSeconds) : base(totalTime) {
-            interval = intervalSeconds;
-            nextInterval = totalTime - interval;
+            _interval = intervalSeconds;
+            _nextInterval = totalTime - _interval;
         }
 
         public override void Tick() {
@@ -20,9 +20,9 @@ namespace Air.UnityGameCore.Runtime.Time {
                 CurrentTime -= UnityEngine.Time.deltaTime;
 
                 // Fire interval events as long as thresholds are crossed
-                while (CurrentTime <= nextInterval && nextInterval >= 0) {
+                while (CurrentTime <= _nextInterval && _nextInterval >= 0) {
                     OnInterval.Invoke();
-                    nextInterval -= interval;
+                    _nextInterval -= _interval;
                 }
             }
 
@@ -36,12 +36,12 @@ namespace Air.UnityGameCore.Runtime.Time {
 
         public override void Reset() {
             base.Reset();
-            nextInterval = initialTime - interval;
+            _nextInterval = initialTime - _interval;
         }
 
         public override void Reset(float newTime) {
             base.Reset(newTime);
-            nextInterval = initialTime - interval;
+            _nextInterval = initialTime - _interval;
         }
     }
 }

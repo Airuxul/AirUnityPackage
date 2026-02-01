@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Air.UnityGameCore.Runtime.Extensions {
+namespace Extensions {
     public static class StringExtensions {
         /// <summary>Checks if a string is Null or white space</summary>
         public static bool IsNullOrWhiteSpace(this string val) => string.IsNullOrWhiteSpace(val);

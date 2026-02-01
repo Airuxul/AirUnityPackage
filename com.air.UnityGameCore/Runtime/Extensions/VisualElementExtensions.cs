@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Air.UnityGameCore.Runtime.Extensions {
+namespace Extensions {
     public static class VisualElementExtensions {
         /// <summary>
         /// Creates a new child VisualElement and adds it to the parent.

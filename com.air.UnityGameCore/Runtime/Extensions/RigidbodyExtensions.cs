@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Air.UnityGameCore.Runtime.Extensions {
+namespace Extensions {
     public static class RigidbodyExtensions {
         /// <summary>
         /// Changes the direction of the Rigidbody's velocity while maintaining its speed.

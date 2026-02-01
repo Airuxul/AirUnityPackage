@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using Air.UnityGameCore.Runtime.Extensions;
+using Extensions;
 
-namespace Air.UnityGameCore.Runtime.Time {
+namespace Time {
     public static class TimerManager {
         static readonly List<Timer> timers = new();
         static readonly List<Timer> sweep = new();

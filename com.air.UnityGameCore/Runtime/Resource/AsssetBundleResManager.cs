@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Air.UnityGameCore.Runtime.Resource
+namespace Resource
 {
     /// <summary>
     /// AssetBundle 资源管理器

@@ -1,9 +1,8 @@
 using System;
 using System.Threading.Tasks;
-using UnityEngine;
 using UnityEngine.Events;
 
-namespace Air.UnityGameCore.Runtime.Extensions {
+namespace Extensions {
     public static class UnityEventExtensions {
 #if UNITY_2023_2_OR_NEWER
         /// <summary>

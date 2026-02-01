@@ -2,10 +2,13 @@
 自用Unity包
 
 ## 自制包
-* com.air.GameCore 通用游戏代码，不依赖Unity，纯c#代码逻辑
-* com.air.UnityGameCore 通用Unity代码
-* com.air.GameplayTag 游戏Tag，仿UE GameplayTag
-* com.air.UI 游戏UI框架 
+* `com.air.GameCore` 通用游戏代码，不依赖Unity，纯c#代码逻辑
+* `com.air.UnityGameCore` 通用Unity代码
+* `com.air.GameplayTag` 游戏Tag，仿UE GameplayTag
 
 ## 引用包
-* com.alelievr.NodeGraphProcessor 节点
+* `com.alelievr.NodeGraphProcessor` 节点
+
+## 使用方式
+安装到Unity项目Assets同层后执行，在`AirUnityPackage`下执行`python install_to_unity.py`即可安装所有库
+

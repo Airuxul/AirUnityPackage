@@ -1,6 +1,6 @@
 using System;
 
-namespace Air.UnityGameCore.Runtime.Resource
+namespace Resource
 {
     public interface IResManager
     {

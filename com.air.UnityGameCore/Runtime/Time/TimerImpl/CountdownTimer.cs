@@ -1,4 +1,4 @@
-namespace Air.UnityGameCore.Runtime.Time {
+namespace Time.TimerImpl {
     /// <summary>
     /// Timer that counts down from a specific value to zero.
     /// </summary>

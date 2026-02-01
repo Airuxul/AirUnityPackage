@@ -1,7 +1,4 @@
-using System;
-using UnityEngine;
-
-namespace Air.UnityGameCore.Runtime.Extensions {
+namespace Extensions {
     public static class AwaitableExtensions {
 #if UNITY_2023_2_OR_NEWER
         /// <summary>

@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace Air.UnityGameCore.Runtime.Time {
+namespace Time {
     public abstract class Timer : IDisposable {
         public float CurrentTime { get; protected set; }
         public bool IsRunning { get; private set; }

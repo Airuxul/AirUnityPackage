@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Air.UnityGameCore.Runtime.Pool
+namespace Pool
 {
     public interface IPool
     {

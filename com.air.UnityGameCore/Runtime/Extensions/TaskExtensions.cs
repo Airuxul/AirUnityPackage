@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Threading.Tasks;
 
-namespace Air.UnityGameCore.Runtime.Extensions {
+namespace Extensions {
     public static class TaskExtensions {
         /// <summary>
         /// Wraps the provided object into a completed Task.
@@ -33,11 +33,9 @@ namespace Air.UnityGameCore.Runtime.Extensions {
             try {
                 await task;
             }
-            catch (Exception exception) {
-                if (onException == null)
-                    throw exception;
-
-                onException(exception);
+            catch (Exception exception)
+            {
+                if (onException != null) onException(exception);
             }
         }
         
@@ -54,8 +52,8 @@ namespace Air.UnityGameCore.Runtime.Extensions {
             if (condition == null) throw new ArgumentNullException(nameof(condition));
             if (pollIntervalMs <= 0) throw new ArgumentOutOfRangeException(nameof(pollIntervalMs), "Poll interval must be positive");
 
-            var cancelled = false;
-            var waitTask = RunWaitLoop(condition, pollIntervalMs, () => cancelled);
+            var cancelledState = new CancelledState();
+            var waitTask = RunWaitLoop(condition, pollIntervalMs, cancelledState);
 
             if (timeoutMs < 0) {
                 await waitTask;
@@ -66,17 +64,21 @@ namespace Air.UnityGameCore.Runtime.Extensions {
             var finished = await Task.WhenAny(waitTask, timeoutTask);
 
             if (finished != waitTask) {
-                cancelled = true;
+                cancelledState.Value = true;
                 return false;
             }
 
             return true;
         }
 
-        static async Task RunWaitLoop(Func<bool> condition, int pollIntervalMs, Func<bool> cancelled) {
-            while (!condition() && !cancelled()) {
+        static async Task RunWaitLoop(Func<bool> condition, int pollIntervalMs, CancelledState cancelledState) {
+            while (!condition() && !cancelledState.Value) {
                 await Task.Delay(pollIntervalMs);
             }
+        }
+
+        sealed class CancelledState {
+            public bool Value;
         }
     }
 }

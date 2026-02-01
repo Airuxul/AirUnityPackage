@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Air.UnityGameCore.Runtime.Resource
+namespace Resource
 {
     public abstract class ResManager : IResManager
     {

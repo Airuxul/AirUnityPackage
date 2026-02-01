@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using UI;
 using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEngine;
-using Air.UnityGameCore.Runtime.UI;
 
-namespace Air.UnityGameCore.Editor.UI
+namespace Editor.UI
 {
     /// <summary>
     /// UI序列化器，负责自动绑定UI组件字段和挂载脚本

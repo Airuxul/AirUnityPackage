@@ -1,4 +1,4 @@
-namespace Air.UnityGameCore.Runtime.UI
+namespace UI
 {
     public class UIShowParam
     {

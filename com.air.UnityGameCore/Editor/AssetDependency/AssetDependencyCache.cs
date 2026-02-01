@@ -5,7 +5,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace Air.UnityGameCore.Editor.AssetDependency
+namespace Editor.AssetDependency
 {
     /// <summary>
     /// 资源依赖缓存管理器
@@ -345,11 +345,16 @@ namespace Air.UnityGameCore.Editor.AssetDependency
         /// </summary>
         public List<string> GetDependencies(string assetPath, bool recursive)
         {
-            if (!IsEnabled || _database == null)
+            if (!IsEnabled)
             {
-                _database.Statistics.CacheMisses++;
                 return null;
             }
+
+            if (_database == null)
+            {
+                return null;
+            }
+            _database.Statistics.CacheMisses++;
             
             if (_database.AssetCache.TryGetValue(assetPath, out var cache))
             {
@@ -366,11 +371,13 @@ namespace Air.UnityGameCore.Editor.AssetDependency
         /// </summary>
         public List<string> GetReverseDependencies(string assetPath)
         {
-            if (!IsEnabled || _database == null)
-            {
-                _database.Statistics.CacheMisses++;
+            if (!IsEnabled)
                 return null;
-            }
+
+            if (_database == null)
+                return null;
+
+            _database.Statistics.CacheMisses++;
             
             if (_database.AssetCache.TryGetValue(assetPath, out var cache))
             {

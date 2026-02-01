@@ -1,7 +1,7 @@
-using UnityEngine;
 using System.Linq;
+using UnityEngine;
 
-namespace Air.UnityGameCore.Runtime.Extensions {
+namespace Extensions {
     public static class GameObjectExtensions {
         /// <summary>
         /// This method is used to hide the GameObject in the Hierarchy view.

@@ -1,7 +1,6 @@
 using UnityEditor;
-using UnityEngine;
 
-namespace Air.UnityGameCore.Editor.AssetDependency
+namespace Editor.AssetDependency
 {
     /// <summary>
     /// 资源依赖监听器

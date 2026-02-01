@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Air.UnityGameCore.Runtime.UI
+namespace UI
 {
     /// <summary>
     /// UI组件基类，提供UI生命周期管理

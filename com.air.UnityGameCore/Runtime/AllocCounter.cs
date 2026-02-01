@@ -3,47 +3,45 @@ using UnityEngine.Profiling;
 
 // See UnityEngine.TestTools.Constraints.AllocatingGCMemoryConstraint
 // and https://maingauche.games/devlog/20230504-counting-allocations-in-unity/
-namespace Air.UnityGameCore.Runtime {
-    public class AllocCounter {
-        UnityEngine.Profiling.Recorder rec;
+public class AllocCounter {
+    private Recorder _rec;
 
-        public AllocCounter() {
-            rec = Recorder.Get("GC.Alloc");
-            rec.enabled = false;
-
-#if !UNITY_WEBGL
-            rec.FilterToCurrentThread();
-#endif
-
-            rec.enabled = true;
-        }
-
-        public int Stop() {
-            if (rec == null) throw new InvalidOperationException("AllocCounter was not started.");
-
-            rec.enabled = false;
+    public AllocCounter() {
+        _rec = Recorder.Get("GC.Alloc");
+        _rec.enabled = false;
 
 #if !UNITY_WEBGL
-            rec.CollectFromAllThreads();
+        _rec.FilterToCurrentThread();
 #endif
 
-            int result = rec.sampleBlockCount;
-            rec = null;
-            return result;
+        _rec.enabled = true;
+    }
+
+    public int Stop() {
+        if (_rec == null) throw new InvalidOperationException("AllocCounter was not started.");
+
+        _rec.enabled = false;
+
+#if !UNITY_WEBGL
+        _rec.CollectFromAllThreads();
+#endif
+
+        int result = _rec.sampleBlockCount;
+        _rec = null;
+        return result;
+    }
+
+    public static int Instrument(Action action) {
+        var counter = new AllocCounter();
+        int allocs;
+
+        try {
+            action();
+        }
+        finally {
+            allocs = counter.Stop();
         }
 
-        public static int Instrument(Action action) {
-            var counter = new AllocCounter();
-            int allocs;
-
-            try {
-                action();
-            }
-            finally {
-                allocs = counter.Stop();
-            }
-
-            return allocs;
-        }
+        return allocs;
     }
 }

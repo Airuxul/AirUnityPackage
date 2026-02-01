@@ -1,10 +1,9 @@
-using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 
-namespace Air.UnityGameCore.Editor.AssetDependency
+namespace Editor.AssetDependency
 {
     /// <summary>
     /// 资源依赖树形视图窗口
@@ -244,8 +243,8 @@ namespace Air.UnityGameCore.Editor.AssetDependency
 
                 if (_rootNode != null)
                 {
-                    TreeViewItem rootItem = BuildTreeRecursive(_rootNode, 1);
-                    root.AddChild(rootItem);
+                    TreeViewItem buildTreeRecursive = BuildTreeRecursive(_rootNode, 1);
+                    root.AddChild(buildTreeRecursive);
                 }
                 else
                 {

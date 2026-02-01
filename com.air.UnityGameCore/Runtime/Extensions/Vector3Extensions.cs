@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Air.UnityGameCore.Runtime.Extensions {
+namespace Extensions {
     public static class Vector3Extensions {
         /// <summary>
         /// Sets any x y z values of a Vector3

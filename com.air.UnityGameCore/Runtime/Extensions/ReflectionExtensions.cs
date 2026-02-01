@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Air.UnityGameCore.Runtime.Extensions {
+namespace Extensions {
     public static class ReflectionExtensions {
         static readonly Dictionary<Type, string> TypeDisplayNames = new() {
             { typeof(int), "int" },
