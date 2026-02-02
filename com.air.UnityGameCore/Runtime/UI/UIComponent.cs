@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Air.UnityGameCore.Runtime.UI.State;
 using UnityEngine;
 
 namespace Air.UnityGameCore.Runtime.UI
@@ -29,9 +30,9 @@ namespace Air.UnityGameCore.Runtime.UI
         
         // todo UI触发器，触发事件或者动画
         // todo UI状态机，快捷修改UI状态
+        protected UIStateCtrl StateCtrl;
 
         #region UI生命周期
-
         protected void Init()
         {
             if (IsInit) return;
@@ -44,6 +45,7 @@ namespace Air.UnityGameCore.Runtime.UI
                     child?.Init();
                 }
             }
+            StateCtrl = GetComponent<UIStateCtrl>();
             OnUIInit();
         }
 

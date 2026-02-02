@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
 using UnityEditor;
 using UnityEditor.Callbacks;
@@ -509,49 +508,6 @@ namespace Air.UnityGameCore.Editor.UI
             }
             
             return current;
-        }
-    }
-
-    /// <summary>
-    /// UIComponent的自定义编辑器
-    /// </summary>
-    [CustomEditor(typeof(UIComponent), true)]
-    public class UIComponentEditor : UnityEditor.Editor
-    {
-        public override void OnInspectorGUI()
-        {
-            DrawDefaultInspector();
-            
-            GUILayout.Space(10);
-            
-            EditorGUILayout.BeginHorizontal();
-            
-            if (GUILayout.Button("Regenerate Designer"))
-            {
-                var uiComponent = (UIComponent)target;
-                string className = uiComponent.GetType().Name;
-                
-                // 查找Designer脚本路径
-                string designerScriptPath = UIScriptGenerator.FindDesignerScriptPath(className);
-                if (!string.IsNullOrEmpty(designerScriptPath))
-                {
-                    string outputFolder = Path.GetDirectoryName(designerScriptPath);
-                    UIScriptGenerator.RegenerateDesignerScriptOnly(uiComponent, outputFolder);
-                }
-                else
-                {
-                    Debug.LogError($"Could not find Designer script for {className}. Please generate scripts first.");
-                }
-            }
-            
-            if (GUILayout.Button("Bind Fields"))
-            {
-                var uiComponent = (UIComponent)target;
-                uiComponent.ClearUIComponentFields();
-                uiComponent.BindUIComponent();
-            }
-            
-            EditorGUILayout.EndHorizontal();
         }
     }
 }

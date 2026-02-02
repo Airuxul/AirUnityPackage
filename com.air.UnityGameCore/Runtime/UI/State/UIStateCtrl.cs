@@ -84,181 +84,412 @@ namespace Air.UnityGameCore.Runtime.UI.State
     }
 
     /// <summary>
-    /// UI状态控制器
-    /// 支持在编辑器中预设多个状态，并在运行时切换
+    /// UI 状态组：组内包含多个状态，有且只能有一个状态被选中。
     /// </summary>
-    [RequireComponent(typeof(UIComponent))]
-    public class UIStateCtrl : MonoBehaviour
+    [Serializable]
+    public class UIStateGroup
     {
-        [SerializeField] private List<UIState> states = new List<UIState>();
-        [SerializeField] private string currentStateName;
-        [SerializeField] private bool applyOnStart = true;
+        [SerializeField] private string groupName;
+        [SerializeField] private List<UIState> states = new();
+        [SerializeField] private int currentStateIndex = -1;
 
-        private UIState currentState;
-        private Dictionary<string, UIState> stateDict;
+        private UIState _currentState;
 
         /// <summary>
-        /// 当前状态名称
+        /// 组名称
         /// </summary>
-        public string CurrentStateName => currentStateName;
+        public string GroupName => groupName;
 
         /// <summary>
-        /// 所有状态列表
+        /// 组内所有状态
         /// </summary>
         public List<UIState> States => states;
 
-        private void Awake()
+        /// <summary>
+        /// 当前选中的状态下标（-1 表示未选中）
+        /// </summary>
+        public int CurrentStateIndex => currentStateIndex;
+
+        /// <summary>
+        /// 当前选中的状态名称（未选中时为空）
+        /// </summary>
+        public string CurrentStateName => _currentState != null ? _currentState.StateName : string.Empty;
+
+        /// <summary>
+        /// 当前选中的状态
+        /// </summary>
+        public UIState CurrentState => _currentState;
+
+        /// <summary>
+        /// 无参构造函数供 Unity 序列化使用
+        /// </summary>
+        public UIStateGroup()
         {
-            InitializeStates();
+            groupName = string.Empty;
         }
 
-        private void Start()
+        public UIStateGroup(string name)
         {
-            if (applyOnStart && !string.IsNullOrEmpty(currentStateName))
-            {
-                SetState(currentStateName);
-            }
+            groupName = name ?? string.Empty;
         }
 
         /// <summary>
-        /// 初始化状态字典
+        /// 根据当前下标同步 _currentState
         /// </summary>
-        private void InitializeStates()
+        internal void Initialize()
         {
-            stateDict = new Dictionary<string, UIState>();
-            foreach (var state in states)
+            if (currentStateIndex >= 0 && currentStateIndex < states.Count && states[currentStateIndex] != null)
             {
-                if (state != null && !string.IsNullOrEmpty(state.StateName))
+                _currentState = states[currentStateIndex];
+            }
+            else
+            {
+                _currentState = null;
+                if (currentStateIndex >= states.Count || currentStateIndex < -1)
                 {
-                    if (!stateDict.ContainsKey(state.StateName))
-                    {
-                        stateDict[state.StateName] = state;
-                    }
-                    else
-                    {
-                        Debug.LogWarning($"[UIStateCtrl] 状态名称重复: {state.StateName}");
-                    }
+                    currentStateIndex = -1;
                 }
             }
         }
 
         /// <summary>
-        /// 设置状态
+        /// 通过下标获取组内状态
         /// </summary>
-        /// <param name="stateName">状态名称</param>
+        /// <param name="index">状态下标</param>
+        /// <returns>状态对象，越界或为 null 时返回 null</returns>
+        public UIState GetState(int index)
+        {
+            if (index < 0 || index >= states.Count) return null;
+            return states[index];
+        }
+
+        /// <summary>
+        /// 设置组内当前状态（组内有且只能有一个状态被选中）。
+        /// 切换时先清除当前选中，再设置并应用新状态。
+        /// </summary>
+        /// <param name="index">状态下标</param>
         /// <returns>是否设置成功</returns>
-        public bool SetState(string stateName)
+        public bool SetState(int index)
         {
-            if (string.IsNullOrEmpty(stateName))
+            if (index < 0 || index >= states.Count)
             {
-                Debug.LogWarning("[UIStateCtrl] 状态名称不能为空");
+                Debug.LogWarning($"[UIStateGroup] 组 '{groupName}' 状态下标越界: {index}, 总数: {states.Count}");
                 return false;
             }
 
-            if (stateDict == null)
+            var state = states[index];
+            if (state == null)
             {
-                InitializeStates();
-            }
-
-            if (stateDict.TryGetValue(stateName, out var state))
-            {
-                currentState = state;
-                currentStateName = stateName;
-                state.Apply();
-                return true;
-            }
-            else
-            {
-                Debug.LogWarning($"[UIStateCtrl] 未找到状态: {stateName}");
+                Debug.LogWarning($"[UIStateGroup] 组 '{groupName}' 下标 {index} 处状态为空");
                 return false;
             }
+
+            // 先将当前选中的状态去除
+            currentStateIndex = -1;
+            _currentState = null;
+
+            // 再设置并应用新的选中状态
+            currentStateIndex = index;
+            _currentState = state;
+            state.Apply();
+            return true;
         }
 
         /// <summary>
-        /// 获取状态
+        /// 添加状态到组内
         /// </summary>
-        /// <param name="stateName">状态名称</param>
-        /// <returns>状态对象</returns>
-        public UIState GetState(string stateName)
-        {
-            if (stateDict == null)
-            {
-                InitializeStates();
-            }
-
-            stateDict.TryGetValue(stateName, out var state);
-            return state;
-        }
-
-        /// <summary>
-        /// 添加新状态
-        /// </summary>
-        /// <param name="stateName">状态名称</param>
-        /// <returns>新创建的状态</returns>
         public UIState AddState(string stateName)
         {
-            if (string.IsNullOrEmpty(stateName))
-            {
-                Debug.LogWarning("[UIStateCtrl] 状态名称不能为空");
-                return null;
-            }
-
-            if (stateDict == null)
-            {
-                InitializeStates();
-            }
-
-            if (stateDict.ContainsKey(stateName))
-            {
-                Debug.LogWarning($"[UIStateCtrl] 状态已存在: {stateName}");
-                return stateDict[stateName];
-            }
-
-            var newState = new UIState(stateName);
+            var newState = new UIState(stateName ?? string.Empty);
             states.Add(newState);
-            stateDict[stateName] = newState;
             return newState;
         }
 
         /// <summary>
-        /// 移除状态
+        /// 通过下标从组内移除状态
         /// </summary>
-        /// <param name="stateName">状态名称</param>
-        public void RemoveState(string stateName)
+        public void RemoveStateAt(int index)
         {
-            var state = GetState(stateName);
-            if (state != null)
+            if (index < 0 || index >= states.Count) return;
+            states.RemoveAt(index);
+            if (currentStateIndex == index)
             {
-                states.Remove(state);
-                stateDict.Remove(stateName);
+                currentStateIndex = -1;
+                _currentState = null;
+            }
+            else if (currentStateIndex > index)
+            {
+                currentStateIndex--;
+            }
+        }
 
-                if (currentStateName == stateName)
+        /// <summary>
+        /// 刷新组内当前选中的状态
+        /// </summary>
+        public void RefreshCurrentState()
+        {
+            if (_currentState != null)
+            {
+                _currentState.Apply();
+            }
+        }
+    }
+
+    /// <summary>
+    /// UI状态控制器
+    /// 支持多个状态组，每组内有多个状态且仅能有一个被选中；在编辑器中预设并在运行时切换。
+    /// </summary>
+    [RequireComponent(typeof(UIComponent))]
+    public class UIStateCtrl : MonoBehaviour
+    {
+        [SerializeField] private List<UIStateGroup> stateGroups = new List<UIStateGroup>();
+        [SerializeField] private bool applyOnStart = true;
+
+        private Dictionary<string, UIStateGroup> groupDict;
+
+        /// <summary>
+        /// 所有状态组
+        /// </summary>
+        public List<UIStateGroup> StateGroups => stateGroups;
+
+        private void Awake()
+        {
+            InitializeGroups();
+        }
+
+        private void Start()
+        {
+            if (applyOnStart)
+            {
+                foreach (var group in stateGroups)
                 {
-                    currentStateName = string.Empty;
-                    currentState = null;
+                    if (group != null && group.CurrentStateIndex >= 0)
+                    {
+                        group.SetState(group.CurrentStateIndex);
+                    }
                 }
             }
         }
 
         /// <summary>
-        /// 刷新当前状态
+        /// 初始化状态组字典及各组内状态
+        /// </summary>
+        private void InitializeGroups()
+        {
+            groupDict = new Dictionary<string, UIStateGroup>();
+            foreach (var group in stateGroups)
+            {
+                if (group != null && !string.IsNullOrEmpty(group.GroupName))
+                {
+                    if (!groupDict.ContainsKey(group.GroupName))
+                    {
+                        group.Initialize();
+                        groupDict[group.GroupName] = group;
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"[UIStateCtrl] 状态组名称重复: {group.GroupName}");
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 设置指定组内的当前状态（该组内有且只能有一个状态被选中）
+        /// </summary>
+        /// <param name="groupName">组名称</param>
+        /// <param name="stateIndex">状态下标</param>
+        /// <returns>是否设置成功</returns>
+        public bool SetState(string groupName, int stateIndex)
+        {
+            if (string.IsNullOrEmpty(groupName))
+            {
+                Debug.LogWarning("[UIStateCtrl] 组名称不能为空");
+                return false;
+            }
+
+            if (groupDict == null)
+            {
+                InitializeGroups();
+            }
+
+            if (groupDict.TryGetValue(groupName, out var group))
+            {
+                return group.SetState(stateIndex);
+            }
+
+            Debug.LogWarning($"[UIStateCtrl] 未找到状态组: {groupName}");
+            return false;
+        }
+
+        /// <summary>
+        /// 当仅有一个状态组时，可直接通过状态下标设置该组当前状态
+        /// </summary>
+        /// <param name="stateIndex">状态下标</param>
+        /// <returns>是否设置成功</returns>
+        public bool SetState(int stateIndex)
+        {
+            if (groupDict == null)
+            {
+                InitializeGroups();
+            }
+
+            if (groupDict.Count == 0)
+            {
+                Debug.LogWarning("[UIStateCtrl] 未配置任何状态组");
+                return false;
+            }
+
+            if (groupDict.Count == 1)
+            {
+                foreach (var g in groupDict.Values)
+                {
+                    return g.SetState(stateIndex);
+                }
+            }
+
+            Debug.LogWarning("[UIStateCtrl] 存在多个状态组时请使用 SetState(groupName, stateIndex)");
+            return false;
+        }
+
+        /// <summary>
+        /// 获取指定组内当前选中的状态下标（-1 表示未选中）
+        /// </summary>
+        public int GetCurrentStateIndex(string groupName)
+        {
+            if (groupDict == null)
+            {
+                InitializeGroups();
+            }
+
+            return groupDict.TryGetValue(groupName, out var group) ? group.CurrentStateIndex : -1;
+        }
+
+        /// <summary>
+        /// 获取指定组内当前选中的状态名称（未选中时为空）
+        /// </summary>
+        public string GetCurrentStateName(string groupName)
+        {
+            if (groupDict == null)
+            {
+                InitializeGroups();
+            }
+
+            return groupDict.TryGetValue(groupName, out var group) ? group.CurrentStateName : null;
+        }
+
+        /// <summary>
+        /// 获取指定组
+        /// </summary>
+        public UIStateGroup GetGroup(string groupName)
+        {
+            if (groupDict == null)
+            {
+                InitializeGroups();
+            }
+
+            groupDict.TryGetValue(groupName, out var group);
+            return group;
+        }
+
+        /// <summary>
+        /// 通过组名与状态下标获取指定组内的状态
+        /// </summary>
+        /// <param name="groupName">组名称</param>
+        /// <param name="stateIndex">状态下标</param>
+        /// <returns>状态对象</returns>
+        public UIState GetState(string groupName, int stateIndex)
+        {
+            var group = GetGroup(groupName);
+            return group?.GetState(stateIndex);
+        }
+
+        /// <summary>
+        /// 添加状态组
+        /// </summary>
+        /// <param name="groupName">组名称</param>
+        /// <returns>新创建的状态组</returns>
+        public UIStateGroup AddGroup(string groupName)
+        {
+            if (string.IsNullOrEmpty(groupName))
+            {
+                Debug.LogWarning("[UIStateCtrl] 组名称不能为空");
+                return null;
+            }
+
+            if (groupDict == null)
+            {
+                InitializeGroups();
+            }
+
+            if (groupDict != null && groupDict.TryGetValue(groupName, out var group))
+            {
+                Debug.LogWarning($"[UIStateCtrl] 状态组已存在: {groupName}");
+                return group;
+            }
+
+            var newGroup = new UIStateGroup(groupName);
+            newGroup.Initialize();
+            stateGroups.Add(newGroup);
+            if (groupDict != null) 
+                groupDict[groupName] = newGroup;
+            return newGroup;
+        }
+
+        /// <summary>
+        /// 移除状态组
+        /// </summary>
+        /// <param name="groupName">组名称</param>
+        public void RemoveGroup(string groupName)
+        {
+            if (groupDict == null)
+            {
+                InitializeGroups();
+            }
+
+            if (groupDict == null || !groupDict.TryGetValue(groupName, out var group)) return;
+            stateGroups.Remove(group);
+            groupDict.Remove(groupName);
+        }
+
+        /// <summary>
+        /// 刷新所有组内当前选中的状态
         /// </summary>
         public void RefreshCurrentState()
         {
-            if (currentState != null)
+            foreach (var group in stateGroups)
             {
-                currentState.Apply();
+                group?.RefreshCurrentState();
             }
         }
 
 #if UNITY_EDITOR
         /// <summary>
-        /// 编辑器预览状态
+        /// 编辑器预览指定组内某下标的状态
         /// </summary>
-        public void PreviewState(string stateName)
+        public void PreviewState(string groupName, int stateIndex)
         {
-            var state = GetState(stateName);
+            var state = GetState(groupName, stateIndex);
             state?.Apply();
+        }
+
+        /// <summary>
+        /// 当仅有一个状态组时，编辑器预览该组内某下标的状态
+        /// </summary>
+        public void PreviewState(int stateIndex)
+        {
+            if (groupDict == null)
+            {
+                InitializeGroups();
+            }
+
+            if (groupDict == null || groupDict.Count != 1) return;
+            foreach (var group in groupDict.Values)
+            {
+                var state = group.GetState(stateIndex);
+                state?.Apply();
+                return;
+            }
         }
 #endif
     }

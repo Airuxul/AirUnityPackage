@@ -215,7 +215,7 @@ namespace Air.UnityGameCore.Editor.UI
                 Debug.Log($"Updating Designer script for {className}...");
 
                 // 1. 清空现有字段的引用（避免引用旧的、可能已删除的组件）
-                UISerializer.ClearUIComponentFields(uiComponent);
+                uiComponent.ClearUIComponentFields();
 
                 // 2. 收集新的字段
                 List<ComponentField> fields = CollectComponentFields(targetGo);
@@ -240,7 +240,7 @@ namespace Air.UnityGameCore.Editor.UI
                         if (uiComponent != null && targetGo != null)
                         {
                             Debug.Log($"Re-binding fields for {className}...");
-                            UISerializer.BindUIComponent(uiComponent);
+                            uiComponent.BindUIComponent();
                             Debug.Log($"Successfully updated and re-bound {className}");
 
                             // 高亮显示GameObject
