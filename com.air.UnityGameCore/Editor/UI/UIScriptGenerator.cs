@@ -6,7 +6,6 @@ using System.Text;
 using UnityEditor;
 using UnityEngine;
 using Air.UnityGameCore.Runtime.UI;
-using log4net.Util;
 using Transform = UnityEngine.Transform;
 
 namespace Air.UnityGameCore.Editor.UI

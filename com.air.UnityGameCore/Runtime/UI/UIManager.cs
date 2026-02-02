@@ -140,6 +140,7 @@ namespace Air.UnityGameCore.Runtime.UI
                 SetPanelRoot(uiPanelConfig.UILayer, go);
                 var rectTransform = go.GetComponent<RectTransform>();
                 rectTransform.FillParent();
+                
                 uiPanel.Init(uiPanelConfig);
                 uiPanel.Show(new UIShowParam());
                 _uiMap.Add(uiPanelConfig.UIPanelId, uiPanel);

@@ -20,19 +20,19 @@ namespace Air.UnityGameCore.Runtime.UI
         [SerializeField]
         protected List<UIComponent> childs = new();
 
-        public List<UIComponent> Childs
-        {
-            get => childs;
-            set => childs = value;
-        }
+        public List<UIComponent> Childs => childs;
 
         public bool IsInit { get; set; }
         public bool IsDestoryed { get; set; }
 
         public UIShowParam UIShowParam { get; set; }
+        
+        // todo UI触发器，触发事件或者动画
+        // todo UI状态机，快捷修改UI状态
 
         #region UI生命周期
-        public void Init()
+
+        protected void Init()
         {
             if (IsInit) return;
             IsInit = true;
@@ -50,26 +50,24 @@ namespace Air.UnityGameCore.Runtime.UI
         public void Show(UIShowParam param)
         {
             UIShowParam = param;
-            if (childs != null)
+            foreach (var child in Childs)
             {
-                foreach (var child in Childs)
-                {
-                    child?.Show(param);
-                }
+                child?.Destory();
             }
             OnUIShow(param);
+            // todo 动画逻辑
+            
         }
+        
 
         public void Hide()
         {
             OnUIHide();
-            if (childs != null)
+            foreach (var child in Childs)
             {
-                foreach (var child in Childs)
-                {
-                    child?.Hide();
-                }
+                child?.Destory();
             }
+            // todo hide动画
         }
 
         public void Destory()
@@ -77,12 +75,9 @@ namespace Air.UnityGameCore.Runtime.UI
             OnUIDestory();
             IsInit = false;
             IsDestoryed = true;
-            if (childs != null)
+            foreach (var child in Childs)
             {
-                foreach (var child in Childs)
-                {
-                    child?.Destory();
-                }
+                child?.Destory();
             }
         }
 
@@ -100,6 +95,15 @@ namespace Air.UnityGameCore.Runtime.UI
         protected virtual void OnUIShow(UIShowParam param)
         {
             // 子类可以重写此方法进行显示逻辑
+        }
+
+        
+        /// <summary>
+        /// 显示完UI组件后回调
+        /// </summary>
+        protected virtual void OnUIShowAfter()
+        {
+            // 子类可以重写此方法进行动画展示完后的逻辑
         }
 
         /// <summary>

@@ -27,15 +27,7 @@ namespace Air.UnityGameCore.Editor.AssetDependency
         private ScrollView _resultScrollView;
         private Label _resultCountLabel;
         
-        private DependencyMode _currentMode = DependencyMode.None;
-        private List<string> _currentResults = new List<string>();
-
-        private enum DependencyMode
-        {
-            None,
-            Dependencies,
-            ReverseDependencies
-        }
+        private List<string> _currentResults = new();
 
         [MenuItem("Tools/资源依赖/资源依赖查询工具")]
         public static void ShowWindow()
@@ -226,8 +218,6 @@ namespace Air.UnityGameCore.Editor.AssetDependency
                 return;
             }
 
-            _currentMode = DependencyMode.Dependencies;
-            
             bool recursive = _recursiveToggle != null && _recursiveToggle.value;
             _currentResults = AssetDependencyAnalyzer.GetDependencies(_targetAssetPath, recursive);
             
@@ -245,8 +235,6 @@ namespace Air.UnityGameCore.Editor.AssetDependency
                 return;
             }
 
-            _currentMode = DependencyMode.ReverseDependencies;
-            
             EditorUtility.DisplayProgressBar("分析中", "正在查找反向依赖...", 0.5f);
             
             try
@@ -382,7 +370,6 @@ namespace Air.UnityGameCore.Editor.AssetDependency
         /// </summary>
         private void ClearResults()
         {
-            _currentMode = DependencyMode.None;
             _currentResults.Clear();
             
             if (_resultScrollView != null)
