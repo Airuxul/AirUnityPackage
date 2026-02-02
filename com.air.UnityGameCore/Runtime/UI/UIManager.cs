@@ -119,11 +119,6 @@ namespace Air.UnityGameCore.Runtime.UI
             // 设置 RectTransform 充满父节点
             rectTransform.FillParent();
 
-            // 为子层级添加独立的 Canvas 组件以控制渲染顺序
-            var canvas = childRoot.AddComponent<Canvas>();
-            canvas.overrideSorting = true;
-            canvas.sortingOrder = sortingOrder;
-
             return childRoot;
         }
 

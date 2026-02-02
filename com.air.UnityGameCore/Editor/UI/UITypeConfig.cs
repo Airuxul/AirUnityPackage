@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Air.UnityGameCore.Editor.UI
 {
@@ -47,7 +48,7 @@ namespace Air.UnityGameCore.Editor.UI
     /// </summary>
     public static class UITypeConfig
     {
-        private static readonly Dictionary<UIType, UITypeInfo> _configs = new Dictionary<UIType, UITypeInfo>
+        private static readonly Dictionary<UIType, UITypeInfo> Configs = new()
         {
             {
                 UIType.Panel, new UITypeInfo
@@ -56,7 +57,7 @@ namespace Air.UnityGameCore.Editor.UI
                     FolderName = "Panels",
                     TemplateFileName = "UIPanelLogicTemplate.txt",
                     BaseClassName = "UIPanel",
-                    Namespace = "Air.UnityGameCore.Generated.Panel"
+                    Namespace = "Air.UnityGameCore.Generated"
                 }
             },
             {
@@ -66,7 +67,7 @@ namespace Air.UnityGameCore.Editor.UI
                     FolderName = "Components",
                     TemplateFileName = "UICompLogicTemplate.txt",
                     BaseClassName = "UIComponent",
-                    Namespace = "Air.UnityGameCore.Generated.Comp"
+                    Namespace = "Air.UnityGameCore.Generated"
                 }
             }
         };
@@ -76,7 +77,7 @@ namespace Air.UnityGameCore.Editor.UI
         /// </summary>
         public static UITypeInfo GetInfo(UIType type)
         {
-            return _configs.TryGetValue(type, out var info) ? info : null;
+            return Configs.GetValueOrDefault(type);
         }
 
         /// <summary>
@@ -94,13 +95,11 @@ namespace Air.UnityGameCore.Editor.UI
         {
             while (componentType != null)
             {
-                foreach (var kvp in _configs)
+                foreach (var kvp in Configs.Where(kvp => componentType.Name == kvp.Value.BaseClassName))
                 {
-                    if (componentType.Name == kvp.Value.BaseClassName)
-                    {
-                        return kvp.Key;
-                    }
+                    return kvp.Key;
                 }
+
                 componentType = componentType.BaseType;
             }
             

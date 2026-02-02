@@ -91,6 +91,7 @@ namespace Air.UnityGameCore.Runtime.UI
         /// </summary>
         protected virtual void OnUIInit()
         {
+            // 子类可以重写此方法进行初始化逻辑
         }
 
         /// <summary>

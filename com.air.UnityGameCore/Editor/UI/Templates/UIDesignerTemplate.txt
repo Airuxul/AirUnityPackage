@@ -9,11 +9,5 @@ namespace Air.UnityGameCore.Generated
     public partial class #CLASSNAME#
     {
 #FIELDS#
-
-        private void InitComponent()
-        {
-            // Auto-generated component initialization
-            // Fields will be automatically bound after compilation
-        }
     }
 }
