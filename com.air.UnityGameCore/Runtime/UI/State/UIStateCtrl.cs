@@ -242,32 +242,23 @@ namespace Air.UnityGameCore.Runtime.UI.State
     [RequireComponent(typeof(UIComponent))]
     public class UIStateCtrl : MonoBehaviour
     {
-        [SerializeField] private List<UIStateGroup> stateGroups = new List<UIStateGroup>();
-        [SerializeField] private bool applyOnStart = true;
+        [SerializeField] private List<UIStateGroup> stateGroups = new();
 
-        private Dictionary<string, UIStateGroup> groupDict;
-
-        /// <summary>
-        /// 所有状态组
-        /// </summary>
+        #if UNITY_EDITOR
         public List<UIStateGroup> StateGroups => stateGroups;
+        #endif
+        
+        private Dictionary<string, UIStateGroup> _groupDict;
 
-        private void Awake()
+        private Dictionary<string, UIStateGroup> GroupDict
         {
-            InitializeGroups();
-        }
-
-        private void Start()
-        {
-            if (applyOnStart)
-            {
-                foreach (var group in stateGroups)
+            get {
+                if (_groupDict == null)
                 {
-                    if (group != null && group.CurrentStateIndex >= 0)
-                    {
-                        group.SetState(group.CurrentStateIndex);
-                    }
+                    InitializeGroups();
                 }
+
+                return _groupDict;
             }
         }
 
@@ -276,21 +267,17 @@ namespace Air.UnityGameCore.Runtime.UI.State
         /// </summary>
         private void InitializeGroups()
         {
-            groupDict = new Dictionary<string, UIStateGroup>();
+            _groupDict = new Dictionary<string, UIStateGroup>();
             foreach (var group in stateGroups)
             {
-                if (group != null && !string.IsNullOrEmpty(group.GroupName))
+                if (group == null || string.IsNullOrEmpty(group.GroupName)) continue;
+                if (_groupDict.ContainsKey(group.GroupName))
                 {
-                    if (!groupDict.ContainsKey(group.GroupName))
-                    {
-                        group.Initialize();
-                        groupDict[group.GroupName] = group;
-                    }
-                    else
-                    {
-                        Debug.LogWarning($"[UIStateCtrl] 状态组名称重复: {group.GroupName}");
-                    }
+                    Debug.LogError($"[UIStateCtrl] 状态组名称重复: {group.GroupName}");
+                    continue;
                 }
+                group.Initialize();
+                _groupDict[group.GroupName] = group;
             }
         }
 
@@ -304,51 +291,16 @@ namespace Air.UnityGameCore.Runtime.UI.State
         {
             if (string.IsNullOrEmpty(groupName))
             {
-                Debug.LogWarning("[UIStateCtrl] 组名称不能为空");
+                Debug.LogError("[UIStateCtrl] 组名称不能为空");
                 return false;
             }
 
-            if (groupDict == null)
-            {
-                InitializeGroups();
-            }
-
-            if (groupDict.TryGetValue(groupName, out var group))
+            if (GroupDict.TryGetValue(groupName, out var group))
             {
                 return group.SetState(stateIndex);
             }
 
-            Debug.LogWarning($"[UIStateCtrl] 未找到状态组: {groupName}");
-            return false;
-        }
-
-        /// <summary>
-        /// 当仅有一个状态组时，可直接通过状态下标设置该组当前状态
-        /// </summary>
-        /// <param name="stateIndex">状态下标</param>
-        /// <returns>是否设置成功</returns>
-        public bool SetState(int stateIndex)
-        {
-            if (groupDict == null)
-            {
-                InitializeGroups();
-            }
-
-            if (groupDict.Count == 0)
-            {
-                Debug.LogWarning("[UIStateCtrl] 未配置任何状态组");
-                return false;
-            }
-
-            if (groupDict.Count == 1)
-            {
-                foreach (var g in groupDict.Values)
-                {
-                    return g.SetState(stateIndex);
-                }
-            }
-
-            Debug.LogWarning("[UIStateCtrl] 存在多个状态组时请使用 SetState(groupName, stateIndex)");
+            Debug.LogError($"[UIStateCtrl] 未找到状态组: {groupName}");
             return false;
         }
 
@@ -357,12 +309,7 @@ namespace Air.UnityGameCore.Runtime.UI.State
         /// </summary>
         public int GetCurrentStateIndex(string groupName)
         {
-            if (groupDict == null)
-            {
-                InitializeGroups();
-            }
-
-            return groupDict.TryGetValue(groupName, out var group) ? group.CurrentStateIndex : -1;
+            return GroupDict.TryGetValue(groupName, out var group) ? group.CurrentStateIndex : -1;
         }
 
         /// <summary>
@@ -370,12 +317,7 @@ namespace Air.UnityGameCore.Runtime.UI.State
         /// </summary>
         public string GetCurrentStateName(string groupName)
         {
-            if (groupDict == null)
-            {
-                InitializeGroups();
-            }
-
-            return groupDict.TryGetValue(groupName, out var group) ? group.CurrentStateName : null;
+            return GroupDict.TryGetValue(groupName, out var group) ? group.CurrentStateName : null;
         }
 
         /// <summary>
@@ -383,12 +325,7 @@ namespace Air.UnityGameCore.Runtime.UI.State
         /// </summary>
         public UIStateGroup GetGroup(string groupName)
         {
-            if (groupDict == null)
-            {
-                InitializeGroups();
-            }
-
-            groupDict.TryGetValue(groupName, out var group);
+            GroupDict.TryGetValue(groupName, out var group);
             return group;
         }
 
@@ -413,26 +350,20 @@ namespace Air.UnityGameCore.Runtime.UI.State
         {
             if (string.IsNullOrEmpty(groupName))
             {
-                Debug.LogWarning("[UIStateCtrl] 组名称不能为空");
+                Debug.LogError("[UIStateCtrl] 组名称不能为空");
                 return null;
             }
 
-            if (groupDict == null)
+            if (GroupDict.TryGetValue(groupName, out var group))
             {
-                InitializeGroups();
-            }
-
-            if (groupDict != null && groupDict.TryGetValue(groupName, out var group))
-            {
-                Debug.LogWarning($"[UIStateCtrl] 状态组已存在: {groupName}");
+                Debug.LogError($"[UIStateCtrl] 状态组已存在: {groupName}");
                 return group;
             }
 
             var newGroup = new UIStateGroup(groupName);
             newGroup.Initialize();
             stateGroups.Add(newGroup);
-            if (groupDict != null) 
-                groupDict[groupName] = newGroup;
+            GroupDict[groupName] = newGroup;
             return newGroup;
         }
 
@@ -442,14 +373,9 @@ namespace Air.UnityGameCore.Runtime.UI.State
         /// <param name="groupName">组名称</param>
         public void RemoveGroup(string groupName)
         {
-            if (groupDict == null)
-            {
-                InitializeGroups();
-            }
-
-            if (groupDict == null || !groupDict.TryGetValue(groupName, out var group)) return;
+            if (!GroupDict.TryGetValue(groupName, out var group)) return;
             stateGroups.Remove(group);
-            groupDict.Remove(groupName);
+            _groupDict.Remove(groupName);
         }
 
         /// <summary>
@@ -457,7 +383,7 @@ namespace Air.UnityGameCore.Runtime.UI.State
         /// </summary>
         public void RefreshCurrentState()
         {
-            foreach (var group in stateGroups)
+            foreach (var (_, group) in GroupDict)
             {
                 group?.RefreshCurrentState();
             }
@@ -478,13 +404,7 @@ namespace Air.UnityGameCore.Runtime.UI.State
         /// </summary>
         public void PreviewState(int stateIndex)
         {
-            if (groupDict == null)
-            {
-                InitializeGroups();
-            }
-
-            if (groupDict == null || groupDict.Count != 1) return;
-            foreach (var group in groupDict.Values)
+            foreach (var group in GroupDict.Values)
             {
                 var state = group.GetState(stateIndex);
                 state?.Apply();

@@ -226,6 +226,8 @@ namespace Air.UnityGameCore.Editor.UI
                 string designerScriptPath = Path.Combine(outputFolder, className + ".Designer.cs");
                 File.WriteAllText(designerScriptPath, designerScript);
                 Debug.Log($"Regenerated designer script: {designerScriptPath}");
+                
+                // todo 生成状态机相关代码
 
                 // 4. 强制导入脚本并刷新
                 AssetDatabase.ImportAsset(designerScriptPath, ImportAssetOptions.ForceUpdate);

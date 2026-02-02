@@ -21,9 +21,9 @@ namespace Air.UnityGameCore.Runtime.UI
         [SerializeField]
         protected List<UIComponent> childs = new();
 
-        public List<UIComponent> Childs => childs;
+        private List<UIComponent> Childs => childs;
 
-        public bool IsInit { get; set; }
+        private bool IsInit { get; set; }
         public bool IsDestoryed { get; set; }
 
         public UIShowParam UIShowParam { get; set; }
@@ -45,7 +45,10 @@ namespace Air.UnityGameCore.Runtime.UI
                     child?.Init();
                 }
             }
-            StateCtrl = GetComponent<UIStateCtrl>();
+            
+            // 状态机 初始化
+            TryGetComponent(out StateCtrl);
+            
             OnUIInit();
         }
 

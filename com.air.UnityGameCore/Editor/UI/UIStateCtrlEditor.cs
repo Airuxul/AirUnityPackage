@@ -4,7 +4,6 @@ using Air.UnityGameCore.Runtime.UI.State;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine.Serialization;
 
 namespace Air.UnityGameCore.Editor.UI
 {
@@ -48,7 +47,7 @@ namespace Air.UnityGameCore.Editor.UI
         private void EnsureFoldoutArrays()
         {
             int groupCount = Mathf.Max(
-                _stateGroupsProperty != null ? _stateGroupsProperty.arraySize : 0,
+                _stateGroupsProperty?.arraySize ?? 0,
                 _stateCtrl.StateGroups?.Count ?? 0);
             int stateCount = GetTotalStateCount();
             if (_groupFoldouts == null || _groupFoldouts.Length != groupCount)
@@ -102,62 +101,74 @@ namespace Air.UnityGameCore.Editor.UI
         private void DrawAddGroupAndStateSection()
         {
             EditorGUILayout.BeginVertical("box");
+            DrawAddGroupRow();
+            EditorGUILayout.Space(5);
+            DrawAddStateToGroupRow();
+            EditorGUILayout.EndVertical();
+        }
+
+        /// <summary>
+        /// 绘制「添加状态组」一行：组名输入 + 添加组按钮
+        /// </summary>
+        private void DrawAddGroupRow()
+        {
             EditorGUILayout.LabelField("添加状态组", EditorStyles.boldLabel);
             EditorGUILayout.BeginHorizontal();
             _newGroupName = EditorGUILayout.TextField("组名称", _newGroupName);
-            if (GUILayout.Button("添加组", GUILayout.Width(70)))
+            if (GUILayout.Button("添加组", GUILayout.Width(70)) && !string.IsNullOrEmpty(_newGroupName))
             {
-                if (!string.IsNullOrEmpty(_newGroupName))
+                Undo.RecordObject(_stateCtrl, "Add State Group");
+                if (_stateCtrl.AddGroup(_newGroupName) != null)
                 {
-                    Undo.RecordObject(_stateCtrl, "Add State Group");
-                    var newGroup = _stateCtrl.AddGroup(_newGroupName);
-                    if (newGroup != null)
-                    {
-                        _newGroupName = "NewGroup";
-                        EnsureFoldoutArrays();
-                        EditorUtility.SetDirty(_stateCtrl);
-                    }
+                    _newGroupName = "NewGroup";
+                    EnsureFoldoutArrays();
+                    EditorUtility.SetDirty(_stateCtrl);
                 }
             }
             EditorGUILayout.EndHorizontal();
+        }
 
-            EditorGUILayout.Space(5);
+        /// <summary>
+        /// 绘制「向组内添加状态」一行：组选择 + 状态名输入 + 添加状态按钮
+        /// </summary>
+        private void DrawAddStateToGroupRow()
+        {
             EditorGUILayout.LabelField("向组内添加状态", EditorStyles.boldLabel);
+            var groupNames = GetGroupNamesForPopup();
+            _selectedGroupIndexForAddState = Mathf.Clamp(_selectedGroupIndexForAddState, 0, groupNames.Count - 1);
+
             EditorGUILayout.BeginHorizontal();
-            var groupNames = _stateCtrl.StateGroups
+            if (groupNames.Count > 0 && groupNames[0] != "(无组)")
+            {
+                _selectedGroupIndexForAddState = EditorGUILayout.Popup(_selectedGroupIndexForAddState, groupNames.ToArray());
+            }
+            _newStateName = EditorGUILayout.TextField("状态名称", _newStateName);
+            if (GUILayout.Button("添加状态", GUILayout.Width(70)) && TryAddStateToSelectedGroup(groupNames))
+            {
+                _newStateName = "NewState";
+                EnsureFoldoutArrays();
+                EditorUtility.SetDirty(_stateCtrl);
+            }
+            EditorGUILayout.EndHorizontal();
+        }
+
+        private List<string> GetGroupNamesForPopup()
+        {
+            var names = _stateCtrl.StateGroups
                 .Where(g => g != null && !string.IsNullOrEmpty(g.GroupName))
                 .Select(g => g.GroupName)
                 .ToList();
-            if (groupNames.Count == 0)
-            {
-                groupNames.Add("(无组)");
-            }
-            _selectedGroupIndexForAddState = Mathf.Clamp(_selectedGroupIndexForAddState, 0, groupNames.Count - 1);
-            int addToGroupIndex = groupNames.Count > 0 && groupNames[0] != "(无组)"
-                ? EditorGUILayout.Popup(_selectedGroupIndexForAddState, groupNames.ToArray())
-                : 0;
-            if (groupNames.Count > 0 && groupNames[0] != "(无组)")
-            {
-                _selectedGroupIndexForAddState = addToGroupIndex;
-            }
-            _newStateName = EditorGUILayout.TextField("状态名称", _newStateName);
-            if (GUILayout.Button("添加状态", GUILayout.Width(70)))
-            {
-                if (groupNames.Count > 0 && groupNames[0] != "(无组)" && !string.IsNullOrEmpty(_newStateName))
-                {
-                    string groupName = groupNames[_selectedGroupIndexForAddState];
-                    Undo.RecordObject(_stateCtrl, "Add State");
-                    var newState = _stateCtrl.GetGroup(groupName)?.AddState(_newStateName);
-                    if (newState != null)
-                    {
-                        _newStateName = "NewState";
-                        EnsureFoldoutArrays();
-                        EditorUtility.SetDirty(_stateCtrl);
-                    }
-                }
-            }
-            EditorGUILayout.EndHorizontal();
-            EditorGUILayout.EndVertical();
+            if (names.Count == 0) names.Add("(无组)");
+            return names;
+        }
+
+        private bool TryAddStateToSelectedGroup(List<string> groupNames)
+        {
+            if (groupNames.Count == 0 || groupNames[0] == "(无组)" || string.IsNullOrEmpty(_newStateName))
+                return false;
+            string groupName = groupNames[_selectedGroupIndexForAddState];
+            Undo.RecordObject(_stateCtrl, "Add State");
+            return _stateCtrl.GetGroup(groupName)?.AddState(_newStateName) != null;
         }
 
         /// <summary>
@@ -192,85 +203,106 @@ namespace Air.UnityGameCore.Editor.UI
         /// <summary>
         /// 绘制单个状态组（含组内当前状态选择与状态列表）
         /// </summary>
-        private void DrawGroupItem(UIStateGroup group, int groupIndex, SerializedProperty groupProperty, ref int stateLinearIndex)
+        public void DrawGroupItem(UIStateGroup group, int groupIndex, SerializedProperty groupProperty, ref int stateLinearIndex)
         {
             if (groupProperty == null) return;
-
             var groupNameProperty = groupProperty.FindPropertyRelative("groupName");
             var statesProperty = groupProperty.FindPropertyRelative("states");
             var currentStateIndexProperty = groupProperty.FindPropertyRelative("currentStateIndex");
             if (groupNameProperty == null || statesProperty == null || currentStateIndexProperty == null) return;
 
             EditorGUILayout.BeginVertical("box");
+            if (DrawGroupHeader(group, groupIndex))
+            {
+                EditorGUILayout.EndVertical();
+                return;
+            }
+            EditorGUILayout.PropertyField(groupNameProperty, new GUIContent("组名称"));
+            DrawGroupCurrentStateSelector(group, groupIndex, currentStateIndexProperty);
+            DrawGroupStatesListWhenExpanded(group, groupIndex, ref stateLinearIndex);
+            EditorGUILayout.EndVertical();
+        }
 
+        /// <summary>
+        /// 绘制状态组标题行：折叠 + 删除组按钮。
+        /// </summary>
+        /// <returns>若用户确认删除组并已执行，返回 true，调用方应结束当前组绘制</returns>
+        private bool DrawGroupHeader(UIStateGroup group, int groupIndex)
+        {
             EditorGUILayout.BeginHorizontal();
             _groupFoldouts[groupIndex] = EditorGUILayout.Foldout(_groupFoldouts[groupIndex],
                 $"组: {group.GroupName} ({group.States.Count} 个状态)", true);
-
-            if (GUILayout.Button("删除组", GUILayout.Width(60)))
+            bool removed = false;
+            if (GUILayout.Button("删除组", GUILayout.Width(60)) &&
+                EditorUtility.DisplayDialog("确认删除", $"确定要删除状态组 '{group.GroupName}' 吗？", "删除", "取消"))
             {
-                if (EditorUtility.DisplayDialog("确认删除", $"确定要删除状态组 '{group.GroupName}' 吗？", "删除", "取消"))
-                {
-                    Undo.RecordObject(_stateCtrl, "Remove State Group");
-                    _stateCtrl.RemoveGroup(group.GroupName);
-                    EnsureFoldoutArrays();
-                    EditorUtility.SetDirty(_stateCtrl);
-                    return;
-                }
+                Undo.RecordObject(_stateCtrl, "Remove State Group");
+                _stateCtrl.RemoveGroup(group.GroupName);
+                EnsureFoldoutArrays();
+                EditorUtility.SetDirty(_stateCtrl);
+                removed = true;
             }
             EditorGUILayout.EndHorizontal();
+            return removed;
+        }
 
-            EditorGUILayout.PropertyField(groupNameProperty, new GUIContent("组名称"));
-
-            // 当前状态选择（组内有且只能选一个，按下标索引）
-            List<string> stateNames = new List<string> { "(无)" };
-            for (int i = 0; i < group.States.Count; i++)
-            {
-                var state = group.States[i];
-                stateNames.Add(state != null ? $"[{i}] {state.StateName}" : $"[{i}] (空)");
-            }
-            int currentIndex = currentStateIndexProperty.intValue >= 0 && currentStateIndexProperty.intValue < group.States.Count
-                ? currentStateIndexProperty.intValue + 1
-                : 0;
+        /// <summary>
+        /// 绘制组内「当前选中状态」下拉与预览按钮
+        /// </summary>
+        private void DrawGroupCurrentStateSelector(UIStateGroup group, int groupIndex, SerializedProperty currentStateIndexProperty)
+        {
+            List<string> stateNames = BuildStateNamesForPopup(group);
+            int currentIndex = GetPopupIndexFromStateIndex(currentStateIndexProperty.intValue, group.States.Count);
             EditorGUI.BeginChangeCheck();
             int newIndex = EditorGUILayout.Popup("当前选中状态", currentIndex, stateNames.ToArray());
             if (EditorGUI.EndChangeCheck())
-            {
                 currentStateIndexProperty.intValue = newIndex == 0 ? -1 : newIndex - 1;
-            }
             if (currentStateIndexProperty.intValue >= 0 && GUILayout.Button("预览当前状态"))
-            {
                 _stateCtrl.PreviewState(group.GroupName, currentStateIndexProperty.intValue);
-            }
+        }
 
-            if (_groupFoldouts[groupIndex])
+        private static List<string> BuildStateNamesForPopup(UIStateGroup group)
+        {
+            var list = new List<string> { "(无)" };
+            for (int i = 0; i < group.States.Count; i++)
             {
-                EditorGUI.indentLevel++;
-                for (int s = 0; s < group.States.Count; s++)
-                {
-                    var state = group.States[s];
-                    if (state == null) continue;
-
-                    int linearIndex = stateLinearIndex;
-                    stateLinearIndex++;
-                    DrawStateItem(state, groupIndex, s, linearIndex, groupProperty, statesProperty);
-                    EditorGUILayout.Space(3);
-                }
-                EditorGUI.indentLevel--;
+                var state = group.States[i];
+                list.Add(state != null ? $"[{i}] {state.StateName}" : $"[{i}] (空)");
             }
-            else
+            return list;
+        }
+
+        private static int GetPopupIndexFromStateIndex(int stateIndex, int stateCount)
+        {
+            return (stateIndex >= 0 && stateIndex < stateCount) ? stateIndex + 1 : 0;
+        }
+
+        /// <summary>
+        /// 组展开时绘制组内状态列表
+        /// </summary>
+        private void DrawGroupStatesListWhenExpanded(UIStateGroup group, int groupIndex, ref int stateLinearIndex)
+        {
+            if (!_groupFoldouts[groupIndex])
             {
                 stateLinearIndex += group.States.Count;
+                return;
             }
-
-            EditorGUILayout.EndVertical();
+            EditorGUI.indentLevel++;
+            for (int s = 0; s < group.States.Count; s++)
+            {
+                var state = group.States[s];
+                if (state == null) continue;
+                int linearIndex = stateLinearIndex++;
+                DrawStateItem(state, groupIndex, s, linearIndex);
+                EditorGUILayout.Space(3);
+            }
+            EditorGUI.indentLevel--;
         }
 
         /// <summary>
         /// 绘制单个状态项
         /// </summary>
-        private void DrawStateItem(UIState state, int groupIndex, int stateIndexInGroup, int stateLinearIndex,
-            SerializedProperty groupProperty, SerializedProperty statesProperty)
+        private void DrawStateItem(UIState state, int groupIndex, int stateIndexInGroup, int stateLinearIndex)
         {
             var group = _stateCtrl.StateGroups[groupIndex];
             string groupName = group?.GroupName ?? string.Empty;
