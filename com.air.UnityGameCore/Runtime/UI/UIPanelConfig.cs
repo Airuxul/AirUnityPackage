@@ -3,6 +3,12 @@ using System.Collections.Generic;
 
 namespace Air.UnityGameCore.Runtime.UI
 {
+    public enum EPanelLayer
+    {
+        Pop,
+        Top
+    }
+    
     /// <summary>
     /// UI配置数据
     /// </summary>
@@ -33,6 +39,6 @@ namespace Air.UnityGameCore.Runtime.UI
         /// <summary>
         /// UI所在层级
         /// </summary>
-        public string UILayer { get; set; }
+        public EPanelLayer UILayer { get; set; }
     }
 }

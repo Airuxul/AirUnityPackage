@@ -30,6 +30,16 @@ namespace Air.UnityGameCore.Runtime.Resource
             return assetPath.ToLower();
         }
 
+        protected override T LoadAsset<T>(string path, ResLoadInfo<T> loadInfo, ELoadType loadType)
+        {
+            var bundlePath = _bundlePathResolver(path);
+            _bundleLoader.LoadBundle(bundlePath);
+            var request = _bundleLoader.LoadBundle(bundlePath);
+            var asset = request.LoadAsset<T>(path);
+            OnAssetLoadCompleted(path, loadInfo, asset, loadType);
+            return asset;
+        }
+
         protected override void LoadAssetAsync<T>(string path, ResLoadInfo<T> loadInfo, ELoadType loadType)
         {
             // 解析 Bundle 路径

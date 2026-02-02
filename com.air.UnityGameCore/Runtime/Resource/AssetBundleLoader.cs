@@ -31,7 +31,44 @@ namespace Air.UnityGameCore.Runtime.Resource
         public AssetBundleLoader(string bundleRootPath, Func<string, string[]> dependenciesResolver = null)
         {
             _bundleRootPath = bundleRootPath;
-            _dependenciesResolver = dependenciesResolver ?? ((path) => Array.Empty<string>());
+            _dependenciesResolver = dependenciesResolver ?? (_ => Array.Empty<string>());
+        }
+        
+        /// <summary>
+        /// 同步加载 AssetBundle
+        /// </summary>
+        /// <param name="bundlePath">Bundle 路径</param>
+        /// <returns>加载的 AssetBundle，失败返回 null</returns>
+        public AssetBundle LoadBundle(string bundlePath)
+        {
+            // 如果 Bundle 已经加载，增加引用计数并返回
+            if (TryGetCachedBundle(bundlePath, out var cachedBundle))
+            {
+                return cachedBundle;
+            }
+
+            // 先同步加载所有依赖
+            var dependencies = _dependenciesResolver(bundlePath);
+            if (dependencies != null && dependencies.Length > 0)
+            {
+                LoadDependenciesSync(dependencies);
+            }
+
+            // 加载主 Bundle
+            var fullPath = GetFullPath(bundlePath);
+            var bundle = AssetBundle.LoadFromFile(fullPath);
+
+            if (bundle != null)
+            {
+                var bundleInfo = CreateBundleInfo(bundlePath, bundle, dependencies);
+                _bundleInfoDict[bundlePath] = bundleInfo;
+            }
+            else
+            {
+                Debug.LogError($"Failed to load AssetBundle from path: {fullPath}");
+            }
+
+            return bundle;
         }
 
         /// <summary>
@@ -39,11 +76,10 @@ namespace Air.UnityGameCore.Runtime.Resource
         /// </summary>
         public void LoadBundleAsync(string bundlePath, Action<AssetBundle> callback)
         {
-            // 如果 Bundle 已经加载
-            if (_bundleInfoDict.TryGetValue(bundlePath, out var bundleInfo))
+            // 如果 Bundle 已经加载，增加引用计数并返回
+            if (TryGetCachedBundle(bundlePath, out var cachedBundle))
             {
-                bundleInfo.RefCount++;
-                callback?.Invoke(bundleInfo.Bundle);
+                callback?.Invoke(cachedBundle);
                 return;
             }
 
@@ -59,6 +95,65 @@ namespace Air.UnityGameCore.Runtime.Resource
             else
             {
                 LoadBundleFromFile(bundlePath, null, callback);
+            }
+        }
+
+        /// <summary>
+        /// 尝试从缓存获取已加载的 Bundle 并增加引用计数
+        /// </summary>
+        /// <returns>如果 Bundle 已加载返回 true，否则返回 false</returns>
+        private bool TryGetCachedBundle(string bundlePath, out AssetBundle bundle)
+        {
+            if (_bundleInfoDict.TryGetValue(bundlePath, out var bundleInfo))
+            {
+                bundleInfo.RefCount++;
+                bundle = bundleInfo.Bundle;
+                return true;
+            }
+
+            bundle = null;
+            return false;
+        }
+
+        /// <summary>
+        /// 同步加载所有依赖
+        /// </summary>
+        private void LoadDependenciesSync(string[] dependencies)
+        {
+            if (dependencies == null || dependencies.Length == 0)
+            {
+                return;
+            }
+
+            foreach (var dep in dependencies)
+            {
+                LoadDependencyBundleSync(dep);
+            }
+        }
+
+        /// <summary>
+        /// 同步加载依赖的 Bundle
+        /// </summary>
+        private void LoadDependencyBundleSync(string bundlePath)
+        {
+            // 如果依赖 Bundle 已经加载，增加引用计数
+            if (TryGetCachedBundle(bundlePath, out _))
+            {
+                return;
+            }
+
+            // 加载依赖的 Bundle
+            var fullPath = GetFullPath(bundlePath);
+            var bundle = AssetBundle.LoadFromFile(fullPath);
+
+            if (bundle != null)
+            {
+                var bundleInfo = CreateBundleInfo(bundlePath, bundle, null);
+                _bundleInfoDict[bundlePath] = bundleInfo;
+            }
+            else
+            {
+                Debug.LogError($"Failed to load dependency AssetBundle: {bundlePath}");
             }
         }
 
@@ -90,20 +185,19 @@ namespace Air.UnityGameCore.Runtime.Resource
         }
 
         /// <summary>
-        /// 加载依赖的 Bundle
+        /// 异步加载依赖的 Bundle
         /// </summary>
         private void LoadDependencyBundleAsync(string bundlePath, Action callback)
         {
-            // 如果依赖 Bundle 已经加载
-            if (_bundleInfoDict.TryGetValue(bundlePath, out var bundleInfo))
+            // 如果依赖 Bundle 已经加载，增加引用计数
+            if (TryGetCachedBundle(bundlePath, out _))
             {
-                bundleInfo.RefCount++;
                 callback?.Invoke();
                 return;
             }
 
-            // 加载依赖的 Bundle
-            var fullPath = System.IO.Path.Combine(_bundleRootPath, bundlePath);
+            // 异步加载依赖的 Bundle
+            var fullPath = GetFullPath(bundlePath);
             var request = AssetBundle.LoadFromFileAsync(fullPath);
             request.completed += operation =>
             {
@@ -112,14 +206,8 @@ namespace Air.UnityGameCore.Runtime.Resource
 
                 if (bundle != null)
                 {
-                    var newBundleInfo = new AssetBundleInfo
-                    {
-                        BundlePath = bundlePath,
-                        Bundle = bundle,
-                        RefCount = 1,
-                        Dependencies = new List<string>()
-                    };
-                    _bundleInfoDict[bundlePath] = newBundleInfo;
+                    var bundleInfo = CreateBundleInfo(bundlePath, bundle, null);
+                    _bundleInfoDict[bundlePath] = bundleInfo;
                 }
                 else
                 {
@@ -131,11 +219,11 @@ namespace Air.UnityGameCore.Runtime.Resource
         }
 
         /// <summary>
-        /// 从文件加载 Bundle
+        /// 从文件异步加载 Bundle
         /// </summary>
         private void LoadBundleFromFile(string bundlePath, string[] dependencies, Action<AssetBundle> callback)
         {
-            var fullPath = System.IO.Path.Combine(_bundleRootPath, bundlePath);
+            var fullPath = GetFullPath(bundlePath);
             var request = AssetBundle.LoadFromFileAsync(fullPath);
             request.completed += operation =>
             {
@@ -144,14 +232,8 @@ namespace Air.UnityGameCore.Runtime.Resource
 
                 if (bundle != null)
                 {
-                    var newBundleInfo = new AssetBundleInfo
-                    {
-                        BundlePath = bundlePath,
-                        Bundle = bundle,
-                        RefCount = 1,
-                        Dependencies = dependencies != null ? new List<string>(dependencies) : new List<string>()
-                    };
-                    _bundleInfoDict[bundlePath] = newBundleInfo;
+                    var bundleInfo = CreateBundleInfo(bundlePath, bundle, dependencies);
+                    _bundleInfoDict[bundlePath] = bundleInfo;
                     callback?.Invoke(bundle);
                 }
                 else
@@ -160,6 +242,28 @@ namespace Air.UnityGameCore.Runtime.Resource
                     callback?.Invoke(null);
                 }
             };
+        }
+
+        /// <summary>
+        /// 创建 AssetBundleInfo 对象
+        /// </summary>
+        private AssetBundleInfo CreateBundleInfo(string bundlePath, AssetBundle bundle, string[] dependencies)
+        {
+            return new AssetBundleInfo
+            {
+                BundlePath = bundlePath,
+                Bundle = bundle,
+                RefCount = 1,
+                Dependencies = dependencies != null ? new List<string>(dependencies) : new List<string>()
+            };
+        }
+
+        /// <summary>
+        /// 获取 Bundle 完整路径
+        /// </summary>
+        private string GetFullPath(string bundlePath)
+        {
+            return System.IO.Path.Combine(_bundleRootPath, bundlePath);
         }
 
         /// <summary>
@@ -194,22 +298,26 @@ namespace Air.UnityGameCore.Runtime.Resource
             if (bundleInfo.RefCount <= 0)
             {
                 // 先卸载依赖
-                if (bundleInfo.Dependencies != null && bundleInfo.Dependencies.Count > 0)
-                {
-                    foreach (var dep in bundleInfo.Dependencies)
-                    {
-                        UnloadDependencyBundle(dep);
-                    }
-                }
+                UnloadDependencies(bundleInfo.Dependencies);
 
                 // 卸载自己
-                if (bundleInfo.Bundle != null)
-                {
-                    bundleInfo.Bundle.Unload(true);
-                    bundleInfo.Bundle = null;
-                }
-                
-                _bundleInfoDict.Remove(bundlePath);
+                UnloadBundleInternal(bundlePath, bundleInfo);
+            }
+        }
+
+        /// <summary>
+        /// 卸载依赖的 Bundle 列表
+        /// </summary>
+        private void UnloadDependencies(List<string> dependencies)
+        {
+            if (dependencies == null || dependencies.Count == 0)
+            {
+                return;
+            }
+
+            foreach (var dep in dependencies)
+            {
+                UnloadDependencyBundle(dep);
             }
         }
 
@@ -228,18 +336,26 @@ namespace Air.UnityGameCore.Runtime.Resource
             // 引用计数为 0 时才真正卸载依赖 Bundle
             if (bundleInfo.RefCount <= 0)
             {
-                if (bundleInfo.Bundle != null)
-                {
-                    bundleInfo.Bundle.Unload(true);
-                    bundleInfo.Bundle = null;
-                }
-                
-                _bundleInfoDict.Remove(bundlePath);
+                UnloadBundleInternal(bundlePath, bundleInfo);
             }
         }
 
         /// <summary>
-        /// 卸载所有未使用的 Bundle
+        /// 内部方法：真正执行 Bundle 的卸载和清理
+        /// </summary>
+        private void UnloadBundleInternal(string bundlePath, AssetBundleInfo bundleInfo)
+        {
+            if (bundleInfo.Bundle != null)
+            {
+                bundleInfo.Bundle.Unload(true);
+                bundleInfo.Bundle = null;
+            }
+
+            _bundleInfoDict.Remove(bundlePath);
+        }
+
+        /// <summary>
+        /// 卸载所有未使用的 Bundle（引用计数为 0 的）
         /// </summary>
         public void UnloadUnusedBundles()
         {
@@ -256,17 +372,12 @@ namespace Air.UnityGameCore.Runtime.Resource
             foreach (var bundlePath in bundlesToRemove)
             {
                 var bundleInfo = _bundleInfoDict[bundlePath];
-                if (bundleInfo.Bundle != null)
-                {
-                    bundleInfo.Bundle.Unload(true);
-                    bundleInfo.Bundle = null;
-                }
-                _bundleInfoDict.Remove(bundlePath);
+                UnloadBundleInternal(bundlePath, bundleInfo);
             }
         }
 
         /// <summary>
-        /// 清空所有 Bundle
+        /// 清空所有 Bundle（忽略引用计数）
         /// </summary>
         public void Clear()
         {

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -89,11 +88,6 @@ namespace Air.UnityGameCore.Runtime.Extensions {
             for (var i = parent.childCount - 1; i >= 0; i--) {
                 action(parent.GetChild(i));
             }
-        }
-
-        [Obsolete("Renamed to ForEveryChild")]
-        static void PerformActionOnChildren(this Transform parent, System.Action<Transform> action) {
-            parent.ForEveryChild(action);
         }
     }
 }

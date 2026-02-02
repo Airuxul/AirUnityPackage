@@ -1,10 +1,9 @@
-using Air.UnityGameCore.Runtime.UI;
-
 namespace Air.UnityGameCore.Runtime.UI
 {
     public class UIPanel : UIComponent
     {
-        public UIPanelConfig UIPanelConfig { get; set; }
+        public UIPanelConfig UIPanelConfig { get; private set; }
+
         public void Init(UIPanelConfig uiPanelConfig)
         {
             UIPanelConfig = uiPanelConfig;
