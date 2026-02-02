@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Editor.UI
+namespace Air.UnityGameCore.Editor.UI
 {
     /// <summary>
     /// UI类型枚举

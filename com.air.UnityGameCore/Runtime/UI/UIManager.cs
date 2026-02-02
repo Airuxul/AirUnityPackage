@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using Resource;
+using Air.UnityGameCore.Runtime.Resource;
 using UnityEngine;
 
-namespace UI
+namespace Air.UnityGameCore.Runtime.UI
 {
     public class UIManager
     {

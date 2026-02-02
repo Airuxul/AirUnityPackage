@@ -1,4 +1,4 @@
-namespace Resource
+namespace Air.UnityGameCore.Runtime.Resource
 {
     public enum EResLoadStatus
     {

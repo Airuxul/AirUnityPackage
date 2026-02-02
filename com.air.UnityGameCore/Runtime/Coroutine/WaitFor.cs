@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Coroutine
+namespace Air.UnityGameCore.Runtime.Coroutine
 {
     public static class WaitFor {
     public static WaitForFixedUpdate FixedUpdate { get; } = new();

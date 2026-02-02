@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace Editor.AssetDependency
+namespace Air.UnityGameCore.Editor.AssetDependency
 {
     /// <summary>
     /// 资源依赖分析器

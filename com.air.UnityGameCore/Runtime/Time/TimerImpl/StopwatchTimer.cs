@@ -1,4 +1,4 @@
-namespace Time.TimerImpl {
+namespace Air.UnityGameCore.Runtime.Time {
     /// <summary>
     /// Timer that counts up from zero to infinity.  Great for measuring durations.
     /// </summary>

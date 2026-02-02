@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using UI;
 using UnityEditor;
 using UnityEngine;
+using Air.UnityGameCore.Runtime.UI;
+using log4net.Util;
 using Transform = UnityEngine.Transform;
 
-namespace Editor.UI
+namespace Air.UnityGameCore.Editor.UI
 {
     /// <summary>
     /// UI脚本生成器，负责根据GameObject结构自动生成UI脚本代码
@@ -21,7 +22,6 @@ namespace Editor.UI
         /// <param name="targetGo">目标GameObject</param>
         /// <param name="className">UI类名</param>
         /// <param name="outputFolder">输出文件夹路径</param>
-        /// <param name="uiType">ui类型</param>
         public static void GenerateUIScript(GameObject targetGo, string className, string outputFolder, UIType uiType)
         {
             if (!ValidateInputParameters(targetGo, className, outputFolder))
@@ -41,7 +41,7 @@ namespace Editor.UI
                 EnsureOutputDirectory(outputFolder);
 
                 // 检查并处理脚本已存在的情况
-                if (TryHandleExistingScripts(className, outputFolder))
+                if (TryHandleExistingScripts(targetGo, className, outputFolder))
                 {
                     return;
                 }
@@ -127,7 +127,7 @@ namespace Editor.UI
         /// 尝试处理脚本已存在的情况
         /// </summary>
         /// <returns>如果处理了已存在脚本返回true</returns>
-        private static bool TryHandleExistingScripts(string className, string outputFolder)
+        private static bool TryHandleExistingScripts(GameObject targetGo, string className, string outputFolder)
         {
             bool logicScriptExists = File.Exists(Path.Combine(outputFolder, className + ".cs"));
             bool designerScriptExists = File.Exists(Path.Combine(outputFolder, className + ".Designer.cs"));
@@ -288,7 +288,6 @@ namespace Editor.UI
         /// </summary>
         /// <param name="className">类名</param>
         /// <param name="fields">组件字段列表</param>
-        /// <param name="uiType">ui类型</param>
         /// <returns>逻辑脚本内容</returns>
         private static string GenerateLogicScript(string className, List<ComponentField> fields, UIType uiType)
         {
@@ -453,7 +452,7 @@ namespace Editor.UI
                 if (UIComponentTypes.IsUIComponent(componentType))
                 {
                     hasUIComponent = true;
-                    string fieldName = ToFieldName(transform.name);
+                    string fieldName = ToFieldName(transform.name ?? "");
 
                     // 添加UIComponent字段
                     currentObjectFields.Add(new ComponentField
@@ -478,7 +477,7 @@ namespace Editor.UI
 
                 if (!UIComponentTypes.IsBasicType(componentType)) continue;
 
-                string fieldName = ToFieldName(transform.name);
+                string fieldName = ToFieldName(transform.name ?? "");
 
                 // 检查是否已经在当前对象字段中存在相同类型
                 bool fieldExists = currentObjectFields.Any(f => f.fieldType == componentType.Name);

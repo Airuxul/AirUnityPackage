@@ -1,4 +1,6 @@
-namespace StateMachine.Layered
+using Air.GameCore.StateMachine;
+
+namespace Air.GameCore.StateMachine.Layered
 {
     public abstract class LayeredStateMachine : StateMachine
     {

@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Extensions {
+namespace Air.UnityGameCore.Runtime.Extensions {
     public static class AsyncOperationExtensions {
         /// <summary>
         /// Extension method that converts an AsyncOperation into a Task.

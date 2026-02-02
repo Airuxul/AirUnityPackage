@@ -1,10 +1,10 @@
 using UnityEngine;
 
-namespace Singleton
+namespace Air.UnityGameCore.Runtime.Singleton
 {
     public abstract class PersistentSingleton<T> : MonoBehaviour where T : Component
     {
-        public bool autoUnparentOnAwake = true;
+        public bool AutoUnparentOnAwake = true;
 
         private static T _instance;
 
@@ -45,7 +45,7 @@ namespace Singleton
         {
             if (!Application.isPlaying) return;
 
-            if (autoUnparentOnAwake)
+            if (AutoUnparentOnAwake)
             {
                 transform.SetParent(null);
             }

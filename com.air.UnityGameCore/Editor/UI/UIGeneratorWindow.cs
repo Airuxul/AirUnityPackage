@@ -1,9 +1,10 @@
 using System.IO;
-using UI;
 using UnityEditor;
 using UnityEngine;
+using Air.UnityGameCore.Runtime.UI;
+using UnityEngine.Serialization;
 
-namespace Editor.UI
+namespace Air.UnityGameCore.Editor.UI
 {
     /// <summary>
     /// UI脚本生成器窗口

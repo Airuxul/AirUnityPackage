@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Threading.Tasks;
 
-namespace Extensions {
+namespace Air.UnityGameCore.Runtime.Extensions {
     public static class TaskExtensions {
         /// <summary>
         /// Wraps the provided object into a completed Task.
@@ -33,9 +33,11 @@ namespace Extensions {
             try {
                 await task;
             }
-            catch (Exception exception)
-            {
-                if (onException != null) onException(exception);
+            catch (Exception exception) {
+                if (onException == null)
+                    throw exception;
+
+                onException(exception);
             }
         }
         
@@ -52,8 +54,8 @@ namespace Extensions {
             if (condition == null) throw new ArgumentNullException(nameof(condition));
             if (pollIntervalMs <= 0) throw new ArgumentOutOfRangeException(nameof(pollIntervalMs), "Poll interval must be positive");
 
-            var cancelledState = new CancelledState();
-            var waitTask = RunWaitLoop(condition, pollIntervalMs, cancelledState);
+            var cancelled = false;
+            var waitTask = RunWaitLoop(condition, pollIntervalMs, () => cancelled);
 
             if (timeoutMs < 0) {
                 await waitTask;
@@ -64,21 +66,17 @@ namespace Extensions {
             var finished = await Task.WhenAny(waitTask, timeoutTask);
 
             if (finished != waitTask) {
-                cancelledState.Value = true;
+                cancelled = true;
                 return false;
             }
 
             return true;
         }
 
-        static async Task RunWaitLoop(Func<bool> condition, int pollIntervalMs, CancelledState cancelledState) {
-            while (!condition() && !cancelledState.Value) {
+        static async Task RunWaitLoop(Func<bool> condition, int pollIntervalMs, Func<bool> cancelled) {
+            while (!condition() && !cancelled()) {
                 await Task.Delay(pollIntervalMs);
             }
-        }
-
-        sealed class CancelledState {
-            public bool Value;
         }
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Extensions {
+namespace Air.UnityGameCore.Runtime.Extensions {
     public static class TransformExtensions {
         /// <summary>
         /// Check if the transform is within a certain distance and optionally within a certain angle (FOV) from the target transform.
@@ -85,13 +85,14 @@ namespace Extensions {
         /// This method iterates over all child transforms in reverse order and executes a given action on them.
         /// The action is a delegate that takes a Transform as parameter.
         /// </remarks>
-        public static void ForEveryChild(this Transform parent, Action<Transform> action) {
+        public static void ForEveryChild(this Transform parent, System.Action<Transform> action) {
             for (var i = parent.childCount - 1; i >= 0; i--) {
                 action(parent.GetChild(i));
             }
         }
 
-        public static void PerformActionOnChildren(this Transform parent, Action<Transform> action) {
+        [Obsolete("Renamed to ForEveryChild")]
+        static void PerformActionOnChildren(this Transform parent, System.Action<Transform> action) {
             parent.ForEveryChild(action);
         }
     }

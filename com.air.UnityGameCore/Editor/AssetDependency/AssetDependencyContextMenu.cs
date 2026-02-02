@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Editor.AssetDependency
+namespace Air.UnityGameCore.Editor.AssetDependency
 {
     /// <summary>
     /// 资源依赖查询的右键菜单扩展
@@ -39,7 +39,7 @@ namespace Editor.AssetDependency
                 return;
 
             string assetPath = AssetDatabase.GetAssetPath(Selection.activeObject);
-            var dependencies = AssetDependencyAnalyzer.GetDependencies(assetPath);
+            var dependencies = AssetDependencyAnalyzer.GetDependencies(assetPath, true);
 
             Debug.Log($"=== {Selection.activeObject.name} 的依赖项 ({dependencies.Count}) ===");
             foreach (string dep in dependencies)

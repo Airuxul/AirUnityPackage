@@ -1,13 +1,16 @@
-public abstract class Singleton<T> where T : class, new()
+namespace Air.GameCore
 {
-    private static T _instance;
-
-    public static T Instance
+    public abstract class Singleton<T> where T : class, new()
     {
-        get
+        private static T _instance;
+
+        public static T Instance
         {
-            _instance ??= new T();
-            return _instance;
+            get
+            {
+                _instance ??= new T();
+                return _instance;
+            }
         }
     }
 }

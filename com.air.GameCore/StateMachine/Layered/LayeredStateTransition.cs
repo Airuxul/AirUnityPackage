@@ -1,6 +1,7 @@
 using System.Collections.Generic;
+using Air.GameCore.StateMachine;
 
-namespace StateMachine.Layered
+namespace Air.GameCore.StateMachine.Layered
 {
     public class LayeredStateTransition : IStateTransition
     {

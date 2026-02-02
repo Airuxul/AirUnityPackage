@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Resource
+namespace Air.UnityGameCore.Runtime.Resource
 {
     /// <summary>
     /// AssetBundle 信息
@@ -31,7 +31,7 @@ namespace Resource
         public AssetBundleLoader(string bundleRootPath, Func<string, string[]> dependenciesResolver = null)
         {
             _bundleRootPath = bundleRootPath;
-            _dependenciesResolver = dependenciesResolver ?? (_ => Array.Empty<string>());
+            _dependenciesResolver = dependenciesResolver ?? ((path) => Array.Empty<string>());
         }
 
         /// <summary>

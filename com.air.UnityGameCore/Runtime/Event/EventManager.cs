@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
+using CodiceApp.EventTracking.Plastic;
 
-namespace Event
+namespace Air.UnityGameCore.Runtime.Event
 {
     public interface IEvent
     {
@@ -101,7 +102,7 @@ namespace Event
             _events.Remove(eventName);
         }
 
-        public void Clear()
+        private void Clear()
         {
             _events.Clear();
         }

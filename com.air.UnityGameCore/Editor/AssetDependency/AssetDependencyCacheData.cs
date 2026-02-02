@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Editor.AssetDependency
+namespace Air.UnityGameCore.Editor.AssetDependency
 {
     /// <summary>
     /// 资源依赖缓存数据

@@ -1,7 +1,7 @@
-using UnityEditor;
 using UnityEngine;
+using UnityEditor;
 
-namespace Editor.UI
+namespace Air.UnityGameCore.Editor.UI
 {
     /// <summary>
     /// UI生成器右键菜单支持

@@ -1,6 +1,7 @@
 using System;
+using System.Collections.Generic;
 
-namespace UI
+namespace Air.UnityGameCore.Runtime.UI
 {
     /// <summary>
     /// UI配置数据

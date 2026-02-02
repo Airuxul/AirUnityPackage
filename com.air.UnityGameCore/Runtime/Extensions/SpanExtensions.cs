@@ -1,6 +1,6 @@
 using System;
 
-namespace Extensions {
+namespace Air.UnityGameCore.Runtime.Extensions {
     public static class SpanExtensions {
         /// <summary>
         /// Copies a block of elements from one span to another.

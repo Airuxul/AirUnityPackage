@@ -2,15 +2,16 @@ using System.IO;
 using System.Reflection;
 using UnityEditor;
 using UnityEditor.SceneManagement;
+using UnityEditor.ShortcutManagement;
 using UnityEngine;
 
-namespace Editor
+namespace Air.UnityGameCore.Editor
 {
     public static class EditorHotKeys
     {
-        static readonly MethodInfo FlipLocked;
-        private static readonly PropertyInfo ConstrainProportions;
-        private const BindingFlags BindingFlags = System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
+        static readonly MethodInfo flipLocked;
+        static readonly PropertyInfo constrainProportions;
+        const BindingFlags bindingFlags = BindingFlags.NonPublic | BindingFlags.Instance;
 
         static EditorHotKeys()
         {
@@ -19,7 +20,7 @@ namespace Editor
             var editorLockTrackerType = typeof(EditorGUIUtility).Assembly.GetType("UnityEditor.EditorGUIUtility+EditorLockTracker");
             flipLocked = editorLockTrackerType.GetMethod("FlipLocked", bindingFlags);
 #endif
-            ConstrainProportions = typeof(Transform).GetProperty("constrainProportionsScale", BindingFlags);
+            constrainProportions = typeof(Transform).GetProperty("constrainProportionsScale", bindingFlags);
         }
 
         [MenuItem("Edit/Toggle Inspector Lock %l")]
@@ -41,8 +42,8 @@ namespace Editor
             {
                 if (activeEditor.target is not Transform target) continue;
 
-                var currentValue = (bool)ConstrainProportions.GetValue(target, null);
-                ConstrainProportions.SetValue(target, !currentValue, null);
+                var currentValue = (bool)constrainProportions.GetValue(target, null);
+                constrainProportions.SetValue(target, !currentValue, null);
             }
 
             ActiveEditorTracker.sharedTracker.ForceRebuild();

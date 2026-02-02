@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using UI;
 using UnityEngine;
 using UnityEngine.UI;
+using Air.UnityGameCore.Runtime.UI;
 
-namespace Editor.UI
+namespace Air.UnityGameCore.Editor.UI
 {
     /// <summary>
     /// UI组件类型管理器，用于识别基础UI组件和自定义UI组件
