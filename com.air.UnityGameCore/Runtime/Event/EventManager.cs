@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 
+// todo 这块逻辑可以移至GameCore中
 namespace Air.UnityGameCore.Runtime.Event
 {
     public interface IEvent
@@ -96,7 +97,7 @@ namespace Air.UnityGameCore.Runtime.Event
                 RemoveEvent(eventName);
         }
         
-        private void RemoveEvent(string eventName)
+        public void RemoveEvent(string eventName)
         {
             _events.Remove(eventName);
         }

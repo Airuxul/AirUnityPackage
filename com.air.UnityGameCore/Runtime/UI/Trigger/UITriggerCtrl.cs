@@ -102,6 +102,7 @@ namespace Air.UnityGameCore.Runtime.UI.Trigger
                 return;
             }
 
+            // 添加默认显示页面动画和事件逻辑
             var showUITriggerBinding = new TriggerBinding
             {
                 BindingName = "ShowUI"
@@ -119,7 +120,26 @@ namespace Air.UnityGameCore.Runtime.UI.Trigger
                 new EventTriggerAction(panelShowAfterEvent)
             );
             
+            // 添加默认关闭页面动画和事件逻辑
+            var closeUITriggerBinding = new TriggerBinding
+            {
+                BindingName = "HideUI"
+            };
+            closeUITriggerBinding.Actions.Add(
+                new AnimationTriggerAction(
+                    AnimationTriggerAction.AnimationSourceType.AnimatorTrigger,
+                    gameObject,
+                    "UIPanelHide",
+                    true)
+            );
+            var panelCloseAfterEvent = new UnityEvent();
+            UnityEventTools.AddPersistentListener(panelCloseAfterEvent, uiPanel.ShowAfter);
+            closeUITriggerBinding.Actions.Add(
+                new EventTriggerAction(panelCloseAfterEvent)
+            );
+            
             bindings.Add(showUITriggerBinding);
+            bindings.Add(closeUITriggerBinding);
         }
 
         /// <summary>

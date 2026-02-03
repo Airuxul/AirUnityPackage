@@ -61,6 +61,10 @@ namespace Air.UnityGameCore.Runtime.UI
             }
         }
 
+        /// <summary>
+        /// 页面加载完实例化逻辑
+        /// </summary>
+        /// <param name="param"></param>
         public void Show(UIShowParam param)
         {
             UIShowParam = param;
@@ -69,9 +73,13 @@ namespace Air.UnityGameCore.Runtime.UI
                 child?.Destory();
             }
             OnUIShow(param);
+            // 播放显示动画
             TriggerCtrl?.TriggerUIPanelShow();
         }
 
+        /// <summary>
+        /// 页面展示动画结束时的回调逻辑
+        /// </summary>
         public void ShowAfter()
         {
             foreach (var child in Childs)
@@ -81,6 +89,9 @@ namespace Air.UnityGameCore.Runtime.UI
             OnUIShowAfter();
         }
 
+        /// <summary>
+        /// 页面隐藏逻辑
+        /// </summary>
         public void Hide()
         {
             OnUIHide();
@@ -91,9 +102,13 @@ namespace Air.UnityGameCore.Runtime.UI
             // todo hide动画
         }
 
+        /// <summary>
+        /// 销毁页面
+        /// </summary>
         public void Destory()
         {
             OnUIDestory();
+            ClearEvent();
             IsInit = false;
             IsDestoryed = true;
             foreach (var child in Childs)
@@ -142,6 +157,26 @@ namespace Air.UnityGameCore.Runtime.UI
         {
             
         }
+        #endregion
+
+        #region 事件
+        private EventHandler _eventHandler;
+
+        private EventHandler EventHandler
+        {
+            get
+            {
+                _eventHandler ??= new EventHandler();
+                return _eventHandler;
+            }
+        }
+
+        public void RegisterEvent(string eventName, System.Action action) => EventHandler.RegisterEvent(eventName, action);
+        public void RegisterEvent<T>(string eventName, System.Action<T> action) => EventHandler.RegisterEvent(eventName, action);
+        public void TriggerEvent(string eventName) => EventHandler.TriggerEvent(eventName);
+        public void TriggerEvent<T>(string eventName, T param) => EventHandler.TriggerEvent(eventName, param);
+        public void UnRegisterEvent(string eventName) => EventHandler.UnRegisterEvent(eventName);
+        private void ClearEvent() => _eventHandler?.Clear();
         #endregion
     }
 }

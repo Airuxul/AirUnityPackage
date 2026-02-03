@@ -169,15 +169,19 @@ namespace Air.UnityGameCore.Runtime.UI
             uiPanelGo.transform.SetParent(rootGo.transform);
         }
 
-        public void DestoryPanel(UIPanel uiPanel)
+        public void DestoryPanel(UIPanel uiPanel, bool isImmediate = true)
         {
             var uiPanelConfig = uiPanel.UIPanelConfig;
             _uiMap.Remove(uiPanelConfig.UIPanelId);
-            uiPanel.Destory();
-            Object.Destroy(uiPanel.gameObject);
-            _resManager.UnloadRes(uiPanelConfig.PrefabPath);
+            // todo: 这个设计目前还没有太大用处，等待后续有关闭动画的需求再继续实现
+            if (isImmediate)
+            {
+                uiPanel.Destory();
+                Object.Destroy(uiPanel.gameObject);
+                _resManager.UnloadRes(uiPanelConfig.PrefabPath);
             
-            _eventManager.TriggerEvent(BaseEventDefine.UIPanelClose, uiPanelConfig);
+                _eventManager.TriggerEvent(BaseEventDefine.UIPanelClose, uiPanelConfig);
+            }
         }
 
         #region 分辨率调整功能
