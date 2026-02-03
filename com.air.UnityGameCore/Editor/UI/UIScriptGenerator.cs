@@ -17,8 +17,12 @@ namespace Air.UnityGameCore.Editor.UI
         /// <summary>
         /// 生成新的脚本（首次生成）
         /// </summary>
-        public static void GenerateUIScript(GameObject targetGo, string className, string outputFolder,
-            UIType uiType)
+        public static void GenerateUIScript(
+            GameObject targetGo,
+            string className,
+            string outputFolder,
+            UIType uiType
+        )
         {
             var existingUIComponent = targetGo.GetComponent<UIComponent>();
             if (existingUIComponent)
@@ -29,7 +33,7 @@ namespace Air.UnityGameCore.Editor.UI
                     throw new Exception($"Could not find existing Designer script for {existingClassName}");
                 }
             }
-            
+
             // 收集字段
             List<ComponentField> fields = CollectComponentFields(targetGo);
 
@@ -46,7 +50,7 @@ namespace Air.UnityGameCore.Editor.UI
                 File.WriteAllText(logicScriptPath, logicScript);
                 Debug.Log($"Generated logic script: {logicScriptPath}");
             }
-            
+
             // 生成设计器脚本
             string designerScript = GenerateDesignerScript(className, fields);
             string designerScriptPath = Path.Combine(outputFolder, className + ".Designer.cs");
@@ -58,7 +62,7 @@ namespace Air.UnityGameCore.Editor.UI
 
             // 添加到UISerializer的待处理列表，等待编译完成
             UISerializer.AddPendingAttachment(GetGameObjectPath(targetGo), className);
-            
+
             AssetDatabase.ImportAsset(logicScriptPath, ImportAssetOptions.ForceUpdate);
             AssetDatabase.ImportAsset(designerScriptPath, ImportAssetOptions.ForceUpdate);
             AssetDatabase.Refresh();
@@ -242,7 +246,7 @@ namespace Air.UnityGameCore.Editor.UI
             ProcessFieldsSameName(fields);
             return fields;
         }
-        
+
         /// <summary>
         /// 处理同名字段
         /// </summary>
@@ -257,6 +261,7 @@ namespace Air.UnityGameCore.Editor.UI
                 {
                     continue;
                 }
+
                 var preField = fieldName2Field[field.fieldName];
                 preField.fieldName = $"{preField.fieldName}{preField.fieldType}";
                 field.fieldName = $"{field.fieldName}{field.fieldType}";
@@ -266,7 +271,8 @@ namespace Air.UnityGameCore.Editor.UI
         /// <summary>
         /// 递归收集组件字段信息
         /// </summary>
-        private static void CollectComponentFieldsRecursive(Transform transform, List<ComponentField> fields, string path)
+        private static void CollectComponentFieldsRecursive(Transform transform, List<ComponentField> fields,
+            string path)
         {
             Component[] components = transform.GetComponents<Component>();
             List<ComponentField> newFields = new List<ComponentField>();
@@ -288,11 +294,14 @@ namespace Air.UnityGameCore.Editor.UI
                     {
                         continue;
                     }
+
                     fields.Add(newFiled);
                     return;
                 }
+
                 newFields.Add(newFiled);
             }
+
             fields.AddRange(newFields);
             for (var i = 0; i < transform.childCount; i++)
             {
