@@ -97,7 +97,7 @@ namespace Air.UnityGameCore.Runtime.UI.Trigger
 
             if (!BindingDict.TryGetValue(bindingName, out var binding))
             {
-                Debug.LogError($"[UITriggerCtrl] 未找到绑定: {bindingName}");
+                // Debug.LogError($"[UITriggerCtrl] 未找到绑定: {bindingName}");
                 return;
             }
 
@@ -149,7 +149,8 @@ namespace Air.UnityGameCore.Runtime.UI.Trigger
         /// </summary>
         public TriggerBinding GetBinding(string bindingName)
         {
-            return BindingDict.GetValueOrDefault(bindingName);
+            BindingDict.TryGetValue(bindingName, out var binding);
+            return binding;
         }
 
         public void TriggerUIPanelShow()
