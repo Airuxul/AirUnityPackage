@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Air.UnityGameCore.Runtime.UI.State;
+using Air.UnityGameCore.Runtime.UI.Trigger;
 using UnityEngine;
 
 namespace Air.UnityGameCore.Runtime.UI
@@ -27,29 +28,37 @@ namespace Air.UnityGameCore.Runtime.UI
         public bool IsDestoryed { get; set; }
 
         public UIShowParam UIShowParam { get; set; }
-        
-        // todo UI触发器，触发事件或者动画
-        // todo UI状态机，快捷修改UI状态
+
+        protected UITriggerCtrl TriggerCtrl;
         protected UIStateCtrl StateCtrl;
 
         #region UI生命周期
+        
         protected void Init()
         {
             if (IsInit) return;
             IsInit = true;
             IsDestoryed = false;
-            if (childs != null)
+            InitOtherComponent();
+            foreach (var child in Childs)
             {
-                foreach (var child in Childs)
-                {
-                    child?.Init();
-                }
+                child?.Init();
             }
             
-            // 状态机 初始化
-            TryGetComponent(out StateCtrl);
-            
             OnUIInit();
+        }
+
+        private void InitOtherComponent()
+        {
+            if (TryGetComponent(out StateCtrl))
+            {
+                // StateCtrl.Init();
+            }
+            
+            if (TryGetComponent(out TriggerCtrl))
+            {
+                // TriggerCtrl.Init();
+            }
         }
 
         public void Show(UIShowParam param)
@@ -60,10 +69,17 @@ namespace Air.UnityGameCore.Runtime.UI
                 child?.Destory();
             }
             OnUIShow(param);
-            // todo 动画逻辑
-            
+            TriggerCtrl?.TriggerUIPanelShow();
         }
-        
+
+        public void ShowAfter()
+        {
+            foreach (var child in Childs)
+            {
+                child?.ShowAfter();
+            }
+            OnUIShowAfter();
+        }
 
         public void Hide()
         {

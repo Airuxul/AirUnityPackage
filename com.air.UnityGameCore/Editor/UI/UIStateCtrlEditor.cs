@@ -15,7 +15,6 @@ namespace Air.UnityGameCore.Editor.UI
     {
         private UIStateCtrl _stateCtrl;
         private SerializedProperty _stateGroupsProperty;
-        private SerializedProperty _applyOnStartProperty;
 
         private bool[] _groupFoldouts;
         private bool[] _stateFoldouts;
@@ -27,7 +26,6 @@ namespace Air.UnityGameCore.Editor.UI
         {
             _stateCtrl = (UIStateCtrl)target;
             _stateGroupsProperty = serializedObject.FindProperty("stateGroups");
-            _applyOnStartProperty = serializedObject.FindProperty("applyOnStart");
             EnsureFoldoutArrays();
         }
 
@@ -91,7 +89,6 @@ namespace Air.UnityGameCore.Editor.UI
         {
             EditorGUILayout.BeginVertical("box");
             EditorGUILayout.LabelField("基础设置", EditorStyles.boldLabel);
-            EditorGUILayout.PropertyField(_applyOnStartProperty, new GUIContent("启动时应用状态"));
             EditorGUILayout.EndVertical();
         }
 
@@ -140,9 +137,9 @@ namespace Air.UnityGameCore.Editor.UI
             EditorGUILayout.BeginHorizontal();
             if (groupNames.Count > 0 && groupNames[0] != "(无组)")
             {
-                _selectedGroupIndexForAddState = EditorGUILayout.Popup(_selectedGroupIndexForAddState, groupNames.ToArray());
+                _selectedGroupIndexForAddState = EditorGUILayout.Popup(_selectedGroupIndexForAddState, groupNames.ToArray(), GUILayout.Width(120));
             }
-            _newStateName = EditorGUILayout.TextField("状态名称", _newStateName);
+            _newStateName = EditorGUILayout.TextField("状态名称", _newStateName, GUILayout.MinWidth(180));
             if (GUILayout.Button("添加状态", GUILayout.Width(70)) && TryAddStateToSelectedGroup(groupNames))
             {
                 _newStateName = "NewState";
@@ -218,7 +215,7 @@ namespace Air.UnityGameCore.Editor.UI
                 return;
             }
             EditorGUILayout.PropertyField(groupNameProperty, new GUIContent("组名称"));
-            DrawGroupCurrentStateSelector(group, groupIndex, currentStateIndexProperty);
+            DrawGroupCurrentStateSelector(group, currentStateIndexProperty);
             DrawGroupStatesListWhenExpanded(group, groupIndex, ref stateLinearIndex);
             EditorGUILayout.EndVertical();
         }
@@ -249,7 +246,7 @@ namespace Air.UnityGameCore.Editor.UI
         /// <summary>
         /// 绘制组内「当前选中状态」下拉与预览按钮
         /// </summary>
-        private void DrawGroupCurrentStateSelector(UIStateGroup group, int groupIndex, SerializedProperty currentStateIndexProperty)
+        private void DrawGroupCurrentStateSelector(UIStateGroup group, SerializedProperty currentStateIndexProperty)
         {
             List<string> stateNames = BuildStateNamesForPopup(group);
             int currentIndex = GetPopupIndexFromStateIndex(currentStateIndexProperty.intValue, group.States.Count);

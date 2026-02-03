@@ -28,7 +28,6 @@ namespace Air.UnityGameCore.Editor.UI
             typeof(Scrollbar),
             typeof(CanvasGroup),
             typeof(UIComponent),
-            typeof(TextMeshPro),
             typeof(TextMeshProUGUI)
         };
 
