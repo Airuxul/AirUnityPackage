@@ -130,7 +130,7 @@ namespace Air.UnityGameCore.Runtime.UI
             return _uiMap[uiPanelId];
         }
         
-        public void ShowPanel(UIPanelConfig uiPanelConfig)
+        public void ShowPanel(UIPanelConfig uiPanelConfig, IUIShowParam showParam)
         {
             var prefabPath = uiPanelConfig.PrefabPath;
             _resManager.LoadInstanceAsync<GameObject>(prefabPath, go =>
@@ -145,7 +145,7 @@ namespace Air.UnityGameCore.Runtime.UI
                 rectTransform.FillParent();
                 
                 uiPanel.Init(uiPanelConfig);
-                uiPanel.Show(new UIShowParam());
+                uiPanel.Show(showParam);
                 _uiMap.Add(uiPanelConfig.UIPanelId, uiPanel);
                 
                 _eventManager.TriggerEvent(BaseEventDefine.UIPanelShow, uiPanelConfig);

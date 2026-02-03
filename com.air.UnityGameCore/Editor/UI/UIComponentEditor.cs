@@ -29,7 +29,8 @@ namespace Air.UnityGameCore.Editor.UI
                 if (!string.IsNullOrEmpty(designerScriptPath))
                 {
                     string outputFolder = Path.GetDirectoryName(designerScriptPath);
-                    UIScriptGenerator.RegenerateDesignerScriptOnly(uiComponent, outputFolder);
+                    UIType uiType = target is UIPanel? UIType.Panel: UIType.Component;
+                    UIScriptGenerator.GenerateUIScript(uiComponent.gameObject, uiComponent.GetType().Name, outputFolder, uiType);
                 }
                 else
                 {

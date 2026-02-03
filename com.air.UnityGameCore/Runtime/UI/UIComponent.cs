@@ -28,7 +28,7 @@ namespace Air.UnityGameCore.Runtime.UI
         private bool IsInit { get; set; }
         public bool IsDestoryed { get; set; }
 
-        public UIShowParam UIShowParam { get; set; }
+        public IUIShowParam UIShowParam { get; set; }
 
         protected UITriggerCtrl TriggerCtrl;
         protected UIStateCtrl StateCtrl;
@@ -65,12 +65,12 @@ namespace Air.UnityGameCore.Runtime.UI
         /// 页面加载完实例化逻辑
         /// </summary>
         /// <param name="param"></param>
-        public void Show(UIShowParam param)
+        public void Show(IUIShowParam param = null)
         {
             UIShowParam = param;
             foreach (var child in Childs)
             {
-                child?.Destory();
+                child?.Show(param);
             }
             OnUIShow(param);
             // 播放显示动画
@@ -87,6 +87,18 @@ namespace Air.UnityGameCore.Runtime.UI
                 child?.ShowAfter();
             }
             OnUIShowAfter();
+        }
+
+        /// <summary>
+        /// 页面重新回到最顶上
+        /// </summary>
+        public void Resume()
+        {
+            foreach (var child in Childs)
+            {
+                child?.Show(UIShowParam);
+            }
+            OnUIShow(UIShowParam);
         }
 
         /// <summary>
@@ -128,7 +140,7 @@ namespace Air.UnityGameCore.Runtime.UI
         /// <summary>
         /// 显示UI组件
         /// </summary>
-        protected virtual void OnUIShow(UIShowParam param)
+        protected virtual void OnUIShow(IUIShowParam param = null)
         {
             // 子类可以重写此方法进行显示逻辑
         }

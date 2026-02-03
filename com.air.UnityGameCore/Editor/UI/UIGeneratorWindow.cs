@@ -305,15 +305,11 @@ namespace Air.UnityGameCore.Editor.UI
                 
                 // 选中生成的脚本文件
                 string logicScriptPath = Path.Combine(_outputFolder, _className + ".cs");
-                if (File.Exists(logicScriptPath))
-                {
-                    Object scriptAsset = AssetDatabase.LoadAssetAtPath<Object>(logicScriptPath);
-                    if (scriptAsset != null)
-                    {
-                        Selection.activeObject = scriptAsset;
-                        EditorGUIUtility.PingObject(scriptAsset);
-                    }
-                }
+                Object scriptAsset = AssetDatabase.LoadAssetAtPath<Object>(logicScriptPath);
+                if (!File.Exists(logicScriptPath)) return;
+                if (scriptAsset == null) return;
+                Selection.activeObject = scriptAsset;
+                EditorGUIUtility.PingObject(scriptAsset);
             }
             catch (System.Exception e)
             {

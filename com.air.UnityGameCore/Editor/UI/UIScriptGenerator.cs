@@ -1,8 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using Air.UnityGameCore.Runtime.UI;
@@ -16,149 +15,38 @@ namespace Air.UnityGameCore.Editor.UI
     public static class UIScriptGenerator
     {
         /// <summary>
-        /// 为指定的GameObject生成UI脚本（指定类名和输出路径）
-        /// </summary>
-        /// <param name="targetGo">目标GameObject</param>
-        /// <param name="className">UI类名</param>
-        /// <param name="outputFolder">输出文件夹路径</param>
-        public static void GenerateUIScript(GameObject targetGo, string className, string outputFolder, UIType uiType)
-        {
-            if (!ValidateInputParameters(targetGo, className, outputFolder))
-            {
-                return;
-            }
-
-            try
-            {
-                // 检查并处理已有UIComponent的情况
-                if (TryHandleExistingUIComponent(targetGo))
-                {
-                    return;
-                }
-                
-                // 确保输出目录存在
-                EnsureOutputDirectory(outputFolder);
-
-                // 检查并处理脚本已存在的情况
-                if (TryHandleExistingScripts(targetGo, className, outputFolder))
-                {
-                    return;
-                }
-
-                // 首次生成脚本
-                GenerateNewScripts(targetGo, className, outputFolder, uiType);
-            }
-            catch (Exception e)
-            {
-                Debug.LogError($"Failed to generate UI scripts for: {e.Message}");
-                throw;
-            }
-        }
-        
-        /// <summary>
-        /// 验证输入参数
-        /// </summary>
-        private static bool ValidateInputParameters(GameObject targetGo, string className, string outputFolder)
-        {
-            if (!targetGo)
-            {
-                Debug.LogError("Target GameObject is null");
-                return false;
-            }
-
-            if (string.IsNullOrEmpty(className))
-            {
-                Debug.LogError("Class name is null or empty");
-                return false;
-            }
-
-            if (string.IsNullOrEmpty(outputFolder))
-            {
-                Debug.LogError("Output folder is null or empty");
-                return false;
-            }
-
-            return true;
-        }
-        
-        /// <summary>
-        /// 尝试处理已有UIComponent的情况
-        /// </summary>
-        /// <returns>如果处理了已有UIComponent返回true</returns>
-        private static bool TryHandleExistingUIComponent(GameObject targetGo)
-        {
-            UIComponent existingUIComponent = targetGo.GetComponent<UIComponent>();
-            if (existingUIComponent == null)
-            {
-                return false;
-            }
-
-            string existingClassName = existingUIComponent.GetType().Name;
-            Debug.Log($"GameObject already has UIComponent: {existingClassName}, updating designer script only");
-
-            string existingDesignerPath = FindDesignerScriptPath(existingClassName);
-            if (!string.IsNullOrEmpty(existingDesignerPath))
-            {
-                string existingOutputFolder = Path.GetDirectoryName(existingDesignerPath);
-                RegenerateDesignerScriptOnly(existingUIComponent, existingOutputFolder);
-            }
-            else
-            {
-                Debug.LogError($"Could not find existing Designer script for {existingClassName}");
-            }
-
-            return true;
-        }
-        
-        /// <summary>
-        /// 确保输出目录存在
-        /// </summary>
-        private static void EnsureOutputDirectory(string outputFolder)
-        {
-            if (!Directory.Exists(outputFolder))
-            {
-                Directory.CreateDirectory(outputFolder);
-                Debug.Log($"Created output directory: {outputFolder}");
-            }
-        }
-        
-        /// <summary>
-        /// 尝试处理脚本已存在的情况
-        /// </summary>
-        /// <returns>如果处理了已存在脚本返回true</returns>
-        private static bool TryHandleExistingScripts(GameObject targetGo, string className, string outputFolder)
-        {
-            bool logicScriptExists = File.Exists(Path.Combine(outputFolder, className + ".cs"));
-            bool designerScriptExists = File.Exists(Path.Combine(outputFolder, className + ".Designer.cs"));
-
-            if (!logicScriptExists || !designerScriptExists)
-            {
-                return false;
-            }
-
-            Debug.Log($"Logic script for {className} already exists, skipping generation");
-
-            return true;
-        }
-        
-        /// <summary>
         /// 生成新的脚本（首次生成）
         /// </summary>
-        private static void GenerateNewScripts(GameObject targetGo, string className, string outputFolder, UIType uiType)
+        public static void GenerateUIScript(GameObject targetGo, string className, string outputFolder,
+            UIType uiType)
         {
+            var existingUIComponent = targetGo.GetComponent<UIComponent>();
+            if (existingUIComponent)
+            {
+                var existingClassName = existingUIComponent.GetType().Name;
+                if (existingClassName != className)
+                {
+                    throw new Exception($"Could not find existing Designer script for {existingClassName}");
+                }
+            }
+            
             // 收集字段
             List<ComponentField> fields = CollectComponentFields(targetGo);
 
             // 生成逻辑脚本
-            string logicScript = GenerateLogicScript(className, fields, uiType);
-            string logicScriptPath = Path.Combine(outputFolder, className + ".cs");
-            if (string.IsNullOrEmpty(logicScript))
+            var logicScriptPath = Path.Combine(outputFolder, className + ".cs");
+            if (!existingUIComponent)
             {
-                throw new Exception("logicScript is null or empty");
-            }
-            File.WriteAllText(logicScriptPath, logicScript);
-            Debug.Log($"Generated logic script: {logicScriptPath}");
+                var logicScript = GenerateLogicScript(className, fields, uiType);
+                if (string.IsNullOrEmpty(logicScript))
+                {
+                    throw new Exception("logicScript is null or empty");
+                }
 
+                File.WriteAllText(logicScriptPath, logicScript);
+                Debug.Log($"Generated logic script: {logicScriptPath}");
+            }
+            
             // 生成设计器脚本
             string designerScript = GenerateDesignerScript(className, fields);
             string designerScriptPath = Path.Combine(outputFolder, className + ".Designer.cs");
@@ -170,8 +58,12 @@ namespace Air.UnityGameCore.Editor.UI
 
             // 添加到UISerializer的待处理列表，等待编译完成
             UISerializer.AddPendingAttachment(GetGameObjectPath(targetGo), className);
+            
+            AssetDatabase.ImportAsset(logicScriptPath, ImportAssetOptions.ForceUpdate);
+            AssetDatabase.ImportAsset(designerScriptPath, ImportAssetOptions.ForceUpdate);
+            AssetDatabase.Refresh();
         }
-        
+
         /// <summary>
         /// 查找Designer脚本的路径
         /// </summary>
@@ -181,7 +73,7 @@ namespace Air.UnityGameCore.Editor.UI
         {
             string designerFileName = className + ".Designer.cs";
             string[] guids = AssetDatabase.FindAssets($"{className} t:Script");
-            
+
             foreach (string guid in guids)
             {
                 string assetPath = AssetDatabase.GUIDToAssetPath(guid);
@@ -190,75 +82,10 @@ namespace Air.UnityGameCore.Editor.UI
                     return assetPath;
                 }
             }
-            
+
             return null;
         }
-        
-        /// <summary>
-        /// 仅重新生成Designer脚本并重新绑定
-        /// </summary>
-        /// <param name="uiComponent">UI组件实例</param>
-        /// <param name="outputFolder">输出文件夹路径</param>
-        public static void RegenerateDesignerScriptOnly(UIComponent uiComponent, string outputFolder)
-        {
-            if (uiComponent == null)
-            {
-                Debug.LogError("UIComponent is null, cannot regenerate designer script");
-                return;
-            }
 
-            GameObject targetGo = uiComponent.gameObject;
-            string className = uiComponent.GetType().Name;
-
-            try
-            {
-                Debug.Log($"Updating Designer script for {className}...");
-
-                // 1. 清空现有字段的引用（避免引用旧的、可能已删除的组件）
-                uiComponent.ClearUIComponentFields();
-
-                // 2. 收集新的字段
-                List<ComponentField> fields = CollectComponentFields(targetGo);
-                Debug.Log($"Collected {fields.Count} fields from GameObject hierarchy");
-
-                // 3. 重新生成设计器脚本
-                string designerScript = GenerateDesignerScript(className, fields);
-                string designerScriptPath = Path.Combine(outputFolder, className + ".Designer.cs");
-                File.WriteAllText(designerScriptPath, designerScript);
-                Debug.Log($"Regenerated designer script: {designerScriptPath}");
-                
-                // todo 生成状态机相关代码
-
-                // 4. 强制导入脚本并刷新
-                AssetDatabase.ImportAsset(designerScriptPath, ImportAssetOptions.ForceUpdate);
-                AssetDatabase.Refresh();
-
-                // 5. 等待编译完成后重新绑定字段
-                // 使用双重延迟确保编译完成
-                EditorApplication.delayCall += () =>
-                {
-                    EditorApplication.delayCall += () =>
-                    {
-                        if (uiComponent != null && targetGo != null)
-                        {
-                            Debug.Log($"Re-binding fields for {className}...");
-                            uiComponent.BindUIComponent();
-                            Debug.Log($"Successfully updated and re-bound {className}");
-
-                            // 高亮显示GameObject
-                            Selection.activeGameObject = targetGo;
-                            EditorGUIUtility.PingObject(targetGo);
-                        }
-                    };
-                };
-            }
-            catch (Exception e)
-            {
-                Debug.LogError($"Failed to regenerate designer script for {className}: {e.Message}");
-                throw;
-            }
-        }
-        
         /// <summary>
         /// 获取GameObject的完整路径
         /// </summary>
@@ -266,11 +93,11 @@ namespace Air.UnityGameCore.Editor.UI
         /// <returns>完整路径字符串</returns>
         private static string GetGameObjectPath(GameObject go)
         {
-            if (go == null) return "";
+            if (!go) return "";
 
             string path = go.name;
             Transform parent = go.transform.parent;
-            while (parent != null)
+            while (parent)
             {
                 string parentName = parent.name;
                 if (!string.IsNullOrEmpty(parentName))
@@ -289,6 +116,7 @@ namespace Air.UnityGameCore.Editor.UI
         /// </summary>
         /// <param name="className">类名</param>
         /// <param name="fields">组件字段列表</param>
+        /// <param name="uiType">脚本类型</param>
         /// <returns>逻辑脚本内容</returns>
         private static string GenerateLogicScript(string className, List<ComponentField> fields, UIType uiType)
         {
@@ -368,7 +196,7 @@ namespace Air.UnityGameCore.Editor.UI
         {
             return FindTemplateFile("UIDesignerTemplate.txt");
         }
-        
+
         /// <summary>
         /// 查找模板文件的实际路径
         /// </summary>
@@ -377,8 +205,9 @@ namespace Air.UnityGameCore.Editor.UI
         private static string FindTemplateFile(string templateFileName)
         {
             // 使用AssetDatabase查找模板文件
-            string[] guids = AssetDatabase.FindAssets(Path.GetFileNameWithoutExtension(templateFileName) + " t:TextAsset");
-            
+            string[] guids =
+                AssetDatabase.FindAssets(Path.GetFileNameWithoutExtension(templateFileName) + " t:TextAsset");
+
             foreach (string guid in guids)
             {
                 string assetPath = AssetDatabase.GUIDToAssetPath(guid);
@@ -387,8 +216,9 @@ namespace Air.UnityGameCore.Editor.UI
                     return Path.GetFullPath(assetPath);
                 }
             }
-            
-            throw new FileNotFoundException($"Could not find template file: {templateFileName}. Please ensure the template exists in the Templates folder.");
+
+            throw new FileNotFoundException(
+                $"Could not find template file: {templateFileName}. Please ensure the template exists in the Templates folder.");
         }
 
         /// <summary>
@@ -400,127 +230,74 @@ namespace Air.UnityGameCore.Editor.UI
         {
             if (string.IsNullOrEmpty(name))
                 return name;
-            
+
             // 首字母转小写
             return char.ToLower(name[0]) + name.Substring(1);
         }
-        
-        /// <summary>
-        /// 收集GameObject中的组件字段信息
-        /// </summary>
-        /// <param name="root">根GameObject</param>
-        /// <returns>组件字段列表</returns>
-        private static List<ComponentField> CollectComponentFields(GameObject root)
+
+        private static List<ComponentField> CollectComponentFields(GameObject targetGo)
         {
             List<ComponentField> fields = new List<ComponentField>();
-            
-            // 从根节点的子节点开始收集，跳过根节点自身的组件
-            for (int i = 0; i < root.transform.childCount; i++)
-            {
-                Transform child = root.transform.GetChild(i);
-                if (child != null)
-                {
-                    CollectComponentFieldsRecursive(child, fields, "");
-                }
-            }
-            
+            CollectComponentFieldsRecursive(targetGo.transform, fields, "");
+            ProcessFieldsSameName(fields);
             return fields;
+        }
+        
+        /// <summary>
+        /// 处理同名字段
+        /// </summary>
+        /// <param name="fields"></param>
+        /// <returns></returns>
+        private static void ProcessFieldsSameName(List<ComponentField> fields)
+        {
+            var fieldName2Field = new Dictionary<string, ComponentField>();
+            foreach (var field in fields)
+            {
+                if (fieldName2Field.TryAdd(field.fieldName, field))
+                {
+                    continue;
+                }
+                var preField = fieldName2Field[field.fieldName];
+                preField.fieldName = $"{preField.fieldName}{preField.fieldType}";
+                field.fieldName = $"{field.fieldName}{field.fieldType}";
+            }
         }
 
         /// <summary>
         /// 递归收集组件字段信息
         /// </summary>
-        /// <param name="transform">当前Transform</param>
-        /// <param name="fields">字段列表</param>
-        /// <param name="path">当前路径</param>
         private static void CollectComponentFieldsRecursive(Transform transform, List<ComponentField> fields, string path)
         {
-            if (transform == null) return;
-
             Component[] components = transform.GetComponents<Component>();
-            bool hasUIComponent = false;
-
-            // 收集当前GameObject上所有需要的组件
-            List<ComponentField> currentObjectFields = new List<ComponentField>();
-
-            // 先检查是否有自定义UIComponent
-            foreach (Component component in components)
+            List<ComponentField> newFields = new List<ComponentField>();
+            var isFirst = string.IsNullOrEmpty(path);
+            var curObjName = transform.name;
+            var currentPath = isFirst ? transform.name : $"{path}/{transform.name}";
+            foreach (var component in components)
             {
-                if (component == null) continue;
-
-                Type componentType = component.GetType();
-
-                if (UIComponentTypes.IsUIComponent(componentType))
+                var componentType = component.GetType();
+                if (!UIComponentTypes.IsBasicType(componentType))
+                    continue;
+                var fieldName = ToFieldName(curObjName);
+                var isUIComp = UIComponentTypes.IsUIComponent(componentType);
+                var newFiled = new ComponentField(fieldName, componentType.Name);
+                // 如果是组件的话，除根节点外，其它直接退出
+                if (isUIComp)
                 {
-                    hasUIComponent = true;
-                    string fieldName = ToFieldName(transform.name ?? "");
-
-                    // 添加UIComponent字段
-                    currentObjectFields.Add(new ComponentField
+                    if (isFirst)
                     {
-                        fieldName = fieldName,
-                        fieldType = componentType.Name,
-                        isBasicType = false,
-                        gameObjectPath = path + transform.name,
-                        isUIComponent = true
-                    });
-
-                    break;
-                }
-            }
-
-            // 收集基础组件（无论是否有UIComponent都要检查）
-            foreach (Component component in components)
-            {
-                if (component == null) continue;
-
-                Type componentType = component.GetType();
-
-                if (!UIComponentTypes.IsBasicType(componentType)) continue;
-
-                string fieldName = ToFieldName(transform.name ?? "");
-
-                // 检查是否已经在当前对象字段中存在相同类型
-                bool fieldExists = currentObjectFields.Any(f => f.fieldType == componentType.Name);
-                if (!fieldExists)
-                {
-                    currentObjectFields.Add(new ComponentField
-                    {
-                        fieldName = fieldName,
-                        fieldType = componentType.Name,
-                        isBasicType = true,
-                        gameObjectPath = path + transform.name,
-                        isUIComponent = false
-                    });
-                }
-            }
-
-            // 如果同一GameObject上有多个组件，添加类型后缀避免重名
-            if (currentObjectFields.Count > 1)
-            {
-                foreach (ComponentField field in currentObjectFields)
-                {
-                    // 添加组件类型作为后缀
-                    field.fieldName = field.fieldName + field.fieldType;
-                }
-            }
-
-            // 将当前对象的所有字段添加到总字段列表
-            fields.AddRange(currentObjectFields);
-
-            // 关键逻辑：只有在当前节点没有UIComponent时，才继续遍历子节点
-            // 如果有UIComponent，则停止深入，因为该UIComponent应该管理自己的子组件
-            if (!hasUIComponent)
-            {
-                string currentPath = string.IsNullOrEmpty(path) ? transform.name : path + "/" + transform.name;
-                for (int i = 0; i < transform.childCount; i++)
-                {
-                    Transform child = transform.GetChild(i);
-                    if (child != null)
-                    {
-                        CollectComponentFieldsRecursive(child, fields, currentPath + "/");
+                        continue;
                     }
+                    fields.Add(newFiled);
+                    return;
                 }
+                newFields.Add(newFiled);
+            }
+            fields.AddRange(newFields);
+            for (var i = 0; i < transform.childCount; i++)
+            {
+                var child = transform.GetChild(i);
+                CollectComponentFieldsRecursive(child, fields, currentPath);
             }
         }
     }
@@ -541,19 +318,10 @@ namespace Air.UnityGameCore.Editor.UI
         /// </summary>
         public string fieldType;
 
-        /// <summary>
-        /// 是否为基础类型
-        /// </summary>
-        public bool isBasicType;
-
-        /// <summary>
-        /// GameObject路径
-        /// </summary>
-        public string gameObjectPath;
-
-        /// <summary>
-        /// 是否为UIComponent
-        /// </summary>
-        public bool isUIComponent;
+        public ComponentField(string fieldName, string fieldType)
+        {
+            this.fieldName = fieldName;
+            this.fieldType = fieldType;
+        }
     }
 }

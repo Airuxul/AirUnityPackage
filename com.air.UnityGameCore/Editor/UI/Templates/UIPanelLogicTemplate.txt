@@ -21,7 +21,7 @@ namespace Air.UnityGameCore.Generated
         /// <summary>
         /// 显示UI组件
         /// </summary>
-        protected override void OnUIShow(UIShowParam param)
+        protected override void OnUIShow(IUIShowParam param)
         {
             // 子类可以重写此方法进行显示逻辑
         }
