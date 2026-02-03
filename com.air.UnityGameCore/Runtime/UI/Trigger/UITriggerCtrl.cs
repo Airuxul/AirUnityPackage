@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEditor.Events;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -74,6 +75,12 @@ namespace Air.UnityGameCore.Runtime.UI.Trigger
             }
         }
 
+        private void Reset()
+        {
+            bindings = null;
+            InitDefaultBindings();
+        }
+
         private void BuildBindingDict()
         {
             InitDefaultBindings();
@@ -100,13 +107,19 @@ namespace Air.UnityGameCore.Runtime.UI.Trigger
                 BindingName = "ShowUI"
             };
             showUITriggerBinding.Actions.Add(
-                new AnimationTriggerAction(AnimationTriggerAction.AnimationSourceType.AnimatorTrigger, gameObject)
+                new AnimationTriggerAction(
+                    AnimationTriggerAction.AnimationSourceType.AnimatorTrigger,
+                    gameObject,
+                    "UIPanelShow",
+                    true)
             );
             var panelShowAfterEvent = new UnityEvent();
-            panelShowAfterEvent.AddListener(uiPanel.ShowAfter);
+            UnityEventTools.AddPersistentListener(panelShowAfterEvent, uiPanel.ShowAfter);
             showUITriggerBinding.Actions.Add(
                 new EventTriggerAction(panelShowAfterEvent)
             );
+            
+            bindings.Add(showUITriggerBinding);
         }
 
         /// <summary>

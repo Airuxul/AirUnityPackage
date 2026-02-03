@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Air.UnityGameCore.Runtime.Event;
 using Air.UnityGameCore.Runtime.Extensions;
 using Air.UnityGameCore.Runtime.Resource;
 using Object = UnityEngine.Object;
@@ -50,6 +51,7 @@ namespace Air.UnityGameCore.Runtime.UI
         };
         
         private readonly IResManager _resManager;
+        private readonly EventManager _eventManager;
         private readonly Dictionary<string, UIPanel> _uiMap;
 
         private GameObject _uiRoot;
@@ -57,9 +59,10 @@ namespace Air.UnityGameCore.Runtime.UI
         private GameObject _topRoot;
         private CanvasScaler _canvasScaler;
         
-        public UIManager(IResManager resManager)
+        public UIManager(IResManager resManager, EventManager eventManager)
         {
             _resManager = resManager;
+            _eventManager = eventManager;
             _uiMap = new Dictionary<string, UIPanel>();
 
             CreateRoot();
@@ -144,6 +147,8 @@ namespace Air.UnityGameCore.Runtime.UI
                 uiPanel.Init(uiPanelConfig);
                 uiPanel.Show(new UIShowParam());
                 _uiMap.Add(uiPanelConfig.UIPanelId, uiPanel);
+                
+                _eventManager.TriggerEvent(BaseEventDefine.UIPanelShow, uiPanelConfig);
             });
         }
 
@@ -171,6 +176,8 @@ namespace Air.UnityGameCore.Runtime.UI
             uiPanel.Destory();
             Object.Destroy(uiPanel.gameObject);
             _resManager.UnloadRes(uiPanelConfig.PrefabPath);
+            
+            _eventManager.TriggerEvent(BaseEventDefine.UIPanelClose, uiPanelConfig);
         }
 
         #region 分辨率调整功能

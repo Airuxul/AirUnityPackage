@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using CodiceApp.EventTracking.Plastic;
 
 namespace Air.UnityGameCore.Runtime.Event
 {

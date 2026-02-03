@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Air.UnityGameCore.Runtime.Event;
 using Air.UnityGameCore.Runtime.UI.State;
 using Air.UnityGameCore.Runtime.UI.Trigger;
 using UnityEngine;
@@ -44,7 +45,6 @@ namespace Air.UnityGameCore.Runtime.UI
             {
                 child?.Init();
             }
-            
             OnUIInit();
         }
 

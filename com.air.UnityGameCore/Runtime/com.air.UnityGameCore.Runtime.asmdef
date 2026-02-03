@@ -1,6 +1,6 @@
 {
     "name": "com.air.UnityGameCore.Runtime",
-    "references": [],
+    "references": ["com.air.GameCore"],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

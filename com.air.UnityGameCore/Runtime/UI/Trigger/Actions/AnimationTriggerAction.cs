@@ -15,6 +15,7 @@ namespace Air.UnityGameCore.Runtime.UI.Trigger
         {
             /// <summary> 使用 Animator 的 Trigger 参数 </summary>
             AnimatorTrigger,
+
             /// <summary> 使用 Animation 组件播放指定 Clip </summary>
             AnimationClip
         }
@@ -64,6 +65,7 @@ namespace Air.UnityGameCore.Runtime.UI.Trigger
                 {
                     throw new Exception("Animtor is null but use");
                 }
+
                 return _animator;
             }
         }
@@ -77,16 +79,26 @@ namespace Air.UnityGameCore.Runtime.UI.Trigger
                 {
                     throw new Exception("Animtor is null but use");
                 }
+
                 return _animation;
-            } 
+            }
         }
 
-        public AnimationTriggerAction() { }
+        public AnimationTriggerAction()
+        {
+        }
 
-        public AnimationTriggerAction(AnimationSourceType sourceType, GameObject go)
+        public AnimationTriggerAction(
+            AnimationSourceType sourceType,
+            GameObject go,
+            string triggerOrClipName,
+            bool waitForCompletion
+        )
         {
             targetObject = go;
             this.sourceType = sourceType;
+            this.triggerOrClipName = triggerOrClipName;
+            this.waitForCompletion = waitForCompletion;
         }
 
         public override void Execute(Action onComplete)
