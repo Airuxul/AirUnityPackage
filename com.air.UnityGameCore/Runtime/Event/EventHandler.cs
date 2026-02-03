@@ -4,6 +4,21 @@ using UnityEngine;
 
 namespace Air.UnityGameCore.Runtime.Event
 {
+    public interface ICanRegisterEvent
+    {
+        public EventHandler EventHandler { get; }
+    }
+
+    public static class CanRegisterEventExtension
+    {
+        public static void RegisterEvent(this ICanRegisterEvent canRegisterEvent, string eventName, System.Action action) => canRegisterEvent.EventHandler.RegisterEvent(eventName, action);
+        public static void RegisterEvent<T>(this ICanRegisterEvent canRegisterEvent, string eventName, System.Action<T> action) => canRegisterEvent.EventHandler.RegisterEvent(eventName, action);
+        public static void TriggerEvent(this ICanRegisterEvent canRegisterEvent, string eventName) => canRegisterEvent.EventHandler.TriggerEvent(eventName);
+        public static void TriggerEvent<T>(this ICanRegisterEvent canRegisterEvent, string eventName, T param) => canRegisterEvent.EventHandler.TriggerEvent(eventName, param);
+        public static void UnRegisterEvent(this ICanRegisterEvent canRegisterEvent, string eventName) => canRegisterEvent.EventHandler.UnRegisterEvent(eventName);
+        public static void ClearEvent(this ICanRegisterEvent canRegisterEvent) => canRegisterEvent.EventHandler?.Clear();
+    }
+    
     /// <summary>
     /// 事件处理器。对本实例注册的事件进行记录，便于按名称或批量取消注册、清理，避免重复注册。
     /// </summary>

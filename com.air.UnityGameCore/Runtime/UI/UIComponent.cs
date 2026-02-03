@@ -9,7 +9,7 @@ namespace Air.UnityGameCore.Runtime.UI
     /// <summary>
     /// UI组件基类，提供UI生命周期管理
     /// </summary>
-    public abstract class UIComponent : MonoBehaviour
+    public abstract class UIComponent : MonoBehaviour, ICanRegisterEvent
     {
         [SerializeField] 
         private UIComponent parent;
@@ -120,7 +120,7 @@ namespace Air.UnityGameCore.Runtime.UI
         public void Destory()
         {
             OnUIDestory();
-            ClearEvent();
+            this.ClearEvent();
             IsInit = false;
             IsDestoryed = true;
             foreach (var child in Childs)
@@ -174,7 +174,7 @@ namespace Air.UnityGameCore.Runtime.UI
         #region 事件
         private EventHandler _eventHandler;
 
-        private EventHandler EventHandler
+        public EventHandler EventHandler
         {
             get
             {
@@ -182,13 +182,6 @@ namespace Air.UnityGameCore.Runtime.UI
                 return _eventHandler;
             }
         }
-
-        public void RegisterEvent(string eventName, System.Action action) => EventHandler.RegisterEvent(eventName, action);
-        public void RegisterEvent<T>(string eventName, System.Action<T> action) => EventHandler.RegisterEvent(eventName, action);
-        public void TriggerEvent(string eventName) => EventHandler.TriggerEvent(eventName);
-        public void TriggerEvent<T>(string eventName, T param) => EventHandler.TriggerEvent(eventName, param);
-        public void UnRegisterEvent(string eventName) => EventHandler.UnRegisterEvent(eventName);
-        private void ClearEvent() => _eventHandler?.Clear();
         #endregion
     }
 }
