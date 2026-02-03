@@ -20,7 +20,7 @@ namespace Air.UnityGameCore.Runtime.UI.Trigger
         }
 
         [SerializeField] private GameObject targetObject;
-        [SerializeField] private AnimationSourceType sourceType = AnimationSourceType.AnimatorTrigger;
+        [SerializeField] private AnimationSourceType sourceType;
         [SerializeField] private string triggerOrClipName;
         [SerializeField] private bool waitForCompletion;
 
@@ -79,6 +79,14 @@ namespace Air.UnityGameCore.Runtime.UI.Trigger
                 }
                 return _animation;
             } 
+        }
+
+        public AnimationTriggerAction() { }
+
+        public AnimationTriggerAction(AnimationSourceType sourceType, GameObject go)
+        {
+            targetObject = go;
+            this.sourceType = sourceType;
         }
 
         public override void Execute(Action onComplete)

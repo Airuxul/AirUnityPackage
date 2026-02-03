@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Air.UnityGameCore.Runtime.UI.Trigger
 {
@@ -50,7 +51,7 @@ namespace Air.UnityGameCore.Runtime.UI.Trigger
     [RequireComponent(typeof(UIComponent))]
     public class UITriggerCtrl : MonoBehaviour
     {
-        [SerializeField] private List<TriggerBinding> bindings = new();
+        [SerializeField] private List<TriggerBinding> bindings;
 
         private Dictionary<string, TriggerBinding> _bindingDict;
         private bool _initialized;
@@ -68,12 +69,14 @@ namespace Air.UnityGameCore.Runtime.UI.Trigger
                 {
                     BuildBindingDict();
                 }
+
                 return _bindingDict;
             }
         }
 
         private void BuildBindingDict()
         {
+            InitDefaultBindings();
             _bindingDict = new Dictionary<string, TriggerBinding>();
             foreach (var b in bindings)
             {
@@ -81,6 +84,29 @@ namespace Air.UnityGameCore.Runtime.UI.Trigger
                 if (!_bindingDict.TryAdd(b.BindingName, b))
                     Debug.LogWarning($"[UITriggerCtrl] 绑定名称重复: {b.BindingName}");
             }
+        }
+
+        public void InitDefaultBindings()
+        {
+            if (bindings != null) return;
+            bindings = new List<TriggerBinding>();
+            if (!TryGetComponent<UIPanel>(out var uiPanel))
+            {
+                return;
+            }
+
+            var showUITriggerBinding = new TriggerBinding
+            {
+                BindingName = "ShowUI"
+            };
+            showUITriggerBinding.Actions.Add(
+                new AnimationTriggerAction(AnimationTriggerAction.AnimationSourceType.AnimatorTrigger, gameObject)
+            );
+            var panelShowAfterEvent = new UnityEvent();
+            panelShowAfterEvent.AddListener(uiPanel.ShowAfter);
+            showUITriggerBinding.Actions.Add(
+                new EventTriggerAction(panelShowAfterEvent)
+            );
         }
 
         /// <summary>

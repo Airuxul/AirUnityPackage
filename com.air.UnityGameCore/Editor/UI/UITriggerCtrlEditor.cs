@@ -18,6 +18,7 @@ namespace Air.UnityGameCore.Editor.UI
         private void OnEnable()
         {
             _triggerCtrl = (UITriggerCtrl)target;
+            _triggerCtrl.InitDefaultBindings();
             _bindingsProperty = serializedObject.FindProperty("bindings");
             EnsureBindingFoldouts();
         }

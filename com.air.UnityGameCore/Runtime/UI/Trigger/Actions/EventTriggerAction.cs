@@ -10,13 +10,20 @@ namespace Air.UnityGameCore.Runtime.UI.Trigger
     [Serializable]
     public class EventTriggerAction : TriggerActionBase
     {
-        [SerializeField] private UnityEvent onTrigger = new UnityEvent();
+        [SerializeField] private UnityEvent onTrigger = new();
 
         /// <summary>
         /// 绑定的触发事件。在 Inspector 中可配置无参回调。
         /// </summary>
         public UnityEvent OnTrigger => onTrigger;
 
+        public EventTriggerAction() {}
+
+        public EventTriggerAction(UnityEvent triggerEvent)
+        {
+            onTrigger = triggerEvent;
+        }
+        
         public override void Execute(Action onComplete)
         {
             try

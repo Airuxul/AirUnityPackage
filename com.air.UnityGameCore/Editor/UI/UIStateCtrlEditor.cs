@@ -449,10 +449,6 @@ namespace Air.UnityGameCore.Editor.UI
                 case InteractableStateAction _:
                     DrawInteractableActionFields(actionProperty);
                     break;
-
-                case AnimatorTriggerStateAction _:
-                    DrawAnimatorTriggerActionFields(actionProperty);
-                    break;
             }
         }
 
@@ -501,12 +497,6 @@ namespace Air.UnityGameCore.Editor.UI
             EditorGUILayout.PropertyField(blockRaycastsProperty, new GUIContent("阻挡射线"));
         }
 
-        private void DrawAnimatorTriggerActionFields(SerializedProperty actionProperty)
-        {
-            var triggerNameProperty = actionProperty.FindPropertyRelative("triggerName");
-            EditorGUILayout.PropertyField(triggerNameProperty, new GUIContent("触发器名称"));
-        }
-
         /// <summary>
         /// 绘制添加动作按钮
         /// </summary>
@@ -553,10 +543,6 @@ namespace Air.UnityGameCore.Editor.UI
             if (GUILayout.Button("+ 交互", GUILayout.Height(25)))
             {
                 AddAction<InteractableStateAction>(state, "Add Interactable Action");
-            }
-            if (GUILayout.Button("+ 动画触发", GUILayout.Height(25)))
-            {
-                AddAction<AnimatorTriggerStateAction>(state, "Add Animator Action");
             }
             EditorGUILayout.EndHorizontal();
 
