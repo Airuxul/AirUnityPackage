@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+
 namespace Air.UnityGameCore.Runtime.UI
 {
     /// <summary>
@@ -6,43 +9,48 @@ namespace Air.UnityGameCore.Runtime.UI
     public interface IUIShowParam
     {
         /// <summary>
-        /// 将当前页面数据转换为指定组件参数类型。
+        /// 将当前页面数据转换为指定组件参数类型（由 <see cref="ShowParamConverters"/> 统一分发）。
         /// </summary>
-        /// <param name="componentParam">转换得到的组件参数，未匹配时为 default</param>
-        /// <returns>是否支持该组件参数类型</returns>
         bool TryTranslate<T>(out T componentParam) where T : struct, IUIShowParam;
     }
 
     /// <summary>
-    /// 示例：页面级参数，承载整页展示所需数据；组件通过 TryTranslate 获取自身参数。
+    /// 页面参数 → 组件参数的转换器注册表。页面实现 TryTranslate 时委托此处，新增组件只需注册一次。
     /// </summary>
-    public struct StartShowParam : IUIShowParam
+    public static class ShowParamConverters
     {
-        public string StartText;
-        public float LeftTime;
+        private static readonly Dictionary<(Type PageType, Type CompType), Delegate> Converters = new();
 
-        /// <inheritdoc />
-        public bool TryTranslate<T>(out T componentParam) where T : struct, IUIShowParam
+        /// <summary>
+        /// 注册：从页面参数 TPage 转换为组件参数 TComp。
+        /// 建议在页面参数类型的静态构造函数中调用。
+        /// </summary>
+        public static void Register<TShowParam1, TShowParam2>(Func<TShowParam1, TShowParam2> converter)
+            where TShowParam1 : struct, IUIShowParam
+            where TShowParam2 : struct, IUIShowParam
+        {
+            Converters[(typeof(TShowParam1), typeof(TShowParam2))] = converter;
+        }
+
+        /// <summary>
+        /// 根据当前页面参数实例与目标组件类型，从注册表执行转换。
+        /// </summary>
+        public static bool TryConvert<TComp>(IUIShowParam page, out TComp componentParam)
+            where TComp : struct, IUIShowParam
         {
             componentParam = default;
-            if (typeof(T) == typeof(CountDownParam))
+            if (page == null) return false;
+            var key = (page.GetType(), typeof(TComp));
+            if (!Converters.TryGetValue(key, out var del) || del == null) return false;
+            try
             {
-                componentParam = (T)(object)new CountDownParam { LeftTime = LeftTime };
+                componentParam = (TComp)del.DynamicInvoke(page);
                 return true;
             }
-            return false;
-        }
-    }
-
-    /// <summary>
-    /// 倒计时组件所需参数，由页面级参数（如 StartShowParam）转换得到。
-    /// </summary>
-    public struct CountDownParam : IUIShowParam
-    {
-        public float LeftTime;
-        public bool TryTranslate<T>(out T componentParam) where T : struct, IUIShowParam
-        {
-            throw new System.NotImplementedException();
+            catch
+            {
+                return false;
+            }
         }
     }
 }
