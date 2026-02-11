@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
@@ -46,8 +46,6 @@ namespace GraphProcessor
 
         //id
         public string				GUID;
-
-		public int					computeOrder = -1;
 
 		/// <summary>Tell wether or not the node can be processed. Do not check anything from inputs because this step happens before inputs are sent to the node</summary>
 		public virtual bool			canProcess => true;
@@ -726,6 +724,42 @@ namespace GraphProcessor
 			foreach (var port in outputPorts)
 				foreach (var edge in port.GetEdges())
 					yield return edge.inputNode;
+		}
+
+		/// <summary>
+		/// Returns true if the input port with the given field name has at least one connection.
+		/// </summary>
+		protected bool IsInputPortConnected(string fieldName) =>
+			inputPorts.Any(p => p.fieldName == fieldName && p.GetEdges().Count > 0);
+
+		/// <summary>
+		/// Sort key for execution order: (Y, X). Smaller Y (higher on screen) executes first.
+		/// </summary>
+		public static (float, float) GetExecutionOrderSortKey(BaseNode node) =>
+			(node?.position.y ?? 0, node?.position.x ?? 0);
+
+		/// <summary>
+		/// Apply execution order sort when the output field has [ExecutionOrder] attribute.
+		/// </summary>
+		protected static IEnumerable<T> ApplyExecutionOrder<T>(BaseNode node, string outputFieldName, IEnumerable<T> nodes) where T : BaseNode
+		{
+			if (nodes == null) return Enumerable.Empty<T>();
+			var field = GetFieldInHierarchy(node.GetType(), outputFieldName);
+			if (field?.GetCustomAttribute<ExecutionOrderAttribute>() == null)
+				return nodes.Where(n => n != null);
+
+			return nodes.Where(n => n != null).OrderBy(n => GetExecutionOrderSortKey(n));
+		}
+
+		static FieldInfo GetFieldInHierarchy(Type type, string fieldName)
+		{
+			while (type != null)
+			{
+				var field = type.GetField(fieldName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+				if (field != null) return field;
+				type = type.BaseType;
+			}
+			return null;
 		}
 
 		/// <summary>

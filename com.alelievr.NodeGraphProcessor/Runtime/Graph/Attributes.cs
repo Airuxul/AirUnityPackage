@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
@@ -243,4 +243,11 @@ namespace GraphProcessor
 
 	[AttributeUsage(AttributeTargets.Method)]
 	public class IsCompatibleWithGraph : Attribute {}
+
+	/// <summary>
+	/// Mark an output port to use execution order by position: when multiple connections exist, sort by input node Y position (top first).
+	/// Enables edge order labels and Y-based execution order in ExecutionOrderProcessor.
+	/// </summary>
+	[AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
+	public class ExecutionOrderAttribute : Attribute { }
 }

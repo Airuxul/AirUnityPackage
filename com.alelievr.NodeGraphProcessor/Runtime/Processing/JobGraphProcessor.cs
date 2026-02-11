@@ -1,9 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using System.Linq;
+﻿using System.Collections.Generic;
 using Unity.Jobs;
-using Unity.Collections;
+
 // using Unity.Entities;
 
 namespace GraphProcessor
@@ -32,15 +29,6 @@ namespace GraphProcessor
 		/// </summary>
 		/// <param name="graph">Graph to be processed</param>
 		public JobGraphProcessor(BaseGraph graph) : base(graph) {}
-
-		public override void UpdateComputeOrder()
-		{
-			scheduleList = graph.nodes.OrderBy(n => n.computeOrder).Select(n => {
-				GraphScheduleList gsl = new GraphScheduleList(n);
-				gsl.dependencies = n.GetInputNodes().ToArray();
-				return gsl;
-			}).ToArray();
-		}
 
 		/// <summary>
 		/// Schedule the graph into the job system

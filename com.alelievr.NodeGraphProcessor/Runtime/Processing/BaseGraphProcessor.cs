@@ -1,20 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using System.Linq;
-using Unity.Jobs;
-using Unity.Collections;
-// using Unity.Entities;
-
 namespace GraphProcessor
 {
 
 	/// <summary>
 	/// Graph processor
 	/// </summary>
-	public abstract class BaseGraphProcessor
+	public abstract class BaseGraphProcessor : IGraphProcessor
 	{
-		protected BaseGraph			graph;
+		protected readonly BaseGraph Graph;
 		
 		/// <summary>
 		/// Manage graph scheduling and processing
@@ -22,12 +14,8 @@ namespace GraphProcessor
 		/// <param name="graph">Graph to be processed</param>
 		public BaseGraphProcessor(BaseGraph graph)
 		{
-			this.graph = graph;
-
-			UpdateComputeOrder();
+			Graph = graph;
 		}
-
-		public abstract void UpdateComputeOrder();
 
 		/// <summary>
 		/// Schedule the graph into the job system
