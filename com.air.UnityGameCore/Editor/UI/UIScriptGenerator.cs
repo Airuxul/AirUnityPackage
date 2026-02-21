@@ -160,7 +160,6 @@ namespace Air.UnityGameCore.Editor.UI
         private static string GenerateScriptFromTemplate(string templatePath, string className,
             List<ComponentField> fields)
         {
-            // todo: 优化这里的读取，通过Resources.Load获取, AI生成的太弱智了
             string template = File.ReadAllText(templatePath);
 
             // 替换类名

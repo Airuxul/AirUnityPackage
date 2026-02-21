@@ -4,7 +4,7 @@ using UnityEditor;
 namespace GraphProcessor
 {
 	[ExecuteAlways]
-	public class DeleteCallback : AssetModificationProcessor
+	public class DeleteCallback : UnityEditor.AssetModificationProcessor
 	{
 		static AssetDeleteResult OnWillDeleteAsset(string path, RemoveAssetOptions options)
 		{

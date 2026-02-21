@@ -31,13 +31,3 @@
 .edge_18 { --edge-width: 18; } .edge_18:hover { --edge-width: 20; }
 .edge_19 { --edge-width: 19; } .edge_19:hover { --edge-width: 21; }
 .edge_20 { --edge-width: 20; } .edge_20:hover { --edge-width: 22; }
-
-/* Execution order label in the middle of edge */
-.edge-execution-order {
-    background-color: rgba(40, 40, 40, 0.95);
-    border-radius: 10px;
-    min-width: 20px;
-    min-height: 20px;
-    -unity-font-style: bold;
-    color: #AAAAAA;
-}

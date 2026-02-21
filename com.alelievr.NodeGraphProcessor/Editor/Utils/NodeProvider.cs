@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System;
@@ -337,13 +337,10 @@ namespace GraphProcessor
 			{
 				if ((portView.direction == Direction.Input && description.isInput) || (portView.direction == Direction.Output && !description.isInput))
 					return false;
-
-				// Data flows from output to input.
-				var outputType = description.isInput ? portView.portType : description.portType;
-				var inputType = description.isInput ? description.portType : portView.portType;
-				if (!BaseGraph.TypesAreConnectable(outputType, inputType))
+	
+				if (!BaseGraph.TypesAreConnectable(description.portType, portView.portType))
 					return false;
-
+					
 				return true;
 			}
 		}

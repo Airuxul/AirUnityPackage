@@ -148,7 +148,7 @@ namespace GraphProcessor
 			graphView = null;
 		}
 
-		protected abstract void	InitializeWindow(BaseGraph baseGraph);
+		protected abstract void	InitializeWindow(BaseGraph graph);
 		protected virtual void InitializeGraphView(BaseGraphView view) {}
 	}
 }
