@@ -1,0 +1,12 @@
+{
+  "name": "com.air.behavior-tree",
+  "displayName": "Behavior Tree",
+  "version": "1.0.0",
+  "unity": "2020.3",
+  "description": "Behavior tree package built on Node Graph Processor for AI and game logic.",
+  "keywords": ["behavior tree", "AI", "node graph", "game logic"],
+  "category": "Unity",
+  "dependencies": {
+    "com.alelievr.node-graph-processor": "1.3.1"
+  }
+}

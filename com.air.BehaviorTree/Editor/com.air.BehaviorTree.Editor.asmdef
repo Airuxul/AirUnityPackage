@@ -1,0 +1,19 @@
+{
+  "name": "com.air.BehaviorTree.Editor",
+  "rootNamespace": "Air.BehaviorTree.Editor",
+  "references": [
+    "GUID:ca937d03ee5dd4d699091438dc0f3ae6",
+    "GUID:a432eb0a70c5c4a37ab50d59671586f8",
+    "GUID:b8f2e4a1c3d5e6f7a9b0c1d2e3f4a5b6"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": true,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": []
+}
