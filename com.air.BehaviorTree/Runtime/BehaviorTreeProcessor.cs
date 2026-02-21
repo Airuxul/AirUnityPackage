@@ -1,6 +1,5 @@
 using System.Linq;
 using UnityEngine;
-using GraphProcessor;
 
 namespace Air.BehaviorTree
 {
@@ -34,6 +33,9 @@ namespace Air.BehaviorTree
         public BTStatus Tick()
         {
             if (rootNode == null)
+                return BTStatus.Failure;
+
+            if (!rootNode.HasChild)
                 return BTStatus.Failure;
 
             return rootNode.Execute(context);

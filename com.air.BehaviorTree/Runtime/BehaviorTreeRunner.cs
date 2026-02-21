@@ -1,5 +1,4 @@
 using UnityEngine;
-using GraphProcessor;
 
 namespace Air.BehaviorTree
 {
@@ -14,9 +13,14 @@ namespace Air.BehaviorTree
         [SerializeField]
         [Tooltip("If true, tick every Update. If false, use manual Tick() calls.")]
         bool tickEveryFrame = true;
+        
+        [SerializeField]
+        [Tooltip("If true, record execution state for editor debug visualization.")]
+        bool enableDebug = true;
 
         BehaviorTreeProcessor processor;
         IBehaviorTreeContext context;
+        BehaviorTreeDebugState debugState;
 
         /// <summary>
         /// The behavior tree graph to execute.
@@ -39,6 +43,11 @@ namespace Air.BehaviorTree
             get => context;
             set => context = value;
         }
+
+        /// <summary>
+        /// Debug state for editor visualization. Only valid when enableDebug is true and after first tick.
+        /// </summary>
+        public BehaviorTreeDebugState DebugState => debugState;
 
         void Awake()
         {
@@ -65,26 +74,23 @@ namespace Air.BehaviorTree
             if (behaviorTree == null)
             {
                 processor = null;
+                debugState = null;
                 return;
             }
 
-            context ??= new DefaultBehaviorTreeContext(gameObject);
+            var defaultContext = new DefaultBehaviorTreeContext(gameObject);
+            if (enableDebug)
+            {
+                debugState = new BehaviorTreeDebugState();
+                context = new DebugBehaviorTreeContext(defaultContext, debugState);
+            }
+            else
+            {
+                debugState = null;
+                context = defaultContext;
+            }
+
             processor = new BehaviorTreeProcessor(behaviorTree, context);
-        }
-    }
-
-    /// <summary>
-    /// Default context implementation. Can be extended for game-specific data.
-    /// </summary>
-    public class DefaultBehaviorTreeContext : IBehaviorTreeContext
-    {
-        public GameObject GameObject { get; }
-        public Transform Transform { get; }
-
-        public DefaultBehaviorTreeContext(GameObject gameObject)
-        {
-            GameObject = gameObject;
-            Transform = gameObject.transform;
         }
     }
 }

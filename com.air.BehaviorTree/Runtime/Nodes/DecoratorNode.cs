@@ -14,7 +14,7 @@ namespace Air.BehaviorTree
         [Output(name = "Child")]
         public object child;
 
-        public override BTStatus Execute(IBehaviorTreeContext context)
+        protected override BTStatus ExecuteInternal(IBehaviorTreeContext context)
         {
             var firstChild = GetFirstChild();
             return firstChild != null ? Decorate(firstChild.Execute(context), context) : BTStatus.Failure;

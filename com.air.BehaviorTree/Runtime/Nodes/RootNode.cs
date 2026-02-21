@@ -16,7 +16,12 @@ namespace Air.BehaviorTree
 
         public override Color color => new Color(0.2f, 0.6f, 0.2f);
 
-        public override BTStatus Execute(IBehaviorTreeContext context)
+        /// <summary>
+        /// Returns true if the root has a child node to execute.
+        /// </summary>
+        public bool HasChild => GetFirstChild() != null;
+
+        protected override BTStatus ExecuteInternal(IBehaviorTreeContext context)
         {
             var firstChild = GetFirstChild();
             return firstChild != null ? firstChild.Execute(context) : BTStatus.Failure;

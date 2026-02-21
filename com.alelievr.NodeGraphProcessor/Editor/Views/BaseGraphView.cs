@@ -1,8 +1,6 @@
-﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
-using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 using UnityEditor.Experimental.GraphView;
 using System.Linq;
@@ -110,6 +108,19 @@ namespace GraphProcessor
 		/// Triggered when a node is duplicated (crt-d) or copy-pasted (crtl-c/crtl-v)
 		/// </summary>
 		public event NodeDuplicatedDelegate	nodeDuplicated;
+
+		/// <summary>
+		/// Triggered when a node position changes (e.g. after drag).
+		/// </summary>
+		public event Action< BaseNode >		onNodePositionChanged;
+
+		/// <summary>
+		/// Notify that a node's position has changed. Call from node views when position is updated.
+		/// </summary>
+		public void NotifyNodePositionChanged(BaseNode node)
+		{
+			onNodePositionChanged?.Invoke(node);
+		}
 
 		/// <summary>
 		/// Object to handle nodes that shows their UI in the inspector.

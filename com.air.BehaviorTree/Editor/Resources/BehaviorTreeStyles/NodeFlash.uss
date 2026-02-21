@@ -1,0 +1,7 @@
+/* White border overlay when a behavior tree node is executed at runtime. Stays at least 0.3s. */
+.bt-node-flash {
+    border-width: 4px;
+    border-color: rgb(255, 255, 255);
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 using GraphProcessor;
 
@@ -11,14 +12,27 @@ namespace Air.BehaviorTree
     public abstract class BehaviorTreeNode : BaseNode
     {
         /// <summary>
-        /// Execute this node. Override in derived classes to implement node logic.
+        /// Execute this node. Records execution start for debug visualization, then calls ExecuteInternal.
         /// </summary>
-        /// <param name="context">Execution context (blackboard, agent, etc.).</param>
-        /// <returns>Execution status.</returns>
-        public abstract BTStatus Execute(IBehaviorTreeContext context);
+        public BTStatus Execute(IBehaviorTreeContext context)
+        {
+            if (context is IBehaviorTreeDebugContext debugContext)
+                debugContext.DebugState.RecordExecutionStart(GUID);
+            var status = ExecuteInternal(context);
+            if (context is IBehaviorTreeDebugContext dc)
+                dc.DebugState.RecordExecutionEnd(GUID, status);
+            return status;
+        }
 
         /// <summary>
-        /// Get child nodes in execution order (sorted by vertical position in graph).
+        /// Override in derived classes to implement node logic.
+        /// </summary>
+        protected abstract BTStatus ExecuteInternal(IBehaviorTreeContext context);
+
+        /// <summary>
+        /// Get child nodes in execution order.
+        /// When output has [OrderByPosition], children are sorted by Y (smaller Y = earlier).
+        /// Otherwise connection order is used.
         /// </summary>
         protected IEnumerable<BehaviorTreeNode> GetOrderedChildren()
         {
@@ -26,7 +40,24 @@ namespace Air.BehaviorTree
                 .OfType<BehaviorTreeNode>()
                 .ToList();
 
-            return children.OrderBy(c => c.position.y).ThenBy(c => c.position.x);
+            if (HasOrderByPositionOnOutput())
+                return children.OrderBy(c => c.position.y).ThenBy(c => c.position.x);
+
+            return children;
+        }
+
+        /// <summary>
+        /// Check if any output field has [OrderByPosition] attribute.
+        /// </summary>
+        bool HasOrderByPositionOnOutput()
+        {
+            foreach (var field in GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
+            {
+                if (field.GetCustomAttribute<GraphProcessor.OutputAttribute>() != null &&
+                    field.GetCustomAttribute<OrderByPositionAttribute>() != null)
+                    return true;
+            }
+            return false;
         }
 
         /// <summary>

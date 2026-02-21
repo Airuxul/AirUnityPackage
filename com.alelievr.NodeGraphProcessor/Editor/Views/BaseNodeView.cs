@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.UIElements;
@@ -997,6 +997,9 @@ namespace GraphProcessor
 
                 nodeTarget.position = newPos;
                 initializing = false;
+
+				if (!initializing)
+					owner.NotifyNodePositionChanged(nodeTarget);
             }
 		}
 

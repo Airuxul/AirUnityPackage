@@ -14,13 +14,14 @@ namespace Air.BehaviorTree
         public object parent;
 
         [Output(name = "Children", allowMultiple = true)]
+        [OrderByPosition]
         public object children;
 
         public override string name => "Selector";
 
         public override Color color => new Color(0.4f, 0.6f, 0.9f);
 
-        public override BTStatus Execute(IBehaviorTreeContext context)
+        protected override BTStatus ExecuteInternal(IBehaviorTreeContext context)
         {
             foreach (var child in GetOrderedChildren())
             {

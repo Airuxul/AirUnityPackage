@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Air.BehaviorTree
 {
     /// <summary>
@@ -6,5 +8,14 @@ namespace Air.BehaviorTree
     /// </summary>
     public interface IBehaviorTreeContext
     {
+    }
+
+    /// <summary>
+    /// Context that provides per-node state storage (e.g. for delay timers).
+    /// Used by stateful nodes like DelayActionNode.
+    /// </summary>
+    public interface IBehaviorTreeNodeStateContext : IBehaviorTreeContext
+    {
+        Dictionary<string, object> NodeState { get; }
     }
 }

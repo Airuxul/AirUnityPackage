@@ -25,13 +25,20 @@ namespace Air.BehaviorTree.Editor
             return true;
         }
 
+        protected override void Update()
+        {
+            base.Update();
+            if (Application.isPlaying && graphView is BehaviorTreeGraphView btGraphView)
+                btGraphView.UpdateDebugVisuals();
+        }
+
         protected override void InitializeWindow(BaseGraph graph)
         {
             titleContent = new GUIContent("Behavior Tree");
             
             if (graphView == null)
             {
-                graphView = new BaseGraphView(this);
+                graphView = new BehaviorTreeGraphView(this);
                 _toolbarView = new ToolbarView(graphView);
                 graphView.Add(_toolbarView);
             }

@@ -20,7 +20,7 @@ namespace Air.BehaviorTree
         /// </summary>
         protected abstract BTStatus OnExecute(IBehaviorTreeContext context);
 
-        public override BTStatus Execute(IBehaviorTreeContext context)
+        protected override BTStatus ExecuteInternal(IBehaviorTreeContext context)
         {
             return OnExecute(context);
         }
