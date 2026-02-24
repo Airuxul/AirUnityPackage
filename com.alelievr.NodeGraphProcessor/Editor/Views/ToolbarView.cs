@@ -171,7 +171,16 @@ namespace GraphProcessor
 			bool exposedParamsVisible = graphView.GetPinnedElementStatus< ExposedParameterView >() != Status.Hidden;
 			showParameters = AddToggle("Show Parameters", exposedParamsVisible, (v) => graphView.ToggleView< ExposedParameterView>());
 
+			AddDropDownButton(new GUIContent("Export"), ShowExportMenu, false);
 			AddButton("Show In Project", () => EditorGUIUtility.PingObject(graphView.graph), false);
+		}
+
+		void ShowExportMenu()
+		{
+			var menu = new GenericMenu();
+			menu.AddItem(new GUIContent("Export to JSON"), false, () => GraphExportUtils.ExportToJson(graphView.graph));
+			menu.AddItem(new GUIContent("Export to Binary"), false, () => GraphExportUtils.ExportToBinary(graphView.graph));
+			menu.ShowAsContext();
 		}
 
 		public virtual void UpdateButtonStatus()

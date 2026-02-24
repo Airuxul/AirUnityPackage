@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor.Experimental.GraphView;
@@ -9,7 +9,7 @@ namespace GraphProcessor
 {
 	public class ProcessorView : PinnedElementView
 	{
-		BaseGraphProcessor	processor;
+		EditorGraphProcessor	processor;
 
 		public ProcessorView()
 		{
@@ -18,7 +18,7 @@ namespace GraphProcessor
 
 		protected override void Initialize(BaseGraphView graphView)
 		{
-			processor = new ProcessGraphProcessor(graphView.graph);
+			processor = new EditorGraphProcessor(graphView.graph);
 
 			graphView.computeOrderUpdated += processor.UpdateComputeOrder;
 

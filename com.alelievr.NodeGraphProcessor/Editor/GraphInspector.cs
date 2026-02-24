@@ -7,6 +7,7 @@ using System.Reflection;
 
 namespace GraphProcessor
 {
+    [CustomEditor(typeof(BaseGraph), true)]
     public class GraphInspector : Editor
     {
         protected VisualElement root;
@@ -41,6 +42,12 @@ namespace GraphProcessor
 
         protected virtual void CreateInspector()
         {
+            var openBtn = new UnityEngine.UIElements.Button(() => DefaultGraphWindow.Open(graph))
+            {
+                text = "Open Graph"
+            };
+            root.Add(openBtn);
+
             parameterContainer = new VisualElement{
                 name = "ExposedParameters"
             };

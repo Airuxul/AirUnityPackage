@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,6 +8,9 @@ using System.Linq;
 [System.Serializable, NodeMenuItem("Custom/#NAME#")]
 public class #SCRIPTNAME# : BaseNode
 {
+	// Set to your RuntimeBaseNode type, e.g. typeof(Runtime#SCRIPTNAME#)
+	public override Type RuntimeNodeType => null;
+
 	[Input(name = "In")]
     public float                input;
 
@@ -15,8 +19,5 @@ public class #SCRIPTNAME# : BaseNode
 
 	public override string		name => "#NAME#";
 
-	protected override void Process()
-	{
-	    output = input * 42;
-	}
+	// SO node only describes ports. Create Runtime#SCRIPTNAME# : RuntimeBaseNode for execution logic.
 }

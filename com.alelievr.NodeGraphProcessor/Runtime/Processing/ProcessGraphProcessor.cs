@@ -1,41 +1,34 @@
-﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-using Unity.Jobs;
-using Unity.Collections;
-// using Unity.Entities;
 
 namespace GraphProcessor
 {
+    /// <summary>
+    /// Synchronous graph processor for RuntimeGraph.
+    /// Processes all nodes in compute order.
+    /// </summary>
+    public class ProcessGraphProcessor : BaseRuntimeGraphProcessor
+    {
+        List<RuntimeBaseNode> processList;
 
-	/// <summary>
-	/// Graph processor
-	/// </summary>
-	public class ProcessGraphProcessor : BaseGraphProcessor
-	{
-		List< BaseNode >		processList;
-		
-		/// <summary>
-		/// Manage graph scheduling and processing
-		/// </summary>
-		/// <param name="graph">Graph to be processed</param>
-		public ProcessGraphProcessor(BaseGraph graph) : base(graph) {}
+        public ProcessGraphProcessor(IRuntimeGraph graph) : base(graph)
+        {
+            processList = graph.Nodes.OrderBy(n => n.ComputeOrder).ToList();
+        }
 
-		public override void UpdateComputeOrder()
-		{
-			processList = graph.nodes.OrderBy(n => n.computeOrder).ToList();
-		}
-
-		/// <summary>
-		/// Process all the nodes following the compute order.
-		/// </summary>
-		public override void Run()
-		{
-			int count = processList.Count;
-
-			for (int i = 0; i < count; i++)
-				processList[i].OnProcess();
-		}
-	}
+        /// <summary>
+        /// Process all nodes following the compute order (from export).
+        /// </summary>
+        public override void Run()
+        {
+            int count = processList.Count;
+            for (int i = 0; i < count; i++)
+            {
+                var node = processList[i];
+                if (node.CanProcess)
+                    node.OnProcess();
+            }
+        }
+    }
 }
