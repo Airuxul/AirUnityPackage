@@ -22,7 +22,11 @@ namespace GraphProcessor
             _customCreators[runtimeNodeType] = creator;
         }
 
-        private static readonly Dictionary<Type, Func<RuntimeGraph, NodeExportData, RuntimeBaseNode>> _customCreators = new();
+        private static readonly Dictionary<Type, Func<RuntimeGraph, NodeExportData, RuntimeBaseNode>> _customCreators = new()
+        {
+            {typeof(RuntimeParameterNode), CreateRuntimeParameterNode},
+            {typeof(RuntimeRelayNode), CreateRuntimeRelayNode}
+        };
 
         /// <summary>
         /// Load RuntimeGraph from JSON string.
@@ -109,49 +113,7 @@ namespace GraphProcessor
                 var node = creator(graph, data);
                 if (node != null) return node;
             }
-            if (runtimeType == typeof(RuntimeParameterNode))
-            {
-                var paramData = JsonUtility.FromJson<ParameterNodeExportData>(data.jsonData ?? "{}");
-                return new RuntimeParameterNode(graph)
-                {
-                    GUID = data.guid,
-                    ComputeOrder = data.computeOrder,
-                    ParameterGUID = paramData.parameterGUID,
-                    ParameterAccessor = paramData.accessor
-                };
-            }
-            if (runtimeType == typeof(RuntimeRelayNode))
-            {
-                var relayData = JsonUtility.FromJson<RelayNodeExportData>(data.jsonData ?? "{}");
-                return new RuntimeRelayNode(graph)
-                {
-                    GUID = data.guid,
-                    ComputeOrder = data.computeOrder,
-                    PackInput = relayData.packInput,
-                    UnpackOutput = relayData.unpackOutput
-                };
-            }
-            var fallback = new RuntimeDataNode(graph)
-            {
-                GUID = data.guid,
-                ComputeOrder = data.computeOrder,
-                NodeType = InferNodeType(data)
-            };
-            if (fallback.NodeType == "Parameter")
-            {
-                var paramData = JsonUtility.FromJson<ParameterNodeExportData>(data.jsonData ?? "{}");
-                fallback.ParameterGUID = paramData.parameterGUID;
-                fallback.ParameterAccessor = paramData.accessor;
-            }
-            return fallback;
-        }
-
-        static string InferNodeType(NodeExportData data)
-        {
-            var typeName = data.type ?? "";
-            if (typeName.Contains("ParameterNode")) return "Parameter";
-            if (typeName.Contains("RelayNode")) return "Relay";
-            return "Relay";
+            return null;
         }
 
         static object DeserializeParameterValue(string typeName, string jsonValue)
@@ -170,18 +132,24 @@ namespace GraphProcessor
             catch { return null; }
         }
 
-        [Serializable]
-        class ParameterNodeExportData
+        static RuntimeParameterNode CreateRuntimeParameterNode(RuntimeGraph graph, NodeExportData nodeExportData)
         {
-            public string parameterGUID;
-            public int accessor;
+            var paramData = JsonUtility.FromJson<ParameterNodeExportData>(nodeExportData.jsonData ?? "{}");
+            return new RuntimeParameterNode(graph)
+            {
+                ParameterAccessor = paramData.accessor,
+                ParameterGUID = paramData.parameterGUID
+            };
         }
 
-        [Serializable]
-        class RelayNodeExportData
+        static RuntimeRelayNode CreateRuntimeRelayNode(RuntimeGraph graph, NodeExportData nodeExportData)
         {
-            public bool packInput;
-            public bool unpackOutput;
+            var paramData = JsonUtility.FromJson<RelayNodeExportData>(nodeExportData.jsonData ?? "{}");
+            return new RuntimeRelayNode(graph)
+            {
+                PackInput = paramData.packInput,
+                UnpackOutput = paramData.unpackOutput
+            };
         }
     }
 }

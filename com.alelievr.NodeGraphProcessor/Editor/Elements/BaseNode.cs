@@ -23,7 +23,7 @@ namespace GraphProcessor
 		/// <summary>
 		/// Override to export custom node data for runtime. Return null to use default export.
 		/// </summary>
-		public virtual string GetExportJsonData() => null;
+		public abstract string GetExportJsonData();
 		
 		[SerializeField]
 		internal string nodeCustomName = null; // The name of the node in case it was renamed by a user

@@ -6,16 +6,18 @@ namespace GraphProcessor
     /// </summary>
     public abstract class BaseRuntimeGraphProcessor
     {
-        protected IRuntimeGraph graph;
+        protected RuntimeGraph graph;
 
         /// <summary>
         /// Manage graph scheduling and processing.
         /// </summary>
         /// <param name="graph">Runtime graph to be processed</param>
-        public BaseRuntimeGraphProcessor(IRuntimeGraph graph)
+        public BaseRuntimeGraphProcessor(RuntimeGraph graph)
         {
             this.graph = graph;
         }
+        
+        // public BaseRuntimeGraphProcessor()
 
         /// <summary>
         /// Execute the graph.

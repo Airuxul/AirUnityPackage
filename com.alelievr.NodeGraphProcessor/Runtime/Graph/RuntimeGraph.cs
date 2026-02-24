@@ -5,87 +5,83 @@ namespace GraphProcessor
     /// <summary>
     /// Runtime graph implementation. Built from GraphExportData (JSON deserialization).
     /// </summary>
-    public class RuntimeGraph : IRuntimeGraph
+    public class RuntimeGraph
     {
-        readonly List<RuntimeBaseNode> nodes = new();
-        readonly List<RuntimeEdge> edges = new();
-        readonly Dictionary<string, RuntimeBaseNode> nodesByGUID = new();
-        readonly Dictionary<string, RuntimeEdge> edgesByGUID = new();
-        readonly Dictionary<string, object> exposedParameters = new();
-        readonly Dictionary<(string nodeGUID, string fieldName, string portId), object> portValues = new();
-
-        public IReadOnlyList<RuntimeBaseNode> Nodes => nodes;
+        public Dictionary<string, RuntimeBaseNode> Guid2Nodes { get; } = new();
+        public Dictionary<string, RuntimeEdge> Guid2Edges { get; } = new();
+        public Dictionary<string, object> ExposedParameters { get; } = new();
+        
+        public Dictionary<(string nodeGUID, string fieldName, string portId), object> PortValues { get; } = new();
 
         public void AddNode(RuntimeBaseNode node)
         {
-            nodes.Add(node);
-            nodesByGUID[node.GUID] = node;
+            Guid2Nodes.Add(node.GUID, node);
         }
 
         public void AddEdge(RuntimeEdge edge)
         {
-            edges.Add(edge);
-            edgesByGUID[edge.GUID] = edge;
+            Guid2Edges.Add(edge.GUID, edge);
         }
 
         public void SetExposedParameter(string guid, object value)
         {
-            exposedParameters[guid] = value;
+            ExposedParameters.Add(guid, value);
         }
 
         public object GetExposedParameter(string guid)
         {
-            return exposedParameters.GetValueOrDefault(guid);
+            return ExposedParameters.GetValueOrDefault(guid);
         }
         
         public bool TryGetNode<T>(string nodeGUID, out T node) where T : RuntimeBaseNode
         {
-            var hasValue = nodesByGUID.TryGetValue(nodeGUID, out var baseNode);
+            var hasValue = Guid2Nodes.TryGetValue(nodeGUID, out var baseNode);
             if (hasValue)
                 node = (T)baseNode;
             else
                 node = null;
             return hasValue;
         }
-
+                
         public void SetPortValue(string nodeGUID, string fieldName, string portId, object value)
         {
             var key = (nodeGUID, fieldName, portId ?? "");
             if (value == null)
-                portValues.Remove(key);
+                PortValues.Remove(key);
             else
-                portValues[key] = value;
+                PortValues[key] = value;
         }
 
         public object GetPortValue(string nodeGUID, string fieldName, string portId)
         {
-            return portValues.GetValueOrDefault((nodeGUID, fieldName, portId ?? ""));
+            return PortValues.GetValueOrDefault((nodeGUID, fieldName, portId ?? ""));
         }
-
+        
+        // todo 优化，缓存字典不遍历
         public IEnumerable<RuntimeBaseNode> GetInputNodes(RuntimeBaseNode node)
         {
-            foreach (var edge in edges)
+            foreach (var edge in Guid2Edges.Values)
             {
-                if (edge.InputNodeGUID == node.GUID && nodesByGUID.TryGetValue(edge.OutputNodeGUID, out var outputNode))
+                if (edge.InputNodeGUID == node.GUID && Guid2Nodes.TryGetValue(edge.OutputNodeGUID, out var outputNode))
                     yield return outputNode;
             }
         }
 
         public IEnumerable<RuntimeBaseNode> GetOutputNodes(RuntimeBaseNode node)
         {
-            foreach (var edge in edges)
+            foreach (var edge in Guid2Edges.Values)
             {
-                if (edge.OutputNodeGUID == node.GUID && nodesByGUID.TryGetValue(edge.InputNodeGUID, out var inputNode))
+                if (edge.OutputNodeGUID == node.GUID && Guid2Nodes.TryGetValue(edge.InputNodeGUID, out var inputNode))
                     yield return inputNode;
             }
         }
-
+        
         public RuntimeEdge GetEdgeForInput(RuntimeBaseNode inputNode, string fieldName, string portId, RuntimeBaseNode outputNode)
         {
-            foreach (var edge in edges)
+            foreach (var edge in Guid2Edges.Values)
             {
                 if (edge.InputNodeGUID == inputNode.GUID && edge.OutputNodeGUID == outputNode.GUID
-                    && edge.InputFieldName == fieldName && (portId == null || edge.InputPortIdentifier == portId))
+                                                         && edge.InputFieldName == fieldName && (portId == null || edge.InputPortIdentifier == portId))
                     return edge;
             }
             return null;
@@ -93,14 +89,13 @@ namespace GraphProcessor
 
         public RuntimeEdge GetEdgeForOutput(RuntimeBaseNode outputNode, string fieldName, string portId, RuntimeBaseNode inputNode)
         {
-            foreach (var edge in edges)
+            foreach (var edge in Guid2Edges.Values)
             {
                 if (edge.OutputNodeGUID == outputNode.GUID && edge.InputNodeGUID == inputNode.GUID
-                    && edge.OutputFieldName == fieldName && (portId == null || edge.OutputPortIdentifier == portId))
+                                                           && edge.OutputFieldName == fieldName && (portId == null || edge.OutputPortIdentifier == portId))
                     return edge;
             }
             return null;
         }
-
     }
 }

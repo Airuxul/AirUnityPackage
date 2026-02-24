@@ -9,9 +9,9 @@ namespace GraphProcessor
     [Serializable]
     public class GraphExportData
     {
-        public List<NodeExportData> nodes = new List<NodeExportData>();
-        public List<EdgeExportData> edges = new List<EdgeExportData>();
-        public List<ExposedParameterExportData> exposedParameters = new List<ExposedParameterExportData>();
+        public List<NodeExportData> nodes = new();
+        public List<EdgeExportData> edges = new();
+        public List<ExposedParameterExportData> exposedParameters = new();
     }
 
     [Serializable]

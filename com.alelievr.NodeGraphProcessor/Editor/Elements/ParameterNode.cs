@@ -1,8 +1,5 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using GraphProcessor;
-using System.Linq;
 using System;
 
 namespace GraphProcessor
@@ -93,6 +90,14 @@ namespace GraphProcessor
 			}
 		}
 
+		public override string GetExportJsonData()
+		{
+			return JsonUtility.ToJson(new ParameterNodeExportData
+			{
+				parameterGUID = parameterGUID,
+				accessor = (int)accessor
+			});
+		}
 	}
 
 	public enum ParameterAccessor

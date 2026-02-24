@@ -7,10 +7,12 @@ namespace GraphProcessor
     {
         BaseGraph graph;
         RuntimeGraph runtimeGraph;
+        private readonly ProcessGraphProcessor RuntimeGraphRunner;
 
         public EditorGraphProcessor(BaseGraph graph)
         {
             this.graph = graph;
+            RuntimeGraphRunner = new ProcessGraphProcessor(RuntimeGraphBuilder.Build(GraphExporter.Export(graph)));
         }
 
         public void UpdateComputeOrder()
@@ -23,7 +25,7 @@ namespace GraphProcessor
             if (runtimeGraph == null)
                 BuildRuntimeGraph();
             if (runtimeGraph != null)
-                RuntimeGraphRunner.Run(runtimeGraph);
+                RuntimeGraphRunner.Run();
         }
 
         void BuildRuntimeGraph()

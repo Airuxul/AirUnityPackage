@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace GraphProcessor
@@ -63,22 +61,6 @@ namespace GraphProcessor
         {
             var custom = node.GetExportJsonData();
             if (!string.IsNullOrEmpty(custom)) return custom;
-            if (node is ParameterNode paramNode)
-            {
-                return JsonUtility.ToJson(new ParameterNodeExportData
-                {
-                    parameterGUID = paramNode.parameterGUID,
-                    accessor = (int)paramNode.accessor
-                });
-            }
-            if (node is RelayNode relayNode)
-            {
-                return JsonUtility.ToJson(new RelayNodeExportData
-                {
-                    packInput = relayNode.packInput,
-                    unpackOutput = relayNode.unpackOutput
-                });
-            }
             return "{}";
         }
 
@@ -102,20 +84,6 @@ namespace GraphProcessor
                 type = paramType.AssemblyQualifiedName,
                 jsonValue = jsonValue
             };
-        }
-
-        [Serializable]
-        class ParameterNodeExportData
-        {
-            public string parameterGUID;
-            public int accessor;
-        }
-
-        [Serializable]
-        class RelayNodeExportData
-        {
-            public bool packInput;
-            public bool unpackOutput;
         }
     }
 }
