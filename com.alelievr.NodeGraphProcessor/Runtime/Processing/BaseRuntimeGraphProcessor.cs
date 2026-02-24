@@ -8,20 +8,20 @@ namespace GraphProcessor
     {
         protected RuntimeGraph graph;
 
-        /// <summary>
-        /// Manage graph scheduling and processing.
-        /// </summary>
-        /// <param name="graph">Runtime graph to be processed</param>
-        public BaseRuntimeGraphProcessor(RuntimeGraph graph)
+        public virtual void InitRuntimeGraph(RuntimeGraph _graph)
         {
-            this.graph = graph;
+            graph = _graph;
         }
-        
-        // public BaseRuntimeGraphProcessor()
 
         /// <summary>
         /// Execute the graph.
         /// </summary>
         public abstract void Run();
+
+        public void Run(RuntimeGraph _graph)
+        {
+            InitRuntimeGraph(_graph);
+            Run();
+        }
     }
 }

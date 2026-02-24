@@ -18,7 +18,7 @@ namespace GraphProcessor
 		/// <summary>
 		/// The RuntimeBaseNode type that handles execution for this SO node. Return null to use generic RuntimeDataNode fallback.
 		/// </summary>
-		public virtual Type RuntimeNodeType => null;
+		public abstract Type RuntimeNodeType { get; }
 
 		/// <summary>
 		/// Override to export custom node data for runtime. Return null to use default export.

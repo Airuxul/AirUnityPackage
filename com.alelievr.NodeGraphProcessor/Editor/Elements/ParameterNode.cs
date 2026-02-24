@@ -4,7 +4,7 @@ using System;
 
 namespace GraphProcessor
 {
-	[System.Serializable]
+	[Serializable]
 	public class ParameterNode : BaseNode
 	{
 		public override Type RuntimeNodeType => typeof(RuntimeParameterNode);

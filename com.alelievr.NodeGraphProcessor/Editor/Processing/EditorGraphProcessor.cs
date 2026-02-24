@@ -5,14 +5,14 @@ namespace GraphProcessor
     /// </summary>
     public class EditorGraphProcessor
     {
-        BaseGraph graph;
-        RuntimeGraph runtimeGraph;
+        private BaseGraph graph;
+        private RuntimeGraph runtimeGraph;
         private readonly ProcessGraphProcessor RuntimeGraphRunner;
 
         public EditorGraphProcessor(BaseGraph graph)
         {
             this.graph = graph;
-            RuntimeGraphRunner = new ProcessGraphProcessor(RuntimeGraphBuilder.Build(GraphExporter.Export(graph)));
+            RuntimeGraphRunner = new ProcessGraphProcessor();
         }
 
         public void UpdateComputeOrder()
@@ -22,8 +22,6 @@ namespace GraphProcessor
 
         public void Run()
         {
-            if (runtimeGraph == null)
-                BuildRuntimeGraph();
             if (runtimeGraph != null)
                 RuntimeGraphRunner.Run();
         }
@@ -32,6 +30,7 @@ namespace GraphProcessor
         {
             var data = GraphExporter.Export(graph);
             runtimeGraph = RuntimeGraphBuilder.Build(data);
+            RuntimeGraphRunner.Run(runtimeGraph);
         }
     }
 }

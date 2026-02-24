@@ -14,21 +14,6 @@ namespace GraphProcessor
         const uint BinaryMagic = 0x47504752; // "GPGR"
 
         /// <summary>
-        /// Register a custom node creator. Call from [RuntimeInitializeOnLoadMethod] in dependent packages.
-        /// </summary>
-        public static void RegisterNodeCreator(Type runtimeNodeType, Func<RuntimeGraph, NodeExportData, RuntimeBaseNode> creator)
-        {
-            if (runtimeNodeType == null || creator == null) return;
-            _customCreators[runtimeNodeType] = creator;
-        }
-
-        private static readonly Dictionary<Type, Func<RuntimeGraph, NodeExportData, RuntimeBaseNode>> _customCreators = new()
-        {
-            {typeof(RuntimeParameterNode), CreateRuntimeParameterNode},
-            {typeof(RuntimeRelayNode), CreateRuntimeRelayNode}
-        };
-
-        /// <summary>
         /// Load RuntimeGraph from JSON string.
         /// </summary>
         public static RuntimeGraph FromJson(string json)
@@ -131,6 +116,23 @@ namespace GraphProcessor
             }
             catch { return null; }
         }
+        
+        #region auto generated
+        /// <summary>
+        /// Register a custom node creator. Call from [RuntimeInitializeOnLoadMethod] in dependent packages.
+        /// </summary>
+        public static void RegisterNodeCreator(Type runtimeNodeType, Func<RuntimeGraph, NodeExportData, RuntimeBaseNode> creator)
+        {
+            if (runtimeNodeType == null || creator == null) return;
+            _customCreators[runtimeNodeType] = creator;
+        }
+
+        private static readonly Dictionary<Type, Func<RuntimeGraph, NodeExportData, RuntimeBaseNode>> _customCreators = new()
+        {
+            {typeof(RuntimeParameterNode), CreateRuntimeParameterNode},
+            {typeof(RuntimeRelayNode), CreateRuntimeRelayNode},
+            {typeof(RuntimeLogNode), CreateRuntimeLogNode},
+        };
 
         static RuntimeParameterNode CreateRuntimeParameterNode(RuntimeGraph graph, NodeExportData nodeExportData)
         {
@@ -151,5 +153,15 @@ namespace GraphProcessor
                 UnpackOutput = paramData.unpackOutput
             };
         }
+        
+        static RuntimeLogNode CreateRuntimeLogNode(RuntimeGraph graph, NodeExportData nodeExportData)
+        {
+            var paramData = JsonUtility.FromJson<LogNodeExportData>(nodeExportData.jsonData ?? "{}");
+            return new RuntimeLogNode(graph)
+            {
+                DefaltMessage = paramData.DefaltMessage
+            };
+        }
+        #endregion
     }
 }

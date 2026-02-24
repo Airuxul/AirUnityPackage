@@ -6,12 +6,13 @@ namespace GraphProcessor
     public class ProcessGraphProcessor : BaseRuntimeGraphProcessor
     {
         private List<RuntimeBaseNode> processList;
-        
-        public ProcessGraphProcessor(RuntimeGraph graph) : base(graph)
+
+        public override void InitRuntimeGraph(RuntimeGraph _graph)
         {
-            processList = graph.Guid2Nodes.Values.ToList().OrderBy(n => n.Order).ToList();
+            base.InitRuntimeGraph(_graph);
+            processList = _graph.Guid2Nodes.Values.ToList().OrderBy(a => a.Order).ToList();
         }
-        
+
         public override void Run()
         {
             int count = processList.Count;
