@@ -18,8 +18,7 @@ namespace GraphProcessor
             int count = processList.Count;
             for (int i = 0; i < count; i++)
             {
-                var node = processList[i];
-                node.OnProcess();
+                processList[i].OnProcess();
             }
         }
     }

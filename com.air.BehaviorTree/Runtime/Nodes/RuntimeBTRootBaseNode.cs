@@ -8,7 +8,7 @@ namespace BehaviorTree
     /// </summary>
     public class RuntimeRootBaseNode : RuntimeBTControlNode
     {
-        public RuntimeRootBaseNode(RuntimeGraph graph) : base(graph)
+        public RuntimeRootBaseNode(RuntimeGraph graph, NodeExportData exportData) : base(graph, exportData)
         {
         }
 

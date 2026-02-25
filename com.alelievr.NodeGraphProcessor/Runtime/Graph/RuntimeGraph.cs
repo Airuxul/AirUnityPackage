@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace GraphProcessor
@@ -17,6 +18,12 @@ namespace GraphProcessor
         public Dictionary<string, object> ExposedParameters { get; } = new();
         
         public Dictionary<(string nodeGUID, string fieldName, string portId), object> PortValues { get; } = new();
+
+        /// <summary>
+        /// Fired when a port value changes. Args: (nodeGUID, fieldName, portId, newValue).
+        /// Input nodes can subscribe to apply values only when output changes.
+        /// </summary>
+        public event Action<string, string, string, object> PortValueChanged;
 
         public void AddNode(RuntimeBaseNode node)
         {
@@ -51,10 +58,27 @@ namespace GraphProcessor
         public void SetPortValue(string nodeGUID, string fieldName, string portId, object value)
         {
             var key = (nodeGUID, fieldName, portId ?? "");
+            var portIdNorm = portId ?? "";
             if (value == null)
-                PortValues.Remove(key);
+            {
+                if (PortValues.Remove(key))
+                    PortValueChanged?.Invoke(nodeGUID, fieldName, portIdNorm, null);
+            }
             else
-                PortValues[key] = value;
+            {
+                if (!PortValues.TryGetValue(key, out var existing) || !ValuesEqual(existing, value))
+                {
+                    PortValues[key] = value;
+                    PortValueChanged?.Invoke(nodeGUID, fieldName, portIdNorm, value);
+                }
+            }
+        }
+
+        static bool ValuesEqual(object a, object b)
+        {
+            if (a == null && b == null) return true;
+            if (a == null || b == null) return false;
+            return a.Equals(b);
         }
 
         public object GetPortValue(string nodeGUID, string fieldName, string portId)

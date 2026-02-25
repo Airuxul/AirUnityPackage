@@ -3,7 +3,7 @@ using System;
 namespace GraphProcessor
 {
     [Serializable]
-    public class LogNodeExportData
+    public class LogNodeParamData : NodeParamData
     {
         public string DefaltMessage;
     }

@@ -138,31 +138,17 @@ namespace GraphProcessor
 
         static RuntimeParameterNode CreateRuntimeParameterNode(RuntimeGraph graph, NodeExportData nodeExportData)
         {
-            var paramData = JsonUtility.FromJson<ParameterNodeExportData>(nodeExportData.jsonData ?? "{}");
-            return new RuntimeParameterNode(graph)
-            {
-                ParameterAccessor = paramData.accessor,
-                ParameterGUID = paramData.parameterGUID
-            };
+            return new RuntimeParameterNode(graph, nodeExportData);
         }
 
         static RuntimeRelayNode CreateRuntimeRelayNode(RuntimeGraph graph, NodeExportData nodeExportData)
         {
-            var paramData = JsonUtility.FromJson<RelayNodeExportData>(nodeExportData.jsonData ?? "{}");
-            return new RuntimeRelayNode(graph)
-            {
-                PackInput = paramData.packInput,
-                UnpackOutput = paramData.unpackOutput
-            };
+            return new RuntimeRelayNode(graph, nodeExportData);
         }
         
         static RuntimeLogNode CreateRuntimeLogNode(RuntimeGraph graph, NodeExportData nodeExportData)
         {
-            var paramData = JsonUtility.FromJson<LogNodeExportData>(nodeExportData.jsonData ?? "{}");
-            return new RuntimeLogNode(graph)
-            {
-                DefaltMessage = paramData.DefaltMessage
-            };
+            return new RuntimeLogNode(graph, nodeExportData);
         }
         #endregion
     }

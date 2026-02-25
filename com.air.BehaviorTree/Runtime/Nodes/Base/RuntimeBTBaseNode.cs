@@ -8,13 +8,13 @@ namespace BehaviorTree
     /// </summary>
     public abstract class RuntimeBTBaseNode : RuntimeBaseNode
     {
+        protected RuntimeBTBaseNode(RuntimeGraph graph, NodeExportData exportData) : base(graph, exportData)
+        {
+        }
+
         public BehaviorTreeStatus Status { get; private set; }
         
         public float LastExecutionTime { get; private set; }
-        
-        protected RuntimeBTBaseNode(RuntimeGraph graph) : base(graph)
-        {
-        }
 
         /// <summary>
         /// When node first Execute
@@ -32,7 +32,9 @@ namespace BehaviorTree
         public override void OnProcess()
         {
             if (Status != BehaviorTreeStatus.Running)
+            {
                 OnInit();
+            }
             Status = OnUpdate();
             LastExecutionTime = Time.time;
         }

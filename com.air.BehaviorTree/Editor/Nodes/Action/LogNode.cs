@@ -16,7 +16,7 @@ namespace BehaviorTree
 
         public override string GetExportJsonData()
         {
-            return JsonUtility.ToJson(new LogNodeExportData { logMessage = logMessage });
+            return JsonUtility.ToJson(new BTLogNodeParamData { LogMessage = logMessage });
         }
     }
 }

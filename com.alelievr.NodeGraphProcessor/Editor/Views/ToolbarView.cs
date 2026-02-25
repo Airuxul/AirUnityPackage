@@ -40,8 +40,8 @@ namespace GraphProcessor
 		List< ToolbarButtonData >	rightButtonDatas = new List< ToolbarButtonData >();
 		protected BaseGraphView		graphView;
 		
-		ToolbarButtonData showProcessor;
-		ToolbarButtonData showParameters;
+		protected ToolbarButtonData showProcessor;
+		protected ToolbarButtonData showParameters;
 
 		public ToolbarView(BaseGraphView graphView)
 		{
@@ -168,14 +168,14 @@ namespace GraphProcessor
 
 			bool processorVisible = graphView.GetPinnedElementStatus< ProcessorView >() != Status.Hidden;
 			showProcessor = AddToggle("Show Processor", processorVisible, (v) => graphView.ToggleView< ProcessorView>());
-			bool exposedParamsVisible = graphView.GetPinnedElementStatus< ExposedParameterView >() != Status.Hidden;
+			bool exposedParamsVisible = graphView.GetPinnedElementStatus<ExposedParameterView>() != Status.Hidden;
 			showParameters = AddToggle("Show Parameters", exposedParamsVisible, (v) => graphView.ToggleView< ExposedParameterView>());
 
 			AddDropDownButton(new GUIContent("Export"), ShowExportMenu, false);
 			AddButton("Show In Project", () => EditorGUIUtility.PingObject(graphView.graph), false);
 		}
 
-		void ShowExportMenu()
+		protected void ShowExportMenu()
 		{
 			var menu = new GenericMenu();
 			menu.AddItem(new GUIContent("Export to JSON"), false, () => GraphExportUtils.ExportToJson(graphView.graph));

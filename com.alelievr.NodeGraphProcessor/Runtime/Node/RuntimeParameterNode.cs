@@ -5,10 +5,15 @@ namespace GraphProcessor
     /// </summary>
     public class RuntimeParameterNode : RuntimeBaseNode
     {
+        public RuntimeParameterNode(RuntimeGraph graph, NodeExportData exportData) : base(graph, exportData)
+        {
+            var nodeParamData = GetNodeParamDataFromJson<ParameterNodeParamData>(exportData.jsonData ?? "{}");
+            ParameterGUID = nodeParamData.ParameterGUID;
+            ParameterAccessor = nodeParamData.Accessor;
+        }
+
         public string ParameterGUID { get; set; }
         public int ParameterAccessor { get; set; }
-
-        public RuntimeParameterNode(RuntimeGraph graph) : base(graph) { }
 
         public override void OnProcess()
         {

@@ -10,8 +10,10 @@ namespace BehaviorTree
     {
         public string LogMessage { get; set; }
 
-        public RuntimeBTLogNode(RuntimeGraph graph) : base(graph)
+        public RuntimeBTLogNode(RuntimeGraph graph, NodeExportData exportData) : base(graph, exportData)
         {
+            var nodeParamData = GetNodeParamDataFromJson<BTLogNodeParamData>(exportData.jsonData ?? "{}");
+            LogMessage = nodeParamData.LogMessage;
         }
 
         protected override BehaviorTreeStatus OnUpdate()

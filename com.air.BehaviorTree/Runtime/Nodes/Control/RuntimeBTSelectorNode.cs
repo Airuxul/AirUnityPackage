@@ -9,8 +9,8 @@ namespace BehaviorTree
     public class RuntimeBTSelectorNode : RuntimeBTControlNode
     {
         private int current;
-        
-        public RuntimeBTSelectorNode(RuntimeGraph graph) : base(graph)
+
+        public RuntimeBTSelectorNode(RuntimeGraph graph, NodeExportData exportData) : base(graph, exportData)
         {
         }
 

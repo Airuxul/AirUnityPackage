@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using GraphProcessor;
 
@@ -16,61 +15,32 @@ namespace BehaviorTree
             RuntimeGraphBuilder.RegisterNodeCreator(typeof(RuntimeBTSequenceNode), CreateSequenceNode);
             RuntimeGraphBuilder.RegisterNodeCreator(typeof(RuntimeBTSelectorNode), CreateSelectorNode);
             RuntimeGraphBuilder.RegisterNodeCreator(typeof(RuntimeBTLogNode), CreateLogNode);
-            RuntimeGraphBuilder.RegisterNodeCreator(typeof(RuntimeBTDelayNode), CreateDelayNode);
+            RuntimeGraphBuilder.RegisterNodeCreator(typeof(RuntimeBTWaitNode), CreateDelayNode);
         }
 
         static RuntimeRootBaseNode CreateRootNode(RuntimeGraph graph, NodeExportData data)
         {
-            var node = new RuntimeRootBaseNode(graph)
-            {
-                GUID = data.guid,
-                Order = data.computeOrder
-            };
-            return node;
+            return new RuntimeRootBaseNode(graph, data);
         }
 
         static RuntimeBTSequenceNode CreateSequenceNode(RuntimeGraph graph, NodeExportData data)
         {
-            var node = new RuntimeBTSequenceNode(graph)
-            {
-                GUID = data.guid,
-                Order = data.computeOrder
-            };
-            return node;
+            return new RuntimeBTSequenceNode(graph, data);
         }
 
         static RuntimeBTSelectorNode CreateSelectorNode(RuntimeGraph graph, NodeExportData data)
         {
-            var node = new RuntimeBTSelectorNode(graph)
-            {
-                GUID = data.guid,
-                Order = data.computeOrder
-            };
-            return node;
+            return new RuntimeBTSelectorNode(graph, data);
         }
 
         static RuntimeBTLogNode CreateLogNode(RuntimeGraph graph, NodeExportData data)
         {
-            var export = JsonUtility.FromJson<LogNodeExportData>(data.jsonData ?? "{}");
-            var node = new RuntimeBTLogNode(graph)
-            {
-                GUID = data.guid,
-                Order = data.computeOrder,
-                LogMessage = export?.logMessage ?? ""
-            };
-            return node;
+            return new RuntimeBTLogNode(graph, data);
         }
 
-        static RuntimeBTDelayNode CreateDelayNode(RuntimeGraph graph, NodeExportData data)
+        static RuntimeBTWaitNode CreateDelayNode(RuntimeGraph graph, NodeExportData data)
         {
-            var export = JsonUtility.FromJson<DelayNodeExportData>(data.jsonData ?? "{}");
-            var node = new RuntimeBTDelayNode(graph)
-            {
-                GUID = data.guid,
-                Order = data.computeOrder,
-                DelayTicks = export?.delayTicks ?? 24
-            };
-            return node;
+            return new RuntimeBTWaitNode(graph, data);
         }
     }
 }

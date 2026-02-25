@@ -14,6 +14,19 @@ namespace BehaviorTree
         {
             _graph = graph;
             _rootBase = FindRoot();
+            InitParameterNodes();
+        }
+
+        /// <summary>
+        /// Process ParameterNodes with Accessor=0 (Get) to push ExposedParameters to connected input nodes.
+        /// </summary>
+        void InitParameterNodes()
+        {
+            foreach (var node in _graph.Guid2Nodes.Values)
+            {
+                if (node is RuntimeParameterNode param && param.ParameterAccessor == 0)
+                    param.OnProcess();
+            }
         }
 
         /// <summary>

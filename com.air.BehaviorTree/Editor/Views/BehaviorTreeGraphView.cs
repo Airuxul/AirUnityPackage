@@ -32,8 +32,8 @@ namespace BehaviorTree
         static readonly Color RunningColor = new(1f, 0.78f, 0f);
         static readonly Color SuccessColor = new(0f, 0.78f, 0.31f);
         static readonly Color FailureColor = new(1f, 0.31f, 0.31f);
-        
-        public Dictionary<string, float> guid2LastNodeExecutionTime = new();
+
+        private readonly Dictionary<string, float> guid2LastNodeExecutionTime = new();
 
         public void UpdateDebugStatus()
         {
@@ -58,6 +58,7 @@ namespace BehaviorTree
                 {
                     continue;
                 }
+
                 var lastExecutionTime = guid2LastNodeExecutionTime.GetValueOrDefault(guid, 0f);
                 if (btNode.LastExecutionTime > lastExecutionTime)
                 {
@@ -124,6 +125,8 @@ namespace BehaviorTree
                 view.RemoveFromClassList(RuntimeFailureClass);
                 ClearRuntimeStatus(view);
             }
+            
+            guid2LastNodeExecutionTime.Clear();
         }
 
         public override EdgeView CreateEdgeView()

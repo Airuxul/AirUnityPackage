@@ -25,7 +25,7 @@ namespace BehaviorTree
             if (graphView == null)
             {
                 graphView = new BehaviorTreeGraphView(this);
-                var toolbar = new ToolbarView(graphView);
+                var toolbar = new BehaviorTreeToolbarView(graphView);
                 graphView.Add(toolbar);
             }
             rootView.Add(graphView);

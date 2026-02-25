@@ -6,12 +6,13 @@ namespace BehaviorTree.Action
 {
     public abstract class RuntimeBTControlNode : RuntimeBTBaseNode
     {
-        protected RuntimeBTControlNode(RuntimeGraph graph) : base(graph)
-        {
-        }
                 
         private List<RuntimeBTBaseNode> childrenCache;
-        
+
+        protected RuntimeBTControlNode(RuntimeGraph graph, NodeExportData exportData) : base(graph, exportData)
+        {
+        }
+
         protected List<RuntimeBTBaseNode> GetChildren()
         {
             childrenCache ??= GetOutputNodes<RuntimeBaseNode>()
