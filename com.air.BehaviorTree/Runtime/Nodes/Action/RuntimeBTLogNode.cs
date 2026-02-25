@@ -14,7 +14,7 @@ namespace BehaviorTree
         {
         }
 
-        public override BehaviorTreeStatus OnUpdate()
+        protected override BehaviorTreeStatus OnUpdate()
         {
             var msg = string.IsNullOrEmpty(LogMessage) ? "Log" : LogMessage;
             Debug.Log(msg);

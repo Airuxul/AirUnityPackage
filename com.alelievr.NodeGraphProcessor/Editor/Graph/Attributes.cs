@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using System;
 
 namespace GraphProcessor
@@ -12,7 +9,7 @@ namespace GraphProcessor
 	public class InputAttribute : Attribute
 	{
 		public string		name;
-		public bool			allowMultiple = false;
+		public bool			allowMultiple;
 
 		/// <summary>
 		/// Mark the field as an input port
@@ -33,7 +30,7 @@ namespace GraphProcessor
 	public class OutputAttribute : Attribute
 	{
 		public string		name;
-		public bool			allowMultiple = true;
+		public bool			allowMultiple;
 
 		/// <summary>
 		/// Mark the field as an output port
@@ -68,6 +65,7 @@ namespace GraphProcessor
 		/// Register the node in the NodeProvider class. The node will also be available in the node creation window.
 		/// </summary>
 		/// <param name="menuTitle">Path in the menu, use / as folder separators</param>
+		/// <param name="onlyCompatibleWithGraph"></param>
 		public NodeMenuItemAttribute(string menuTitle = null, Type onlyCompatibleWithGraph = null)
 		{
 			this.menuTitle = menuTitle;
@@ -97,7 +95,7 @@ namespace GraphProcessor
 	/// <summary>
 	/// Allow you to customize the input function of a port
 	/// </summary>
-	[AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
+	[AttributeUsage(AttributeTargets.Method)]
 	public class CustomPortInputAttribute : Attribute
 	{
 		public string	fieldName;
@@ -122,7 +120,7 @@ namespace GraphProcessor
 	/// <summary>
 	/// Allow you to customize the input function of a port
 	/// </summary>
-	[AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
+	[AttributeUsage(AttributeTargets.Method)]
 	public class CustomPortOutputAttribute : Attribute
 	{
 		public string	fieldName;
@@ -134,7 +132,7 @@ namespace GraphProcessor
 		/// See CustomPortsNode example in Samples.
 		/// </summary>
 		/// <param name="fieldName">local field of the node</param>
-		/// <param name="inputType">type of input of the port</param>
+		/// <param name="outputType">type of output of the port</param>
 		/// <param name="allowCast">if cast is allowed when connecting an edge</param>
 		public CustomPortOutputAttribute(string fieldName, Type outputType, bool allowCast = true)
 		{

@@ -8,7 +8,7 @@ using UnityEditor.SceneManagement;
 
 namespace GraphProcessor
 {
-	[System.Serializable]
+	[Serializable]
 	public abstract class BaseGraphWindow : EditorWindow
 	{
 		protected VisualElement		rootView;

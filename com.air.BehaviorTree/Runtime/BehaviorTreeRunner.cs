@@ -24,6 +24,8 @@ namespace BehaviorTree
         private RuntimeGraph _runtimeGraph;
         private BehaviorTreeProcessor _processor;
 
+        public RuntimeGraph RuntimeGraph => _runtimeGraph;
+
         private void Awake()
         {
             if (graphAsset == null)
@@ -39,25 +41,34 @@ namespace BehaviorTree
 
         private void Start()
         {
-            if (playMode == PlayMode.Once && _processor != null)
-                _processor.Tick();
+            if (playMode != PlayMode.Once || _processor == null) return;
+            _processor.Tick();
         }
 
         private void Update()
         {
-            if (playMode == PlayMode.Update && _processor != null)
-                _processor.Tick();
+            if (playMode != PlayMode.Update || _processor == null) return;
+            _processor.Tick();
         }
 
         private void FixedUpdate()
         {
-            if (playMode == PlayMode.FixedUpdate && _processor != null)
-                _processor.Tick();
+            if (playMode != PlayMode.FixedUpdate || _processor == null) return;
+            _processor.Tick();
         }
 
         /// <summary>
         /// Manually tick the tree once.
         /// </summary>
-        public BehaviorTreeStatus Tick() => _processor?.Tick() ?? BehaviorTreeStatus.Failure;
+        public BehaviorTreeStatus Tick()
+        {
+            var status = _processor?.Tick() ?? BehaviorTreeStatus.Failure;
+            return status;
+        }
+
+        /// <summary>
+        /// Asset path of the source graph SO. Loaded from export data. Used by editor for runtime debug visualization.
+        /// </summary>
+        public string GetSourceGraphPath() => _runtimeGraph?.SourceGraphPath;
     }
 }

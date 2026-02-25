@@ -2,8 +2,9 @@
   "name": "com.air.BehaviorTree.Editor",
   "rootNamespace": "BehaviorTree",
   "references": [
+    "com.air.BehaviorTree.Runtime",
     "com.alelievr.NodeGraphProcessor.Editor",
-    "com.air.BehaviorTree.Runtime"
+    "com.alelievr.NodeGraphProcessor.Runtime"
   ],
   "includePlatforms": ["Editor"],
   "excludePlatforms": [],

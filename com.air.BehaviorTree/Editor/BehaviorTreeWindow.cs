@@ -2,7 +2,6 @@ using UnityEditor;
 using GraphProcessor;
 using UnityEditor.Callbacks;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace BehaviorTree
 {
@@ -25,11 +24,18 @@ namespace BehaviorTree
             titleContent = new GUIContent("Behavior Tree");
             if (graphView == null)
             {
-                graphView = new BaseGraphView(this);
+                graphView = new BehaviorTreeGraphView(this);
                 var toolbar = new ToolbarView(graphView);
                 graphView.Add(toolbar);
             }
             rootView.Add(graphView);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            if (graphView is BehaviorTreeGraphView btView)
+                btView.UpdateDebugStatus();
         }
     }
 }

@@ -1,0 +1,18 @@
+/* Use outline for visibility - works on any element */
+.bt-runtime-running {
+    outline-width: 3px;
+    outline-style: solid;
+    outline-color: rgb(255, 200, 0);
+}
+
+.bt-runtime-success {
+    outline-width: 3px;
+    outline-style: solid;
+    outline-color: rgb(0, 200, 80);
+}
+
+.bt-runtime-failure {
+    outline-width: 3px;
+    outline-style: solid;
+    outline-color: rgb(255, 80, 80);
+}

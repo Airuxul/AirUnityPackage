@@ -1,4 +1,5 @@
 using GraphProcessor;
+using UnityEngine;
 
 namespace BehaviorTree
 {
@@ -7,6 +8,10 @@ namespace BehaviorTree
     /// </summary>
     public abstract class RuntimeBTBaseNode : RuntimeBaseNode
     {
+        public BehaviorTreeStatus Status { get; private set; }
+        
+        public float LastExecutionTime { get; private set; }
+        
         protected RuntimeBTBaseNode(RuntimeGraph graph) : base(graph)
         {
         }
@@ -19,7 +24,7 @@ namespace BehaviorTree
         /// <summary>
         /// Execute the node and return its status.
         /// </summary>
-        public abstract BehaviorTreeStatus OnUpdate();
+        protected abstract BehaviorTreeStatus OnUpdate();
         
         /// <summary>
         /// ProcessGraphProcessor calls OnProcess; we delegate to OnExecute and store status.
@@ -29,13 +34,7 @@ namespace BehaviorTree
             if (Status != BehaviorTreeStatus.Running)
                 OnInit();
             Status = OnUpdate();
+            LastExecutionTime = Time.time;
         }
-
-        /// <summary>
-        /// Last execution status. Used by parent composite nodes.
-        /// </summary>
-        public BehaviorTreeStatus Status { get; protected set; }
-
-
     }
 }

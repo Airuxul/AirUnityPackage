@@ -61,6 +61,8 @@ namespace GraphProcessor
         /// </summary>
         public static T BuildInto<T>(GraphExportData data, T graph) where T : RuntimeGraph
         {
+            graph.SourceGraphPath = data.sourceGraphPath ?? "";
+
             foreach (var param in data.exposedParameters)
             {
                 var value = DeserializeParameterValue(param.type, param.jsonValue);

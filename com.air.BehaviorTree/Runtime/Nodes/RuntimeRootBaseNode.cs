@@ -12,7 +12,7 @@ namespace BehaviorTree
         {
         }
 
-        public override BehaviorTreeStatus OnUpdate()
+        protected override BehaviorTreeStatus OnUpdate()
         {
             var child = GetChild();
             if (child == null)

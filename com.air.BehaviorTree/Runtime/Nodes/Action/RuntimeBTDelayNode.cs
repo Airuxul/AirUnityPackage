@@ -20,16 +20,10 @@ namespace BehaviorTree
             _elapsedTicks = 0;
         }
 
-        public override BehaviorTreeStatus OnUpdate()
+        protected override BehaviorTreeStatus OnUpdate()
         {
             _elapsedTicks++;
-            if (_elapsedTicks >= DelayTicks)
-            {
-                _elapsedTicks = 0;
-                return BehaviorTreeStatus.Success;
-            }
-
-            return BehaviorTreeStatus.Running;
+            return _elapsedTicks >= DelayTicks ? BehaviorTreeStatus.Success : BehaviorTreeStatus.Running;
         }
     }
 }

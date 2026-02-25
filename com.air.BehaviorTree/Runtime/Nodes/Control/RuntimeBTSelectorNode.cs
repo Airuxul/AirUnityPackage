@@ -19,7 +19,7 @@ namespace BehaviorTree
             current = 0;
         }
 
-        public override BehaviorTreeStatus OnUpdate()
+        protected override BehaviorTreeStatus OnUpdate()
         {
             var children = GetChildren();
             while (current < children.Count)

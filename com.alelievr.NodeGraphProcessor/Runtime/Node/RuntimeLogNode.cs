@@ -1,3 +1,5 @@
+using UnityEngine;
+
 namespace GraphProcessor
 {
     public class RuntimeLogNode : RuntimeBaseNode
@@ -15,6 +17,7 @@ namespace GraphProcessor
             {
                 inputMessage = DefaltMessage;
             }
+            Debug.Log(inputMessage);
         }
     }
 }

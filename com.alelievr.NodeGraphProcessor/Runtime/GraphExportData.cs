@@ -12,6 +12,10 @@ namespace GraphProcessor
         public List<NodeExportData> nodes = new();
         public List<EdgeExportData> edges = new();
         public List<ExposedParameterExportData> exposedParameters = new();
+        /// <summary>
+        /// Asset path of the source graph SO (e.g. "Assets/Graphs/MyGraph.asset"). Used for runtime debug loading.
+        /// </summary>
+        public string sourceGraphPath;
     }
 
     [Serializable]

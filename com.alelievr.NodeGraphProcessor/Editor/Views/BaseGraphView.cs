@@ -310,8 +310,8 @@ namespace GraphProcessor
 				if (oldInputNode == null && !edge.inputPort.portData.acceptMultipleEdges || !edge.outputPort.portData.acceptMultipleEdges)
 					continue;
 
-				oldInputNode = oldInputNode ?? edge.inputNode;
-				oldOutputNode = oldOutputNode ?? edge.outputNode;
+				oldInputNode ??= edge.inputNode;
+				oldOutputNode ??= edge.outputNode;
 
 				var inputPort = oldInputNode.GetPort(edge.inputPort.fieldName, edge.inputPortIdentifier);
 				var outputPort = oldOutputNode.GetPort(edge.outputPort.fieldName, edge.outputPortIdentifier);

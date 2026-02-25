@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEditor;
 
 namespace GraphProcessor
 {
@@ -9,7 +10,10 @@ namespace GraphProcessor
     {
         public static GraphExportData Export(BaseGraph graph)
         {
-            var data = new GraphExportData();
+            var data = new GraphExportData
+            {
+                sourceGraphPath = AssetDatabase.GetAssetPath(graph)
+            };
 
             graph.Deserialize();
             graph.UpdateComputeOrder();

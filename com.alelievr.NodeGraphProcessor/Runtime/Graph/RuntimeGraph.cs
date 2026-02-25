@@ -7,6 +7,11 @@ namespace GraphProcessor
     /// </summary>
     public class RuntimeGraph
     {
+        /// <summary>
+        /// Asset path of the source graph SO. Set from GraphExportData when loading from JSON.
+        /// </summary>
+        public string SourceGraphPath { get; set; }
+
         public Dictionary<string, RuntimeBaseNode> Guid2Nodes { get; } = new();
         public Dictionary<string, RuntimeEdge> Guid2Edges { get; } = new();
         public Dictionary<string, object> ExposedParameters { get; } = new();
