@@ -1,0 +1,9 @@
+{
+  "name": "com.air.behavior-tree",
+  "displayName": "Behavior Tree",
+  "version": "0.1.0",
+  "unity": "2020.3",
+  "description": "Behavior tree package built on NodeGraphProcessor for AI and game logic.",
+  "keywords": ["behavior-tree", "ai", "node-graph"],
+  "category": "Unity"
+}

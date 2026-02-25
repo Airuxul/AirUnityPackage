@@ -26,7 +26,7 @@ namespace GraphProcessor
             window.InitializeGraph(graph);
         }
 
-        protected override void InitializeWindow(BaseGraph graph)
+        protected override void InitializeWindow(BaseGraph _graph)
         {
             var graphView = new BaseGraphView(this);
             rootView.Add(new ToolbarView(graphView));
