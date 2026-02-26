@@ -2,10 +2,10 @@ using System;
 using UnityEngine;
 using GraphProcessor;
 
-namespace BehaviorTree
+namespace Air.BehaviorTree
 {
     [Serializable, NodeMenuItem("Behavior Tree/Actions/Wait", typeof(BehaviorTreeGraph))]
-    public class WaitNode : ActionNode
+    public class BTWaitNode : BTActionNode
     {
         public override Type RuntimeNodeType => typeof(RuntimeBTWaitNode);
 
@@ -17,7 +17,7 @@ namespace BehaviorTree
 
         public override string GetExportJsonData()
         {
-            return JsonUtility.ToJson(new BTWaitNodeParamData { WaitTicks = waitTicks });
+            return GetExportJsonData(new WaitNodeParamData { WaitTicks = waitTicks });
         }
     }
 }

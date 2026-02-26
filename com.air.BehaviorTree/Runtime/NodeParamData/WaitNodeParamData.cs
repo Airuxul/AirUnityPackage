@@ -1,10 +1,10 @@
 using System;
 using GraphProcessor;
 
-namespace BehaviorTree
+namespace Air.BehaviorTree
 {
     [Serializable]
-    public class BTWaitNodeParamData : NodeParamData
+    public class WaitNodeParamData : NodeParamData
     {
         public int WaitTicks;
     }

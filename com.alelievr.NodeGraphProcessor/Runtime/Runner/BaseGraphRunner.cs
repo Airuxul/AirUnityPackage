@@ -43,5 +43,10 @@ namespace GraphProcessor
             if(playMode == EPlayMode.FixedUpdate)
                 _graphProcessor.Run();
         }
+
+        private void OnDestroy()
+        {
+            _runtimeGraph?.Dispose();
+        }
     }
 }

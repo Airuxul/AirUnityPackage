@@ -2,10 +2,10 @@ using System;
 using UnityEngine;
 using GraphProcessor;
 
-namespace BehaviorTree
+namespace Air.BehaviorTree
 {
     [Serializable, NodeMenuItem("Behavior Tree/Actions/Log", typeof(BehaviorTreeGraph))]
-    public class LogNode : ActionNode
+    public class BTLogNode : BTActionNode
     {
         public override Type RuntimeNodeType => typeof(RuntimeBTLogNode);
 
@@ -16,7 +16,7 @@ namespace BehaviorTree
 
         public override string GetExportJsonData()
         {
-            return JsonUtility.ToJson(new BTLogNodeParamData { LogMessage = logMessage });
+            return GetExportJsonData(new LogNodeParamData { LogMessage = logMessage });
         }
     }
 }

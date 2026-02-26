@@ -1,7 +1,7 @@
 using UnityEngine;
 using GraphProcessor;
 
-namespace BehaviorTree
+namespace Air.BehaviorTree
 {
     /// <summary>
     /// Leaf node that logs a message and returns Success.
@@ -12,7 +12,7 @@ namespace BehaviorTree
 
         public RuntimeBTLogNode(RuntimeGraph graph, NodeExportData exportData) : base(graph, exportData)
         {
-            var nodeParamData = GetNodeParamDataFromJson<BTLogNodeParamData>(exportData.jsonData ?? "{}");
+            var nodeParamData = GetNodeParamDataFromJson<LogNodeParamData>(exportData.jsonData ?? "{}");
             LogMessage = nodeParamData.LogMessage;
         }
 

@@ -3,7 +3,7 @@ using UnityEditor;
 using UnityEngine;
 using Status = UnityEngine.UIElements.DropdownMenuAction.Status;
 
-namespace BehaviorTree
+namespace Air.BehaviorTree
 {
     public class BehaviorTreeToolbarView : ToolbarView
     {

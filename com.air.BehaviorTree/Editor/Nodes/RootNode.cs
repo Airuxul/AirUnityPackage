@@ -1,8 +1,7 @@
 using System;
-using UnityEngine;
 using GraphProcessor;
 
-namespace BehaviorTree
+namespace Air.BehaviorTree
 {
     [Serializable, NodeMenuItem("Behavior Tree/Root", typeof(BehaviorTreeGraph))]
     public class RootNode : BaseNode
@@ -12,7 +11,7 @@ namespace BehaviorTree
         public override string name => "Root";
 
         [Output(name = "Child")]
-        public object output;
+        public BehaviorTreeStatus output;
 
         public override bool deletable => false;
 

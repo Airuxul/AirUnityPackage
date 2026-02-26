@@ -2,7 +2,6 @@ using System.IO;
 using System.Reflection;
 using UnityEditor;
 using UnityEditor.SceneManagement;
-using UnityEditor.ShortcutManagement;
 using UnityEngine;
 
 namespace Air.UnityGameCore.Editor

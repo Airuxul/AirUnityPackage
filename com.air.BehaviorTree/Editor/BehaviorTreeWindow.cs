@@ -3,7 +3,7 @@ using GraphProcessor;
 using UnityEditor.Callbacks;
 using UnityEngine;
 
-namespace BehaviorTree
+namespace Air.BehaviorTree
 {
     public class BehaviorTreeWindow : BaseGraphWindow
     {

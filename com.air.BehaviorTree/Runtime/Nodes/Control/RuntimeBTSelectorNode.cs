@@ -1,7 +1,6 @@
-using BehaviorTree.Action;
 using GraphProcessor;
 
-namespace BehaviorTree
+namespace Air.BehaviorTree
 {
     /// <summary>
     /// Selector node: executes children in order. Succeeds on first success; fails when all fail.

@@ -202,7 +202,7 @@ namespace GraphProcessor
         
         public override string GetExportJsonData()
         {
-            return JsonUtility.ToJson(new RelayNodeParamData
+            return GetExportJsonData(new RelayNodeParamData
             {
                 PackInput = packInput,
                 UnpackOutput = unpackOutput

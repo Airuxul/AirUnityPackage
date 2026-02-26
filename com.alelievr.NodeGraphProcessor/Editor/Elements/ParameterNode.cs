@@ -92,7 +92,7 @@ namespace GraphProcessor
 
 		public override string GetExportJsonData()
 		{
-			return JsonUtility.ToJson(new ParameterNodeParamData
+			return GetExportJsonData(new ParameterNodeParamData
 			{
 				ParameterGUID = parameterGUID,
 				Accessor = (int)accessor

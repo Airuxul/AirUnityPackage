@@ -1,6 +1,6 @@
 using GraphProcessor;
 
-namespace BehaviorTree
+namespace Air.BehaviorTree
 {
     /// <summary>
     /// Executes a behavior tree by traversing from root. Uses tree structure, not compute order.

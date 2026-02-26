@@ -1,7 +1,7 @@
 using GraphProcessor;
 using UnityEngine;
 
-namespace BehaviorTree
+namespace Air.BehaviorTree
 {
     /// <summary>
     /// Base class for behavior tree runtime nodes. Extends RuntimeBaseNode with BT status semantics.

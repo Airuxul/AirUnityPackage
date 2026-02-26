@@ -2,11 +2,10 @@ using System.Collections.Generic;
 using System.Linq;
 using GraphProcessor;
 
-namespace BehaviorTree.Action
+namespace Air.BehaviorTree
 {
     public abstract class RuntimeBTControlNode : RuntimeBTBaseNode
     {
-                
         private List<RuntimeBTBaseNode> childrenCache;
 
         protected RuntimeBTControlNode(RuntimeGraph graph, NodeExportData exportData) : base(graph, exportData)
@@ -18,16 +17,7 @@ namespace BehaviorTree.Action
             childrenCache ??= GetOutputNodes<RuntimeBaseNode>()
                 .Select(n => n as RuntimeBTBaseNode)
                 .Where(n => n != null).OrderBy(node => node.Order).ToList();
-
             return childrenCache;
-        }
-        
-        /// <summary>
-        /// Get the single child (for decorators or root).
-        /// </summary>
-        protected RuntimeBTBaseNode GetChild()
-        {
-            return GetChildren().FirstOrDefault();
         }
     }
 }

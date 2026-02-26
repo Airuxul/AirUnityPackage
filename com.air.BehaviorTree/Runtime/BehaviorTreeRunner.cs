@@ -1,7 +1,7 @@
 using UnityEngine;
 using GraphProcessor;
 
-namespace BehaviorTree
+namespace Air.BehaviorTree
 {
     /// <summary>
     /// MonoBehaviour that runs a behavior tree from a JSON asset.
@@ -55,6 +55,11 @@ namespace BehaviorTree
         {
             if (playMode != PlayMode.FixedUpdate || _processor == null) return;
             _processor.Tick();
+        }
+
+        private void OnDestroy()
+        {
+            _runtimeGraph?.Dispose();
         }
 
         /// <summary>

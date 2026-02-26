@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEngine;
 using GraphProcessor;
 
-namespace BehaviorTree
+namespace Air.BehaviorTree
 {
     /// <summary>
     /// Behavior tree graph type. Used by the editor and for asset creation.
@@ -15,11 +15,11 @@ namespace BehaviorTree
         {
             base.UpdateComputeOrder(type);
 
-            var processedParents = new HashSet<ControlNode>();
+            var processedParents = new HashSet<BTControlNode>();
             foreach (var edge in edges)
             {
                 if (edge.outputNode == null || edge.inputNode == null) continue;
-                if (edge.outputNode is not ControlNode controlNode) continue;
+                if (edge.outputNode is not BTControlNode controlNode) continue;
                 if (edge.outputFieldName != "output") continue;
                 if (!processedParents.Add(controlNode)) continue;
 

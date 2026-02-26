@@ -17,7 +17,7 @@ namespace GraphProcessor
         
         public override string GetExportJsonData()
         {
-            return JsonUtility.ToJson(new LogNodeParamData
+            return GetExportJsonData(new LogNodeParamData
             {
                 DefaltMessage = defaltMessage
             });

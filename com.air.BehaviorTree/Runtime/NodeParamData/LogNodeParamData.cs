@@ -1,10 +1,10 @@
 using System;
 using GraphProcessor;
 
-namespace BehaviorTree
+namespace Air.BehaviorTree
 {
     [Serializable]
-    public class BTLogNodeParamData : NodeParamData
+    public class LogNodeParamData : NodeParamData
     {
         public string LogMessage;
     }

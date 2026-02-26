@@ -6,7 +6,7 @@ namespace GraphProcessor
     /// <summary>
     /// Runtime graph implementation. Built from GraphExportData (JSON deserialization).
     /// </summary>
-    public class RuntimeGraph
+    public class RuntimeGraph : IDisposable
     {
         /// <summary>
         /// Asset path of the source graph SO. Set from GraphExportData when loading from JSON.
@@ -17,6 +17,7 @@ namespace GraphProcessor
         public Dictionary<string, RuntimeEdge> Guid2Edges { get; } = new();
         public Dictionary<string, object> ExposedParameters { get; } = new();
         
+        // todo 优化成多个字典，减少装箱拆箱
         public Dictionary<(string nodeGUID, string fieldName, string portId), object> PortValues { get; } = new();
 
         /// <summary>
@@ -44,17 +45,7 @@ namespace GraphProcessor
         {
             return ExposedParameters.GetValueOrDefault(guid);
         }
-        
-        public bool TryGetNode<T>(string nodeGUID, out T node) where T : RuntimeBaseNode
-        {
-            var hasValue = Guid2Nodes.TryGetValue(nodeGUID, out var baseNode);
-            if (hasValue)
-                node = (T)baseNode;
-            else
-                node = null;
-            return hasValue;
-        }
-                
+
         public void SetPortValue(string nodeGUID, string fieldName, string portId, object value)
         {
             var key = (nodeGUID, fieldName, portId ?? "");
@@ -66,11 +57,9 @@ namespace GraphProcessor
             }
             else
             {
-                if (!PortValues.TryGetValue(key, out var existing) || !ValuesEqual(existing, value))
-                {
-                    PortValues[key] = value;
-                    PortValueChanged?.Invoke(nodeGUID, fieldName, portIdNorm, value);
-                }
+                if (PortValues.TryGetValue(key, out var existing) && ValuesEqual(existing, value)) return;
+                PortValues[key] = value;
+                PortValueChanged?.Invoke(nodeGUID, fieldName, portIdNorm, value);
             }
         }
 
@@ -96,6 +85,7 @@ namespace GraphProcessor
             }
         }
 
+        // todo 优化，缓存字典不遍历
         public IEnumerable<RuntimeBaseNode> GetOutputNodes(RuntimeBaseNode node)
         {
             foreach (var edge in Guid2Edges.Values)
@@ -105,6 +95,7 @@ namespace GraphProcessor
             }
         }
         
+        // todo 优化，缓存字典不遍历
         public RuntimeEdge GetEdgeForInput(RuntimeBaseNode inputNode, string fieldName, string portId, RuntimeBaseNode outputNode)
         {
             foreach (var edge in Guid2Edges.Values)
@@ -116,6 +107,7 @@ namespace GraphProcessor
             return null;
         }
 
+        // todo 优化，缓存字典不遍历
         public RuntimeEdge GetEdgeForOutput(RuntimeBaseNode outputNode, string fieldName, string portId, RuntimeBaseNode inputNode)
         {
             foreach (var edge in Guid2Edges.Values)
@@ -125,6 +117,11 @@ namespace GraphProcessor
                     return edge;
             }
             return null;
+        }
+
+        public void Dispose()
+        {
+            PortValueChanged = null;
         }
     }
 }

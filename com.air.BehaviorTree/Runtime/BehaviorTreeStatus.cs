@@ -1,4 +1,4 @@
-namespace BehaviorTree
+namespace Air.BehaviorTree
 {
     /// <summary>
     /// Execution status of a behavior tree node.

@@ -23,7 +23,7 @@ namespace GraphProcessor
 		/// <summary>
 		/// Override to export custom node data for runtime. Return null to use default export.
 		/// </summary>
-		public abstract string GetExportJsonData();
+		public virtual string GetExportJsonData() => string.Empty;
 		
 		[SerializeField]
 		internal string nodeCustomName = null; // The name of the node in case it was renamed by a user
@@ -848,5 +848,10 @@ namespace GraphProcessor
 		public string GetCustomName() => String.IsNullOrEmpty(nodeCustomName) ? name : nodeCustomName; 
 
 		#endregion
+		
+		public string GetExportJsonData<T>(T nodeParamData) where T : NodeParamData
+		{
+			return JsonUtility.ToJson(nodeParamData);
+		}
 	}
 }

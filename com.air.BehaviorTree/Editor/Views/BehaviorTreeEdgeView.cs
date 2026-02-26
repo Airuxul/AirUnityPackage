@@ -3,7 +3,7 @@ using GraphProcessor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace BehaviorTree
+namespace Air.BehaviorTree
 {
     /// <summary>
     /// Edge view that draws order numbers for control nodes with sortChildrenByPosition.
@@ -38,7 +38,7 @@ namespace BehaviorTree
         {
             if (serializedEdge?.outputNode == null
                 || serializedEdge?.inputNode == null
-                || serializedEdge.outputNode is not ControlNode controlNode)
+                || serializedEdge.outputNode is not BTControlNode controlNode)
             {
                 orderLabel.style.display = DisplayStyle.None;
                 return;
