@@ -131,10 +131,25 @@ namespace GraphProcessor
 
         private static readonly Dictionary<Type, Func<RuntimeGraph, NodeExportData, RuntimeBaseNode>> _customCreators = new()
         {
-            {typeof(RuntimeParameterNode), (graph, data) => new RuntimeParameterNode(graph, data)},
-            {typeof(RuntimeRelayNode), (graph, data) => new RuntimeRelayNode(graph, data)},
-            {typeof(RuntimeLogNode), (graph, data) => new RuntimeLogNode(graph, data)}
+            {typeof(RuntimeParameterNode), CreateRuntimeParameterNode},
+            {typeof(RuntimeRelayNode), CreateRuntimeRelayNode},
+            {typeof(RuntimeLogNode), CreateRuntimeLogNode},
         };
+
+        static RuntimeParameterNode CreateRuntimeParameterNode(RuntimeGraph graph, NodeExportData nodeExportData)
+        {
+            return new RuntimeParameterNode(graph, nodeExportData);
+        }
+
+        static RuntimeRelayNode CreateRuntimeRelayNode(RuntimeGraph graph, NodeExportData nodeExportData)
+        {
+            return new RuntimeRelayNode(graph, nodeExportData);
+        }
+        
+        static RuntimeLogNode CreateRuntimeLogNode(RuntimeGraph graph, NodeExportData nodeExportData)
+        {
+            return new RuntimeLogNode(graph, nodeExportData);
+        }
         #endregion
     }
 }

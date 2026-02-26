@@ -15,11 +15,10 @@ namespace GraphProcessor
 
         public Dictionary<string, RuntimeBaseNode> Guid2Nodes { get; } = new();
         public Dictionary<string, RuntimeEdge> Guid2Edges { get; } = new();
-        
-        // todo 优化object成多个基本参数字典，减少装箱拆箱
         public Dictionary<string, object> ExposedParameters { get; } = new();
-
-        private Dictionary<(string nodeGUID, string fieldName, string portId), object> PortValues { get; } = new();
+        
+        // todo 优化成多个字典，减少装箱拆箱
+        public Dictionary<(string nodeGUID, string fieldName, string portId), object> PortValues { get; } = new();
 
         /// <summary>
         /// Fired when a port value changes. Args: (nodeGUID, fieldName, portId, newValue).
@@ -76,7 +75,7 @@ namespace GraphProcessor
             return PortValues.GetValueOrDefault((nodeGUID, fieldName, portId ?? ""));
         }
         
-        // todo 优化，缓存成字典，不进行遍历
+        // todo 优化，缓存字典不遍历
         public IEnumerable<RuntimeBaseNode> GetInputNodes(RuntimeBaseNode node)
         {
             foreach (var edge in Guid2Edges.Values)
@@ -86,6 +85,7 @@ namespace GraphProcessor
             }
         }
 
+        // todo 优化，缓存字典不遍历
         public IEnumerable<RuntimeBaseNode> GetOutputNodes(RuntimeBaseNode node)
         {
             foreach (var edge in Guid2Edges.Values)
@@ -95,6 +95,7 @@ namespace GraphProcessor
             }
         }
         
+        // todo 优化，缓存字典不遍历
         public RuntimeEdge GetEdgeForInput(RuntimeBaseNode inputNode, string fieldName, string portId, RuntimeBaseNode outputNode)
         {
             foreach (var edge in Guid2Edges.Values)
@@ -106,6 +107,7 @@ namespace GraphProcessor
             return null;
         }
 
+        // todo 优化，缓存字典不遍历
         public RuntimeEdge GetEdgeForOutput(RuntimeBaseNode outputNode, string fieldName, string portId, RuntimeBaseNode inputNode)
         {
             foreach (var edge in Guid2Edges.Values)

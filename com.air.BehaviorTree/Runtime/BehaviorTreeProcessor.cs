@@ -24,7 +24,7 @@ namespace Air.BehaviorTree
         {
             foreach (var node in _graph.Guid2Nodes.Values)
             {
-                if (node is RuntimeParameterNode param && param.ParamData.Accessor == 0)
+                if (node is RuntimeParameterNode param && param.ParameterAccessor == 0)
                     param.OnProcess();
             }
         }
