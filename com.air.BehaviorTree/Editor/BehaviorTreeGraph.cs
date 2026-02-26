@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using GraphProcessor;
 
@@ -15,23 +14,21 @@ namespace Air.BehaviorTree
         {
             base.UpdateComputeOrder(type);
 
-            var processedParents = new HashSet<BTControlNode>();
+            var processedParentFields = new HashSet<(BaseNode, string)>();
             foreach (var edge in edges)
             {
                 if (edge.outputNode == null || edge.inputNode == null) continue;
-                if (edge.outputNode is not BTControlNode controlNode) continue;
-                if (edge.outputFieldName != "output") continue;
-                if (!processedParents.Add(controlNode)) continue;
+                if (edge.outputNode is not ISortChildrenByPosition) continue;
+                if (!processedParentFields.Add((edge.outputNode, edge.outputFieldName))) continue;
 
-                var siblingEdges = edges
-                    .Where(e => e.outputNode == controlNode && e.outputFieldName == "output")
-                    .OrderBy(e => e.inputNode.position.y)
-                    .ToList();
+                var siblingEdges = GraphUtils.GetSortedChildEdges(this, edge.outputNode, edge.outputFieldName);
+                if (siblingEdges == null) continue;
 
+                var parentComputeOrder = edge.outputNode.computeOrder;
                 for (var i = 0; i < siblingEdges.Count; i++)
                 {
                     var childNode = siblingEdges[i].inputNode;
-                    childNode.computeOrder = controlNode.computeOrder * 10000 + i;
+                    childNode.computeOrder = parentComputeOrder * 10000 + i;
                 }
             }
         }

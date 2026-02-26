@@ -1,6 +1,6 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace GraphProcessor
 {
@@ -124,6 +124,42 @@ namespace GraphProcessor
             }
 
             cyclicNodes.ForEach((tn) => cyclicNode?.Invoke(tn.node));
+        }
+
+        /// <summary>
+        /// Returns child edges of the given parent node for the specified output field, sorted by child node's Y position.
+        /// Only applies when the parent implements <see cref="ISortChildrenByPosition"/>.
+        /// </summary>
+        /// <param name="graph">The graph containing nodes and edges.</param>
+        /// <param name="parentNode">The parent node.</param>
+        /// <param name="outputFieldName">The output field name to filter edges.</param>
+        /// <returns>Sorted list of child edges, or null if the parent does not implement the interface.</returns>
+        public static List<SerializableEdge> GetSortedChildEdges(BaseGraph graph, BaseNode parentNode, string outputFieldName)
+        {
+            if (graph == null || parentNode == null || parentNode is not ISortChildrenByPosition || string.IsNullOrEmpty(outputFieldName))
+                return null;
+
+            return graph.edges
+                .Where(e => e.outputNode == parentNode && e.outputFieldName == outputFieldName)
+                .OrderBy(e => e.inputNode.position.y)
+                .ToList();
+        }
+
+        /// <summary>
+        /// Returns the index of the given edge in the sorted child edges of its output node and field.
+        /// Returns -1 if the output node does not implement <see cref="ISortChildrenByPosition"/> or the edge is not found.
+        /// </summary>
+        public static int GetSortedChildEdgeIndex(BaseGraph graph, SerializableEdge edge)
+        {
+            if (graph == null || edge?.outputNode == null)
+                return -1;
+
+            var sortedEdges = GetSortedChildEdges(graph, edge.outputNode, edge.outputFieldName);
+            if (sortedEdges == null)
+                return -1;
+
+            var index = sortedEdges.FindIndex(e => e.GUID == edge.GUID);
+            return index;
         }
     }
 }

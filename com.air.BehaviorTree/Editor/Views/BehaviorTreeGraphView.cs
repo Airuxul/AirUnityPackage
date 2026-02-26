@@ -8,9 +8,9 @@ using UnityEngine.UIElements;
 namespace Air.BehaviorTree
 {
     /// <summary>
-    /// Graph view for behavior trees. Uses custom edge view that draws order numbers.
+    /// Graph view for behavior trees. Uses SortChildrenGraphView for edge order labels.
     /// </summary>
-    public class BehaviorTreeGraphView : BaseGraphView
+    public class BehaviorTreeGraphView : SortChildrenGraphView
     {
         const string RuntimeRunningClass = "bt-runtime-running";
         const string RuntimeSuccessClass = "bt-runtime-success";
@@ -22,8 +22,6 @@ namespace Air.BehaviorTree
 
         public BehaviorTreeGraphView(EditorWindow window) : base(window)
         {
-            computeOrderUpdated += RefreshEdgeOrderLabels;
-            onNodePositionChanged += _ => RefreshEdgeOrderLabels();
             var statusStyle = Resources.Load<StyleSheet>(RuntimeStatusStyle);
             if (statusStyle != null)
                 styleSheets.Add(statusStyle);
@@ -127,20 +125,6 @@ namespace Air.BehaviorTree
             }
             
             guid2LastNodeExecutionTime.Clear();
-        }
-
-        public override EdgeView CreateEdgeView()
-        {
-            return new BehaviorTreeEdgeView();
-        }
-
-        void RefreshEdgeOrderLabels()
-        {
-            foreach (var edgeView in edgeViews)
-            {
-                if (edgeView is BehaviorTreeEdgeView btEdge)
-                    btEdge.UpdateOrderLabel();
-            }
         }
     }
 }

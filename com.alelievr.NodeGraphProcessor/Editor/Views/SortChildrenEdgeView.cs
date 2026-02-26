@@ -1,22 +1,20 @@
-using System.Linq;
-using GraphProcessor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Air.BehaviorTree
+namespace GraphProcessor
 {
     /// <summary>
-    /// Edge view that draws order numbers for control nodes with sortChildrenByPosition.
+    /// Edge view that draws order numbers when the output node implements <see cref="ISortChildrenByPosition"/>.
     /// </summary>
-    public class BehaviorTreeEdgeView : EdgeView
+    public class SortChildrenEdgeView : EdgeView
     {
         readonly Label orderLabel = new();
 
-        static readonly string edgeOrderStyle = "BehaviorTreeStyles/BehaviorTreeEdgeOrder";
+        static readonly string edgeOrderStyle = "GraphProcessorStyles/EdgeOrder";
 
-        public BehaviorTreeEdgeView()
+        public SortChildrenEdgeView()
         {
-            orderLabel.AddToClassList("behavior-tree-edge-order");
+            orderLabel.AddToClassList("edge-order-label");
             orderLabel.styleSheets.Add(Resources.Load<StyleSheet>(edgeOrderStyle));
             orderLabel.pickingMode = PickingMode.Ignore;
             Add(orderLabel);
@@ -36,9 +34,7 @@ namespace Air.BehaviorTree
 
         public void UpdateOrderLabel()
         {
-            if (serializedEdge?.outputNode == null
-                || serializedEdge?.inputNode == null
-                || serializedEdge.outputNode is not BTControlNode controlNode)
+            if (serializedEdge?.outputNode == null || serializedEdge?.inputNode == null)
             {
                 orderLabel.style.display = DisplayStyle.None;
                 return;
@@ -51,12 +47,7 @@ namespace Air.BehaviorTree
                 return;
             }
 
-            var siblingEdges = graph.edges
-                .Where(e => e.outputNode == controlNode && e.outputFieldName == "output")
-                .OrderBy(e => e.inputNode.position.y)
-                .ToList();
-
-            var index = siblingEdges.FindIndex(e => e.GUID == serializedEdge.GUID);
+            var index = GraphUtils.GetSortedChildEdgeIndex(graph, serializedEdge);
             if (index < 0)
             {
                 orderLabel.style.display = DisplayStyle.None;
