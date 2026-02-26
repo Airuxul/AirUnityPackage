@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor.Experimental.GraphView;
-using UnityEngine.UIElements;
 using UnityEditor;
 
 namespace GraphProcessor
@@ -14,8 +12,8 @@ namespace GraphProcessor
     {
         public readonly BaseGraphView graphView;
 
-        Dictionary< Edge, PortView >    edgeInputPorts = new Dictionary< Edge, PortView >();
-        Dictionary< Edge, PortView >    edgeOutputPorts = new Dictionary< Edge, PortView >();
+        Dictionary< Edge, PortView >    edgeInputPorts = new();
+        Dictionary< Edge, PortView >    edgeOutputPorts = new();
 
         static CreateNodeMenuWindow     edgeNodeCreateMenuWindow;
 

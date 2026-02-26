@@ -1,0 +1,17 @@
+{
+  "name": "com.air.BehaviorTree.Editor",
+  "rootNamespace": "BehaviorTree",
+  "references": [
+    "com.air.BehaviorTree.Runtime",
+    "com.alelievr.NodeGraphProcessor.Editor",
+    "com.alelievr.NodeGraphProcessor.Runtime"
+  ],
+  "includePlatforms": ["Editor"],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": []
+}

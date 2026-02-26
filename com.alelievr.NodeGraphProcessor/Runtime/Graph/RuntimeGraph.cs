@@ -1,0 +1,127 @@
+using System;
+using System.Collections.Generic;
+
+namespace GraphProcessor
+{
+    /// <summary>
+    /// Runtime graph implementation. Built from GraphExportData (JSON deserialization).
+    /// </summary>
+    public class RuntimeGraph : IDisposable
+    {
+        /// <summary>
+        /// Asset path of the source graph SO. Set from GraphExportData when loading from JSON.
+        /// </summary>
+        public string SourceGraphPath { get; set; }
+
+        public Dictionary<string, RuntimeBaseNode> Guid2Nodes { get; } = new();
+        public Dictionary<string, RuntimeEdge> Guid2Edges { get; } = new();
+        public Dictionary<string, object> ExposedParameters { get; } = new();
+        
+        // todo 优化成多个字典，减少装箱拆箱
+        public Dictionary<(string nodeGUID, string fieldName, string portId), object> PortValues { get; } = new();
+
+        /// <summary>
+        /// Fired when a port value changes. Args: (nodeGUID, fieldName, portId, newValue).
+        /// Input nodes can subscribe to apply values only when output changes.
+        /// </summary>
+        public event Action<string, string, string, object> PortValueChanged;
+
+        public void AddNode(RuntimeBaseNode node)
+        {
+            Guid2Nodes.Add(node.GUID, node);
+        }
+
+        public void AddEdge(RuntimeEdge edge)
+        {
+            Guid2Edges.Add(edge.GUID, edge);
+        }
+
+        public void SetExposedParameter(string guid, object value)
+        {
+            ExposedParameters.Add(guid, value);
+        }
+
+        public object GetExposedParameter(string guid)
+        {
+            return ExposedParameters.GetValueOrDefault(guid);
+        }
+
+        public void SetPortValue(string nodeGUID, string fieldName, string portId, object value)
+        {
+            var key = (nodeGUID, fieldName, portId ?? "");
+            var portIdNorm = portId ?? "";
+            if (value == null)
+            {
+                if (PortValues.Remove(key))
+                    PortValueChanged?.Invoke(nodeGUID, fieldName, portIdNorm, null);
+            }
+            else
+            {
+                if (PortValues.TryGetValue(key, out var existing) && ValuesEqual(existing, value)) return;
+                PortValues[key] = value;
+                PortValueChanged?.Invoke(nodeGUID, fieldName, portIdNorm, value);
+            }
+        }
+
+        static bool ValuesEqual(object a, object b)
+        {
+            if (a == null && b == null) return true;
+            if (a == null || b == null) return false;
+            return a.Equals(b);
+        }
+
+        public object GetPortValue(string nodeGUID, string fieldName, string portId)
+        {
+            return PortValues.GetValueOrDefault((nodeGUID, fieldName, portId ?? ""));
+        }
+        
+        // todo 优化，缓存字典不遍历
+        public IEnumerable<RuntimeBaseNode> GetInputNodes(RuntimeBaseNode node)
+        {
+            foreach (var edge in Guid2Edges.Values)
+            {
+                if (edge.InputNodeGUID == node.GUID && Guid2Nodes.TryGetValue(edge.OutputNodeGUID, out var outputNode))
+                    yield return outputNode;
+            }
+        }
+
+        // todo 优化，缓存字典不遍历
+        public IEnumerable<RuntimeBaseNode> GetOutputNodes(RuntimeBaseNode node)
+        {
+            foreach (var edge in Guid2Edges.Values)
+            {
+                if (edge.OutputNodeGUID == node.GUID && Guid2Nodes.TryGetValue(edge.InputNodeGUID, out var inputNode))
+                    yield return inputNode;
+            }
+        }
+        
+        // todo 优化，缓存字典不遍历
+        public RuntimeEdge GetEdgeForInput(RuntimeBaseNode inputNode, string fieldName, string portId, RuntimeBaseNode outputNode)
+        {
+            foreach (var edge in Guid2Edges.Values)
+            {
+                if (edge.InputNodeGUID == inputNode.GUID && edge.OutputNodeGUID == outputNode.GUID
+                                                         && edge.InputFieldName == fieldName && (portId == null || edge.InputPortIdentifier == portId))
+                    return edge;
+            }
+            return null;
+        }
+
+        // todo 优化，缓存字典不遍历
+        public RuntimeEdge GetEdgeForOutput(RuntimeBaseNode outputNode, string fieldName, string portId, RuntimeBaseNode inputNode)
+        {
+            foreach (var edge in Guid2Edges.Values)
+            {
+                if (edge.OutputNodeGUID == outputNode.GUID && edge.InputNodeGUID == inputNode.GUID
+                                                           && edge.OutputFieldName == fieldName && (portId == null || edge.OutputPortIdentifier == portId))
+                    return edge;
+            }
+            return null;
+        }
+
+        public void Dispose()
+        {
+            PortValueChanged = null;
+        }
+    }
+}
