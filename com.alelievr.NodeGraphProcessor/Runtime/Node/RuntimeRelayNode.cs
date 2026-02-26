@@ -3,18 +3,12 @@ namespace GraphProcessor
     /// <summary>
     /// Runtime node for RelayNode. Pass-through relay logic. PackInput/UnpackOutput exported for future use.
     /// </summary>
-    public class RuntimeRelayNode : RuntimeBaseNode
+    public class RuntimeRelayNode : RuntimeBaseNodeWithParam<RelayNodeParamData>
     {
-        public RuntimeRelayNode(RuntimeGraph graph, NodeExportData exportData) : base(graph, exportData)
-        {
-            var nodeParamData = GetNodeParamDataFromJson<RelayNodeParamData>(exportData.jsonData ?? "{}");
-            PackInput = nodeParamData.PackInput;
-            UnpackOutput = nodeParamData.UnpackOutput;
-        }
+        public RuntimeRelayNode(RuntimeGraph graph, NodeExportData exportData) : base(graph, exportData) { }
 
-        public bool PackInput { get; set; }
-        public bool UnpackOutput { get; set; }
-
+        public bool PackInput => ParamData.PackInput;
+        public bool UnpackOutput => ParamData.UnpackOutput;
 
         public override void OnProcess()
         {
