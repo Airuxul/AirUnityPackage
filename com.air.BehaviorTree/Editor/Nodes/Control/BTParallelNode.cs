@@ -1,5 +1,6 @@
 using System;
 using GraphProcessor;
+using UnityEngine;
 
 namespace Air.BehaviorTree
 {
@@ -8,12 +9,17 @@ namespace Air.BehaviorTree
     {
         public override Type RuntimeNodeType => typeof(RuntimeBTParallelNode);
 
+        public override string name => "Parallel";
+
         [Input]
-        public int successThreshold = -1;
-        
+        [SerializeField]
+        [AllowDefaultEdit]
+        [ExportFieldsAsPorts]
+        public ParallelNodeParamData ParallelNodeParamData = new() { SuccessThreshold = -1 };
+
         public override string GetExportJsonData()
         {
-            return GetExportJsonData(new ParallelNodeParamData {SuccessThreshold = successThreshold});
+            return GetExportJsonData(ParallelNodeParamData);
         }
     }
 }

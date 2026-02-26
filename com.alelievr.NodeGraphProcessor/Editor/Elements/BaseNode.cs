@@ -534,6 +534,42 @@ namespace GraphProcessor
 		public virtual FieldInfo[] GetNodeFields()
 			=> GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
+		/// <summary>
+		/// Gets serializable sub-fields of a type in the same order as CreateExportFieldsAsPortsBehavior.
+		/// </summary>
+		public static FieldInfo[] GetExportFieldsAsPortsSubFields(Type fieldType)
+		{
+			var bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
+			return fieldType.GetFields(bindingFlags)
+				.Where(f => !f.IsStatic
+					&& f.GetCustomAttribute<NonSerializedAttribute>() == null
+					&& (f.IsPublic || f.GetCustomAttribute<SerializeField>() != null))
+				.OrderBy(f => f.MetadataToken)
+				.ToArray();
+		}
+
+		/// <summary>
+		/// Creates port data for each serializable field of the given type. Used by ExportFieldsAsPortsAttribute.
+		/// </summary>
+		static IEnumerable<PortData> CreateExportFieldsAsPortsBehavior(Type fieldType, string portNamePrefix)
+		{
+			foreach (var subField in GetExportFieldsAsPortsSubFields(fieldType))
+			{
+				var displayName = String.IsNullOrEmpty(portNamePrefix)
+					? subField.Name
+					: portNamePrefix + subField.Name;
+				var tooltipAttr = subField.GetCustomAttribute<TooltipAttribute>();
+				yield return new PortData
+				{
+					identifier = subField.Name,
+					displayName = displayName,
+					displayType = subField.FieldType,
+					acceptMultipleEdges = false,
+					tooltip = tooltipAttr?.tooltip,
+				};
+			}
+		}
+
 		void InitializeInOutDatas()
 		{
 			var fields = GetNodeFields();
@@ -546,6 +582,7 @@ namespace GraphProcessor
 				var tooltipAttribute = field.GetCustomAttribute< TooltipAttribute >();
 				var showInInspector = field.GetCustomAttribute< ShowInInspector >();
 				var vertical = field.GetCustomAttribute< VerticalAttribute >();
+				var exportFieldsAttr = field.GetCustomAttribute< ExportFieldsAsPortsAttribute >();
 				bool isMultiple = false;
 				bool input = false;
 				string name = field.Name;
@@ -554,12 +591,15 @@ namespace GraphProcessor
 				if (showInInspector != null)
 					_needsInspector = true;
 
+				// When no Input/Output, skip port generation. ExportFieldsAsPorts without ports is drawn in controls.
 				if (inputAttribute == null && outputAttribute == null)
 					continue ;
-
-				//check if field is a collection type
-				isMultiple = (inputAttribute != null) ? inputAttribute.allowMultiple : (outputAttribute.allowMultiple);
-				input = inputAttribute != null;
+				else
+				{
+					//check if field is a collection type
+					isMultiple = (inputAttribute != null) ? inputAttribute.allowMultiple : outputAttribute.allowMultiple;
+					input = inputAttribute != null;
+				}
 				tooltip = tooltipAttribute?.tooltip;
 
 				if (!String.IsNullOrEmpty(inputAttribute?.name))
@@ -567,8 +607,20 @@ namespace GraphProcessor
 				if (!String.IsNullOrEmpty(outputAttribute?.name))
 					name = outputAttribute.name;
 
+				CustomPortBehaviorDelegate behavior = null;
+				if (exportFieldsAttr != null)
+				{
+					var subFields = GetExportFieldsAsPortsSubFields(field.FieldType);
+					if (subFields.Length > 0)
+					{
+						var capturedFieldType = field.FieldType;
+						var capturedPrefix = exportFieldsAttr.portNamePrefix;
+						behavior = edges => CreateExportFieldsAsPortsBehavior(capturedFieldType, capturedPrefix);
+					}
+				}
+
 				// By default we set the behavior to null, if the field have a custom behavior, it will be set in the loop just below
-				nodeFields[field.Name] = new NodeFieldInformation(field, name, input, isMultiple, tooltip, vertical != null, null);
+				nodeFields[field.Name] = new NodeFieldInformation(field, name, input, isMultiple, tooltip, vertical != null, behavior);
 			}
 
 			foreach (var method in methods)

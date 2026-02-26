@@ -1,5 +1,4 @@
 using System;
-using UnityEngine;
 
 namespace GraphProcessor
 {
@@ -10,17 +9,14 @@ namespace GraphProcessor
 
         public override string name => "Log";
         
-        [Input] 
-        public string inputMessage;
-        
-        public string defaltMessage = "Default log message";
+        [Input]
+        [AllowDefaultEdit]
+        [ExportFieldsAsPorts]
+        public LogNodeParamData logNodeParamData = new (){DefaltMessage = "Default log message" };
         
         public override string GetExportJsonData()
         {
-            return GetExportJsonData(new LogNodeParamData
-            {
-                DefaltMessage = defaltMessage
-            });
+            return GetExportJsonData(logNodeParamData);
         }
     }
 }

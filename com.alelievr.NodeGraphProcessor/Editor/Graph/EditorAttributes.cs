@@ -165,6 +165,41 @@ namespace GraphProcessor
 	}
 
 	/// <summary>
+	/// Automatically export all serializable fields of a class/struct as multiple ports.
+	/// Use with [Input] or [Output] on a field whose type is a serializable class or struct.
+	/// Can also be used alone (without [Input]/[Output]) - the field is treated as Input for port generation.
+	/// Each public field or [SerializeField] field of that type will become a separate port.
+	/// When used without [Input]/[Output] or on a non-public field, add [SerializeField] for Unity serialization.
+	/// Note: You need [CustomPortInput] and [CustomPortOutput] for data transfer when using this attribute.
+	/// </summary>
+	[AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
+	public class ExportFieldsAsPortsAttribute : Attribute
+	{
+		/// <summary>
+		/// Optional name prefix for generated ports. If null, uses the sub-field name.
+		/// </summary>
+		public string portNamePrefix;
+
+		/// <summary>
+		/// Automatically export all serializable fields as multiple ports.
+		/// </summary>
+		/// <param name="portNamePrefix">Optional prefix for port display names</param>
+		public ExportFieldsAsPortsAttribute(string portNamePrefix = null)
+		{
+			this.portNamePrefix = portNamePrefix;
+		}
+	}
+
+	/// <summary>
+	/// When applied to an input field (or ExportFieldsAsPorts + Input), shows PropertyField(s) for editing default value when the port has no connection.
+	/// Output fields do not support default value editing. Without this attribute, input fields use the original logic (no inline editor).
+	/// </summary>
+	[AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
+	public class AllowDefaultEditAttribute : Attribute
+	{
+	}
+
+	/// <summary>
 	/// Allow to bind a method to generate a specific set of ports based on a field type in a node
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]

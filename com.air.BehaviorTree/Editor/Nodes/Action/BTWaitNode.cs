@@ -11,13 +11,15 @@ namespace Air.BehaviorTree
 
         public override string name => "Wait";
 
-        [SerializeField]
         [Input]
-        public int waitTicks = 24;
+        [SerializeField]
+        [AllowDefaultEdit]
+        [ExportFieldsAsPorts]
+        public WaitNodeParamData WaitNodeParamData = new() {WaitTicks = 24};
 
         public override string GetExportJsonData()
         {
-            return GetExportJsonData(new WaitNodeParamData { WaitTicks = waitTicks });
+            return GetExportJsonData(WaitNodeParamData);
         }
     }
 }

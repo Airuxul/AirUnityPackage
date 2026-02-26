@@ -11,12 +11,15 @@ namespace Air.BehaviorTree
 
         public override string name => "Log";
 
+        [Input]
         [SerializeField]
-        public string logMessage = "";
+        [AllowDefaultEdit]
+        [ExportFieldsAsPorts]
+        public LogNodeParamData LogNodeParamData = new() { LogMessage = "" };
 
         public override string GetExportJsonData()
         {
-            return GetExportJsonData(new LogNodeParamData { LogMessage = logMessage });
+            return GetExportJsonData(LogNodeParamData);
         }
     }
 }

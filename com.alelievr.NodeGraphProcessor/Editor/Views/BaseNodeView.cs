@@ -20,12 +20,12 @@ namespace GraphProcessor
 	{
 		public BaseNode							nodeTarget;
 
-		public List< PortView >					inputPortViews = new List< PortView >();
-		public List< PortView >					outputPortViews = new List< PortView >();
+		public List< PortView >					inputPortViews = new();
+		public List< PortView >					outputPortViews = new();
 
 		public BaseGraphView					owner { private set; get; }
 
-		protected Dictionary< string, List< PortView > > portsPerFieldName = new Dictionary< string, List< PortView > >();
+		protected Dictionary< string, List< PortView > > portsPerFieldName = new();
 
         public VisualElement 					controlsContainer;
 		protected VisualElement					debugContainer;
@@ -694,9 +694,13 @@ namespace GraphProcessor
 
 				//skip if the field is an input/output and not marked as SerializedField
 				bool hasInputAttribute         = field.GetCustomAttribute(typeof(InputAttribute)) != null;
-				bool hasInputOrOutputAttribute = hasInputAttribute || field.GetCustomAttribute(typeof(OutputAttribute)) != null;
+				bool hasOutputAttribute        = field.GetCustomAttribute(typeof(OutputAttribute)) != null;
+				bool hasInputOrOutputAttribute = hasInputAttribute || hasOutputAttribute;
 				bool showAsDrawer			   = !fromInspector && field.GetCustomAttribute(typeof(ShowAsDrawer)) != null;
-				if (!serializeField && hasInputOrOutputAttribute && !showAsDrawer)
+				bool hasExportFieldsAsPorts   = field.GetCustomAttribute<ExportFieldsAsPortsAttribute>() != null;
+				bool allowDefaultEdit = field.GetCustomAttribute<AllowDefaultEditAttribute>() != null;
+				// When ExportFieldsAsPorts, allow through for default value editing and serialization
+				if (!serializeField && hasInputOrOutputAttribute && !showAsDrawer && !hasExportFieldsAsPorts)
 				{
 					AddEmptyField(field, fromInspector);
 					continue;
@@ -719,6 +723,8 @@ namespace GraphProcessor
 
 				var showInputDrawer = field.GetCustomAttribute(typeof(InputAttribute)) != null && field.GetCustomAttribute(typeof(SerializeField)) != null;
 				showInputDrawer |= field.GetCustomAttribute(typeof(InputAttribute)) != null && field.GetCustomAttribute(typeof(ShowAsDrawer)) != null;
+				// ExportFieldsAsPorts: show multiple PropertyFields only when AllowDefaultEdit is present (Input only, Output does not support default edit)
+				showInputDrawer |= hasExportFieldsAsPorts && allowDefaultEdit && hasInputAttribute;
 				showInputDrawer &= !fromInspector; // We can't show a drawer in the inspector
 				showInputDrawer &= !typeof(IList).IsAssignableFrom(field.FieldType);
 
@@ -728,15 +734,52 @@ namespace GraphProcessor
 				if (inspectorNameAttribute != null)
 					displayName = inspectorNameAttribute.displayName;
 
-				var elem = AddControlField(field, displayName, showInputDrawer);
-				if (hasInputAttribute)
+				if (hasExportFieldsAsPorts && !hasInputOrOutputAttribute)
 				{
-					hideElementIfConnected[field.Name] = elem;
+					// ExportFieldsAsPorts without Input/Output: config data, draw in controls (not as input ports)
+					var subFields = BaseNode.GetExportFieldsAsPortsSubFields(field.FieldType);
+					if (subFields.Length > 0)
+						AddExportFieldsAsPortsToControls(field, displayName);
+					else
+						AddControlField(field, displayName, false);
+				}
+				else if (hasExportFieldsAsPorts && showInputDrawer)
+				{
+					var subFields = BaseNode.GetExportFieldsAsPortsSubFields(field.FieldType);
+					if (subFields.Length > 0)
+						AddExportFieldsAsPortsControlFields(field);
+					else
+					{
+						// Primitive/simple type with no sub-fields: use normal single PropertyField
+						var elem = AddControlField(field, displayName, showInputDrawer);
+						if (hasInputAttribute)
+						{
+							hideElementIfConnected[field.Name] = elem;
+							if (portsPerFieldName.TryGetValue(field.Name, out var pvs))
+								if (pvs.Any(pv => pv.GetEdges().Count > 0))
+									elem.style.display = DisplayStyle.None;
+						}
+					}
+				}
+				else if (hasExportFieldsAsPorts && hasInputOrOutputAttribute && !showInputDrawer)
+				{
+					// ExportFieldsAsPorts with Input/Output but without AllowDefaultEdit: add empty ports only
+					AddEmptyFieldForExportFieldsAsPorts(field, fromInspector);
+				}
+				else if (!hasOutputAttribute || hasInputAttribute)
+				{
+					// Output-only: skip (no default value editing). Input or mixed: draw PropertyField
+					var elem = AddControlField(field, displayName, showInputDrawer);
+					// Hide PropertyField when any port has connection
+					if (hasInputAttribute)
+					{
+						hideElementIfConnected[field.Name] = elem;
 
-					// Hide the field right away if there is already a connection:
-					if (portsPerFieldName.TryGetValue(field.Name, out var pvs))
-						if (pvs.Any(pv => pv.GetEdges().Count > 0))
-							elem.style.display = DisplayStyle.None;
+						// Hide the field right away if there is already a connection:
+						if (portsPerFieldName.TryGetValue(field.Name, out var pvs))
+							if (pvs.Any(pv => pv.GetEdges().Count > 0))
+								elem.style.display = DisplayStyle.None;
+					}
 				}
 			}
 		}
@@ -759,6 +802,25 @@ namespace GraphProcessor
 			box.AddToClassList("port-input-element");
 			box.AddToClassList("empty");
 			inputContainerElement.Add(box);
+		}
+
+		/// <summary>
+		/// Adds empty port-input-elements for ExportFieldsAsPorts when AllowDefaultEdit is not used (original logic).
+		/// </summary>
+		private void AddEmptyFieldForExportFieldsAsPorts(FieldInfo field, bool fromInspector)
+		{
+			if (fromInspector) return;
+			if (field.GetCustomAttribute<VerticalAttribute>() != null) return;
+
+			var subFields = BaseNode.GetExportFieldsAsPortsSubFields(field.FieldType);
+			foreach (var subField in subFields)
+			{
+				var boxName = field.Name + "." + subField.Name;
+				var box = new VisualElement { name = boxName };
+				box.AddToClassList("port-input-element");
+				box.AddToClassList("empty");
+				inputContainerElement.Add(box);
+			}
 		}
 
 		void UpdateFieldVisibility(string fieldName, object newValue)
@@ -847,6 +909,79 @@ namespace GraphProcessor
 		{
 			int i = owner.graph.nodes.FindIndex(n => n == nodeTarget);
 			return owner.serializedGraph.FindProperty("nodes").GetArrayElementAtIndex(i).FindPropertyRelative(fieldName);
+		}
+
+		/// <summary>
+		/// Adds PropertyFields for ExportFieldsAsPorts (no Input/Output) to controls - config data, not ports.
+		/// </summary>
+		void AddExportFieldsAsPortsToControls(FieldInfo field, string parentDisplayName)
+		{
+			var subFields = BaseNode.GetExportFieldsAsPortsSubFields(field.FieldType);
+			var parentProp = FindSerializedProperty(field.Name);
+			if (parentProp == null) return;
+
+			foreach (var subField in subFields)
+			{
+				var subProp = parentProp.FindPropertyRelative(subField.Name);
+				if (subProp == null) continue;
+
+				var subDisplayName = ObjectNames.NicifyVariableName(subField.Name);
+				var element = new PropertyField(subProp, subDisplayName);
+				element.Bind(owner.serializedGraph);
+
+				element.RegisterValueChangeCallback(_ => NotifyNodeChanged());
+
+				if (!fieldControlsMap.TryGetValue(field, out var inputFieldList))
+					inputFieldList = fieldControlsMap[field] = new List<VisualElement>();
+				inputFieldList.Add(element);
+
+				controlsContainer.Add(element);
+				element.name = field.Name + "." + subField.Name;
+			}
+		}
+
+		/// <summary>
+		/// Adds one PropertyField per sub-field for ExportFieldsAsPorts. Each appears next to its port for default value editing.
+		/// </summary>
+		void AddExportFieldsAsPortsControlFields(FieldInfo field)
+		{
+			var subFields = BaseNode.GetExportFieldsAsPortsSubFields(field.FieldType);
+			var parentProp = FindSerializedProperty(field.Name);
+			if (parentProp == null) return;
+
+			foreach (var subField in subFields)
+			{
+				var subProp = parentProp.FindPropertyRelative(subField.Name);
+				if (subProp == null) continue;
+
+				var element = new PropertyField(subProp, "");
+				element.Bind(owner.serializedGraph);
+				element.AddToClassList("DrawerField_2020_3");
+
+				element.RegisterValueChangeCallback(_ => {
+					NotifyNodeChanged();
+				});
+
+				if (!fieldControlsMap.TryGetValue(field, out var inputFieldList))
+					inputFieldList = fieldControlsMap[field] = new List<VisualElement>();
+				inputFieldList.Add(element);
+
+				var boxName = field.Name + "." + subField.Name;
+				var box = new VisualElement { name = boxName };
+				box.AddToClassList("port-input-element");
+				box.Add(element);
+				inputContainerElement.Add(box);
+				element.name = boxName;
+
+				hideElementIfConnected[boxName] = element;
+
+				if (portsPerFieldName.TryGetValue(field.Name, out var pvs))
+				{
+					var portWithId = pvs.FirstOrDefault(pv => pv.portData.identifier == subField.Name);
+					if (portWithId != null && portWithId.GetEdges().Count > 0)
+						element.style.display = DisplayStyle.None;
+				}
+			}
 		}
 
 		protected VisualElement AddControlField(FieldInfo field, string label = null, bool showInputDrawer = false, Action valueChangedCallback = null)
@@ -949,10 +1084,13 @@ namespace GraphProcessor
 
 		internal void OnPortConnected(PortView port)
 		{
-			if(port.direction == Direction.Input && inputContainerElement?.Q(port.fieldName) != null)
-				inputContainerElement.Q(port.fieldName).AddToClassList("empty");
+			var boxName = port.portData.identifier != null ? port.fieldName + "." + port.portData.identifier : port.fieldName;
+			if (port.direction == Direction.Input && inputContainerElement?.Q(boxName) != null)
+				inputContainerElement.Q(boxName).AddToClassList("empty");
 			
-			if (hideElementIfConnected.TryGetValue(port.fieldName, out var elem))
+			if (hideElementIfConnected.TryGetValue(boxName, out var elem))
+				elem.style.display = DisplayStyle.None;
+			else if (hideElementIfConnected.TryGetValue(port.fieldName, out elem))
 				elem.style.display = DisplayStyle.None;
 
 			onPortConnected?.Invoke(port);
@@ -960,9 +1098,10 @@ namespace GraphProcessor
 
 		internal void OnPortDisconnected(PortView port)
 		{
-			if (port.direction == Direction.Input && inputContainerElement?.Q(port.fieldName) != null)
+			var boxName = port.portData.identifier != null ? port.fieldName + "." + port.portData.identifier : port.fieldName;
+			if (port.direction == Direction.Input && inputContainerElement?.Q(boxName) != null)
 			{
-				inputContainerElement.Q(port.fieldName).RemoveFromClassList("empty");
+				inputContainerElement.Q(boxName).RemoveFromClassList("empty");
 
 				if (nodeTarget.nodeFields.TryGetValue(port.fieldName, out var fieldInfo))
 				{
@@ -975,7 +1114,9 @@ namespace GraphProcessor
 				}
 			}
 			
-			if (hideElementIfConnected.TryGetValue(port.fieldName, out var elem))
+			if (hideElementIfConnected.TryGetValue(boxName, out var elem))
+				elem.style.display = DisplayStyle.Flex;
+			else if (hideElementIfConnected.TryGetValue(port.fieldName, out elem))
 				elem.style.display = DisplayStyle.Flex;
 
 			onPortDisconnected?.Invoke(port);
