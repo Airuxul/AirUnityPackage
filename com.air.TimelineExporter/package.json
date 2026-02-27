@@ -1,0 +1,13 @@
+{
+  "name": "com.air.timeline-exporter",
+  "displayName": "Timeline Exporter",
+  "version": "0.1.0",
+  "unity": "2020.3",
+  "description": "Export Unity Timeline to serialized format for runtime playback simulation without PlayableDirector.",
+  "keywords": ["timeline", "export", "serialization", "playback"],
+  "category": "Unity",
+  "dependencies": {
+    "com.unity.nuget.newtonsoft-json": "3.0.2",
+    "com.unity.timeline": "1.6.4"
+  }
+}

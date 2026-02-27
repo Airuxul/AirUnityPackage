@@ -1,0 +1,17 @@
+{
+  "name": "com.air.TimelineExporter.Runtime",
+  "rootNamespace": "Air.TimelineExporter",
+  "references": [
+    "Newtonsoft.Json",
+    "Unity.Timeline",
+    "UnityEngine.CoreModule"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": []
+}

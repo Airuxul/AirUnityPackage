@@ -1,0 +1,21 @@
+{
+    "name": "com.air.TimelineExporter.Editor",
+    "rootNamespace": "Air.TimelineExporter.Editor",
+    "references": [
+        "com.air.TimelineExporter.Runtime",
+        "Unity.Timeline",
+        "Unity.Timeline.Editor",
+        "UnityEditor",
+        "UnityEngine.CoreModule"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": []
+}
