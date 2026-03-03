@@ -1,0 +1,19 @@
+{
+  "name": "com.air.timeline-kit",
+  "displayName": "Timeline Kit",
+  "version": "0.1.0",
+  "unity": "2021.3",
+  "description": "Extension library for Unity Timeline. Provides generic base classes for custom clips, tracks and mixers, exports asset reference manifests from Timeline assets, and supports dynamic loading of referenced assets at runtime.",
+  "keywords": ["timeline", "extension", "reference", "dynamic-loading", "clip", "track"],
+  "category": "Unity",
+  "dependencies": {
+    "com.unity.timeline": "1.6.4"
+  },
+  "samples": [
+    {
+      "displayName": "Custom Clip",
+      "description": "Example custom Timeline clip, track and behaviours showing the Timeline Kit extension pattern.",
+      "path": "Samples/Custom Clip"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "name": "com.air.TimelineKit.Editor",
+  "rootNamespace": "TimelineKit.Editor",
+  "references": [
+    "com.air.TimelineKit.Runtime",
+    "Unity.Timeline",
+    "Unity.Timeline.Editor",
+    "UnityEditor",
+    "UnityEngine.CoreModule"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": []
+}
