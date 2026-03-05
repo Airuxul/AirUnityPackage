@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using UnityEditor.Events;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -84,6 +83,7 @@ namespace Air.UnityGameCore.Runtime.UI.Trigger
         private void BuildBindingDict()
         {
             InitDefaultBindings();
+            RebindDefaultCallbacks();
             _bindingDict = new Dictionary<string, TriggerBinding>();
             foreach (var b in bindings)
             {
@@ -115,7 +115,7 @@ namespace Air.UnityGameCore.Runtime.UI.Trigger
                     true)
             );
             var panelShowAfterEvent = new UnityEvent();
-            UnityEventTools.AddPersistentListener(panelShowAfterEvent, uiPanel.ShowAfter);
+            panelShowAfterEvent.AddListener(uiPanel.ShowAfter);
             showUITriggerBinding.Actions.Add(
                 new EventTriggerAction(panelShowAfterEvent)
             );
@@ -133,13 +133,49 @@ namespace Air.UnityGameCore.Runtime.UI.Trigger
                     true)
             );
             var panelCloseAfterEvent = new UnityEvent();
-            UnityEventTools.AddPersistentListener(panelCloseAfterEvent, uiPanel.ShowAfter);
+            panelCloseAfterEvent.AddListener(uiPanel.ShowAfter);
             closeUITriggerBinding.Actions.Add(
                 new EventTriggerAction(panelCloseAfterEvent)
             );
             
             bindings.Add(showUITriggerBinding);
             bindings.Add(closeUITriggerBinding);
+        }
+
+        private void RebindDefaultCallbacks()
+        {
+            if (!TryGetComponent<UIPanel>(out var uiPanel) || bindings == null) return;
+            RebindDefaultEvent("ShowUI", uiPanel.ShowAfter);
+            RebindDefaultEvent("HideUI", uiPanel.ShowAfter);
+        }
+
+        private void RebindDefaultEvent(string bindingName, UnityAction callback)
+        {
+            if (callback == null) return;
+
+            var binding = bindings.Find(b => b != null && b.BindingName == bindingName);
+            if (binding == null) return;
+
+            EventTriggerAction eventAction = null;
+            foreach (var action in binding.Actions)
+            {
+                if (action is EventTriggerAction triggerAction)
+                {
+                    eventAction = triggerAction;
+                    break;
+                }
+            }
+
+            if (eventAction == null)
+            {
+                var unityEvent = new UnityEvent();
+                unityEvent.AddListener(callback);
+                binding.Actions.Add(new EventTriggerAction(unityEvent));
+                return;
+            }
+
+            eventAction.OnTrigger.RemoveListener(callback);
+            eventAction.OnTrigger.AddListener(callback);
         }
 
         /// <summary>
