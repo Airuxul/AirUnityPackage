@@ -9,6 +9,7 @@
     ],
     "category": "Unity",
     "dependencies": {
-        "com.unity.textmeshpro": "3.0.6"
+        "com.unity.textmeshpro": "3.0.6",
+        "com.air.game-core": "1.0.1"
     }
 }
