@@ -1,8 +1,10 @@
 {
     "name": "com.air.UnityGameCore.Editor",
+    "rootNamespace": "Air.UnityGameCore.Editor",
     "references": [
         "com.air.UnityGameCore.Runtime",
-        "Unity.TextMeshPro"
+        "UnityEditor",
+        "UnityEngine.UIElementsModule"
     ],
     "includePlatforms": [
         "Editor"

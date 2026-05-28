@@ -1,17 +1,20 @@
 # Timeline Kit (`com.air.timeline-kit`)
 
-Unity Timeline extension library. Provides three capabilities:
+Unity Timeline 扩展库，提供：
 
-1. **Extension Framework** — generic base classes for custom clips, tracks and mixers.
-2. **Reference Export** — scan a Timeline asset and generate a `TimelineReferenceManifest` listing every asset it references (prefabs, audio clips, etc.).
-3. **Dynamic Loading** — `ITimelineAssetLoader` abstraction for loading referenced assets at runtime (Resources, Addressables, or custom backends).
+1. **扩展框架** — 自定义 Clip / Track / Mixer 的泛型基类
+2. **引用导出** — 扫描 Timeline 资源，生成 `TimelineReferenceManifest`
+3. **动态加载** — `ITimelineAssetLoader` 抽象（Resources、Addressables 或自定义后端）
 
----
+## 安装
 
-## Requirements
+```json
+"com.air.timeline-kit": "file:../CustomPackages/com.air.TimelineKit"
+```
 
-- Unity 2021.3+
-- `com.unity.timeline` 1.6.4+
+- Unity **2021.3+**
+- `com.unity.timeline` **1.6.4+**（见 `package.json` dependencies）
+- Package Manager 可导入 **Custom Clip** 示例
 
 ---
 

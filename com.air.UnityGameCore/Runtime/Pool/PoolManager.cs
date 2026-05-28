@@ -19,7 +19,7 @@ namespace Air.UnityGameCore.Runtime.Pool
         void Prewarm(int count);
     }
 
-    public class ObjectPool<T> : IPool<T>
+    public class UnityObjectPool<T> : IPool<T>
     {
         private readonly Stack<T> _stack;
         private readonly Func<T> _createFunc;
@@ -35,7 +35,7 @@ namespace Air.UnityGameCore.Runtime.Pool
         public int CountInactive => _stack.Count;
         public int CountActive => _countAll - _stack.Count;
 
-        public ObjectPool(
+        public UnityObjectPool(
             Func<T> createFunc,
             Action<T> onGet = null,
             Action<T> onRelease = null,
@@ -156,7 +156,7 @@ namespace Air.UnityGameCore.Runtime.Pool
         }
     }
 
-    public class GameObjectPool : ObjectPool<GameObject>
+    public class GameObjectPool : UnityObjectPool<GameObject>
     {
         private readonly Action<GameObject, GameObjectPool> _onCreated;
         private readonly Action<GameObject, GameObjectPool> _onDestroyed;
@@ -224,7 +224,7 @@ namespace Air.UnityGameCore.Runtime.Pool
         }
     }
 
-    public class ComponentPool<T> : ObjectPool<T>, IComponentPool where T : Component
+    public class ComponentPool<T> : UnityObjectPool<T>, IComponentPool where T : Component
     {
         private readonly Action<Component, IComponentPool> _onCreated;
         private readonly Action<Component, IComponentPool> _onDestroyed;
@@ -307,7 +307,7 @@ namespace Air.UnityGameCore.Runtime.Pool
         private static readonly Dictionary<PoolKey, IComponentPool> ComponentPools = new();
         private static readonly Dictionary<int, IComponentPool> ComponentInstanceToPool = new();
 
-        public static ObjectPool<T> GetOrCreatePool<T>(
+        public static UnityObjectPool<T> GetOrCreatePool<T>(
             string key = null,
             Func<T> createFunc = null,
             Action<T> onGet = null,
@@ -319,10 +319,10 @@ namespace Air.UnityGameCore.Runtime.Pool
         {
             var poolKey = BuildKey<T>(key);
             if (ObjectPools.TryGetValue(poolKey, out var pool))
-                return (ObjectPool<T>)pool;
+                return (UnityObjectPool<T>)pool;
 
             createFunc ??= GetDefaultFactory<T>();
-            var newPool = new ObjectPool<T>(createFunc, onGet, onRelease, onDestroy, defaultCapacity, maxSize, collectionCheck);
+            var newPool = new UnityObjectPool<T>(createFunc, onGet, onRelease, onDestroy, defaultCapacity, maxSize, collectionCheck);
             ObjectPools[poolKey] = newPool;
             return newPool;
         }
@@ -336,11 +336,11 @@ namespace Air.UnityGameCore.Runtime.Pool
         public static void Release<T>(T instance, string key = null)
         {
             var poolKey = BuildKey<T>(key);
-            ObjectPool<T> pool;
+            UnityObjectPool<T> pool;
 
             if (ObjectPools.TryGetValue(poolKey, out var existing))
             {
-                pool = (ObjectPool<T>)existing;
+                pool = (UnityObjectPool<T>)existing;
             }
             else
             {

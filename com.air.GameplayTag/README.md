@@ -1,6 +1,14 @@
-# Gameplay Tag System
+# Gameplay Tag (`com.air.gameplay-tag`)
 
-一个类似UE4的Gameplay Tag系统，用于Unity项目中管理和使用层级化的标签。
+一个类似 UE4 的 Gameplay Tag 系统，用于 Unity 项目中管理和使用层级化的标签。
+
+## 安装
+
+```json
+"com.air.gameplay-tag": "file:../CustomPackages/com.air.GameplayTag"
+```
+
+无其他 Air 包依赖。命名空间：`Air.GameplayTag`。
 
 ## 功能特点
 

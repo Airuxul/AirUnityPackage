@@ -1,11 +1,12 @@
 {
-    "name": "com.air.game-core",
-    "displayName": "Game Core",
-    "version": "1.0.1",
-    "unity": "2020.3",
-    "description": "Game Core",
-    "keywords": [
-        "GameFramework"
-    ],
-    "category": "Unity"
+  "name": "com.air.game-core",
+  "displayName": "Game Core",
+  "version": "1.0.1",
+  "unity": "2020.3",
+  "description": "Pure C# game framework utilities: singleton, object/list pools, finite state machine, and layered state machine. No Unity engine dependency.",
+  "keywords": ["game-framework", "state-machine", "pool", "singleton"],
+  "category": "Unity",
+  "author": {
+    "name": "airuxul"
+  }
 }

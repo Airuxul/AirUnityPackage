@@ -1,6 +1,6 @@
 {
   "name": "com.air.BehaviorTree.Runtime",
-  "rootNamespace": "BehaviorTree",
+  "rootNamespace": "Air.BehaviorTree",
   "references": ["com.alelievr.NodeGraphProcessor.Runtime"],
   "includePlatforms": [],
   "excludePlatforms": [],

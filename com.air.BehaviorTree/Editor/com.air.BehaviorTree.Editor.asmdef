@@ -1,6 +1,6 @@
 {
   "name": "com.air.BehaviorTree.Editor",
-  "rootNamespace": "BehaviorTree",
+  "rootNamespace": "Air.BehaviorTree.Editor",
   "references": [
     "com.air.BehaviorTree.Runtime",
     "com.alelievr.NodeGraphProcessor.Editor",
