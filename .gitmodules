@@ -1,0 +1,24 @@
+[submodule "packages/com.air.game-core"]
+	path = packages/com.air.game-core
+	url = https://github.com/Airuxul/game-core.git
+[submodule "packages/com.air.unity-game-core"]
+	path = packages/com.air.unity-game-core
+	url = https://github.com/Airuxul/unity-game-core.git
+[submodule "packages/com.air.unity-ui"]
+	path = packages/com.air.unity-ui
+	url = https://github.com/Airuxul/unity-ui.git
+[submodule "packages/com.air.gameplay-tag"]
+	path = packages/com.air.gameplay-tag
+	url = https://github.com/Airuxul/gameplay-tag.git
+[submodule "packages/com.air.unity-behavior-tree"]
+	path = packages/com.air.unity-behavior-tree
+	url = https://github.com/Airuxul/unity-behavior-tree.git
+[submodule "packages/com.air.unity-timeline-kit"]
+	path = packages/com.air.unity-timeline-kit
+	url = https://github.com/Airuxul/unity-timeline-kit.git
+[submodule "packages/com.alelievr.node-graph-processor"]
+	path = packages/com.alelievr.node-graph-processor
+	url = https://github.com/Airuxul/node-graph-processor.git
+[submodule "packages/unity-cli"]
+	path = packages/unity-cli
+	url = https://github.com/Airuxul/unity-cli.git

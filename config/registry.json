@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "metaRepository": "https://github.com/Airuxul/AirUnityPackage.git",
+  "packagesRoot": "packages",
+  "defaultUnityProject": "..",
+  "packages": [
+    {
+      "id": "com.air.game-core",
+      "folder": "com.air.game-core",
+      "repository": "https://github.com/Airuxul/game-core.git",
+      "installDefault": true
+    },
+    {
+      "id": "com.air.unity-game-core",
+      "folder": "com.air.unity-game-core",
+      "repository": "https://github.com/Airuxul/unity-game-core.git",
+      "installDefault": true
+    },
+    {
+      "id": "com.air.unity-ui",
+      "folder": "com.air.unity-ui",
+      "repository": "https://github.com/Airuxul/unity-ui.git",
+      "installDefault": true
+    },
+    {
+      "id": "com.air.gameplay-tag",
+      "folder": "com.air.gameplay-tag",
+      "repository": "https://github.com/Airuxul/gameplay-tag.git",
+      "installDefault": true
+    },
+    {
+      "id": "com.air.unity-behavior-tree",
+      "folder": "com.air.unity-behavior-tree",
+      "repository": "https://github.com/Airuxul/unity-behavior-tree.git",
+      "installDefault": true
+    },
+    {
+      "id": "com.air.unity-timeline-kit",
+      "folder": "com.air.unity-timeline-kit",
+      "repository": "https://github.com/Airuxul/unity-timeline-kit.git",
+      "installDefault": true
+    },
+    {
+      "id": "com.alelievr.node-graph-processor",
+      "folder": "com.alelievr.node-graph-processor",
+      "repository": "https://github.com/Airuxul/node-graph-processor.git",
+      "installDefault": true
+    },
+    {
+      "id": "com.air.unity-connector",
+      "folder": "unity-cli/com.air.unity-connector",
+      "repository": "https://github.com/Airuxul/unity-cli.git",
+      "submodulePath": "unity-cli",
+      "installDefault": true
+    }
+  ]
+}

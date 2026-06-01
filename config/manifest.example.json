@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "com.air.game-core": "file:../CustomPackages/packages/com.air.game-core",
+    "com.air.unity-game-core": "file:../CustomPackages/packages/com.air.unity-game-core",
+    "com.air.unity-ui": "file:../CustomPackages/packages/com.air.unity-ui",
+    "com.air.gameplay-tag": "file:../CustomPackages/packages/com.air.gameplay-tag",
+    "com.air.unity-behavior-tree": "file:../CustomPackages/packages/com.air.unity-behavior-tree",
+    "com.air.unity-timeline-kit": "file:../CustomPackages/packages/com.air.unity-timeline-kit",
+    "com.alelievr.node-graph-processor": "file:../CustomPackages/packages/com.alelievr.node-graph-processor",
+    "com.air.unity-connector": "file:../CustomPackages/packages/unity-cli/com.air.unity-connector"
+  }
+}
