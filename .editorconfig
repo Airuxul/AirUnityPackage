@@ -8,6 +8,14 @@ insert_final_newline = true
 [*.{cs,csx}]
 indent_style = space
 indent_size = 4
+tab_width = 4
+trim_trailing_whitespace = true
+insert_final_newline = true
+charset = utf-8
+
+# Avoid blank line between every statement (use IDE format on save with .editorconfig)
+csharp_new_line_between_members_in_object = false
+csharp_new_line_between_members_in_anonymous_types = false
 
 [*.{json,md,yml,yaml}]
 indent_style = space

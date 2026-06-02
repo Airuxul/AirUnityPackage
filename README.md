@@ -33,7 +33,7 @@ install-to-unity.bat C:\Project\GameDemo
 
 ## 包列表
 
-[docs/PACKAGES.md](docs/PACKAGES.md) · 架构约束：[docs/CONSTRAINTS.md](docs/CONSTRAINTS.md)
+[docs/PACKAGES.md](docs/PACKAGES.md) · 架构：[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) · 功能 Tag：[docs/PACKAGE_TAGS.md](docs/PACKAGE_TAGS.md) · 约束：[docs/CONSTRAINTS.md](docs/CONSTRAINTS.md) · C# 规范：[docs/C_SHARP_STANDARDS.md](docs/C_SHARP_STANDARDS.md)
 
 ## 手动 manifest
 
