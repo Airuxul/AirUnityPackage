@@ -1,0 +1,48 @@
+---
+description: Air UPM packages C# style and folder layout (mandatory for packages/**/*.cs)
+globs: packages/**/*.cs
+alwaysApply: false
+---
+
+# Air Packages C# — mandatory
+
+When creating or editing **any** `.cs` under `packages/`, you **must** follow [docs/C_SHARP_STANDARDS.md](../../docs/C_SHARP_STANDARDS.md) and [docs/CONSTRAINTS.md](../../docs/CONSTRAINTS.md).
+
+## Before coding
+
+1. Read **C_SHARP_STANDARDS** §4 for the target package folder template.
+2. Confirm layer (game-core / unity-game-core / unity-ui / domain) in **ARCHITECTURE**.
+
+## Non‑negotiable rules
+
+| Rule | Detail |
+|------|--------|
+| **Formatting** | C#: **4 spaces**, LF, UTF-8. **No** blank line after every line of code. At most one blank line between logical blocks (e.g. after `using` block, between methods). Match `.editorconfig` and neighboring files in the same folder. |
+| Layout | `Runtime/` + `Editor/`; feature subfolders (`Core/`, `Event/`, `UI/State/`) — no flat dump of types |
+| Files | One main type per file; `FileName.cs` = type name |
+| Namespace | `Air.<Feature>...` matching folder + asmdef `rootNamespace` |
+| Runtime | No `UnityEditor`; no gameplay/UI in game-core |
+| Dependencies | No cross-layer hacks; no duplicate EventBus/资源 in UI |
+
+## After coding
+
+- Re-read edited `.cs` files: no double-spaced lines, indent is 4 spaces inside `{ }`.
+- Sync `package.json` + `.asmdef` if references changed.
+- Run through **C_SHARP_STANDARDS** §9 checklist.
+- New folders only inside the package’s documented template — never `Scripts/`, `Misc/`, or package-root `.cs` (except game-core single-file utilities).
+
+## Mandatory compile + log loop (Unity C#)
+
+For **every** change to `packages/**/*.cs`, you must complete this loop before finishing:
+
+1. Prefer running `tools/unity-compile-loop.ps1` as the default verifier:
+   - `.\tools\unity-compile-loop.ps1 -IncludeWarnings -ConsoleLines 400`
+2. If the script cannot be used, do the manual equivalent:
+   - `unity-cmd --profile editor compile --timeout 20000`
+   - `unity-cmd --profile editor console --type error,warning --lines 400`
+3. If logs include compile/runtime errors caused by the change, fix them immediately.
+4. Repeat until there are no relevant errors.
+
+Do not stop at code edits only; the task is incomplete until compile + log verification passes.
+
+If unsure where a type belongs, **stop and pick the folder from C_SHARP_STANDARDS §8** before writing files.
