@@ -1,27 +1,34 @@
-# 仓库目录说明
+# Repository Structure
+
+**Last Updated:** 2026-06-02 · **Owner:** meta-repo · **Scope:** agent documentation (English)
 
 ```text
 CustomPackages/
-├── install-to-unity.bat
-├── init-submodules.bat
-├── packages/              # Git Submodule（UPM 源码）
-├── config/registry.json
+├── packages/                 # Git submodules only (UPM sources)
+├── config/
+│   ├── registry.json         # Package index, installDefault, repo URLs
+│   ├── package-tags.json     # Feature tag index
+│   └── manifest.example.json # Example file: paths for Unity manifest
 ├── tools/
-├── docs/
-└── .cursor/rules/         # Cursor 项目规则（含 C# 规范）
+│   ├── install-packages.ps1
+│   ├── validate-docs.ps1
+│   ├── install-git-hooks.ps1
+│   └── unity-compile-loop.ps1
+├── docs/                     # Meta-repo agent markdown (English)
+├── .cursor/rules/            # Unity package C# development (not docs/)
+├── .cursor/skills/           # doc-read-index, doc-generate-update, unity-cmd
+├── .githooks/pre-commit
+├── init-submodules.bat
+├── install-to-unity.bat
+├── README.md                 # User docs (English)
+└── README.zh-CN.md           # User docs (Chinese)
 ```
 
-## 原则
+## Path rules
 
-- **`packages/<folder>/`** 目录名与 `package.json` 的 `name` 一致。
-- **元仓库根** 只放入口脚本、配置与说明；UPM 实现均在子仓库。
+- **User docs:** repository root `README.md` / `README.zh-CN.md` only.
+- **Agent markdown:** `docs/` — meta repo workflow, registry, doc governance only.
+- **Package C# rules:** `.cursor/rules/` — see [README](../.cursor/rules/README.md); applied via `unity-package-develop.mdc` for `packages/**/*.cs`.
+- **Machine-readable agent data:** `config/*.json` (not duplicated in user README unless workflow changes).
 
-## 文档
-
-| 文档 | 用途 |
-|------|------|
-| [C_SHARP_STANDARDS.md](C_SHARP_STANDARDS.md) | C# 规范与 `packages/` 目录结构（**改 C# 必读**） |
-| [CONSTRAINTS.md](CONSTRAINTS.md) | 包职责与 v2 API |
-| [ARCHITECTURE.md](ARCHITECTURE.md) | 依赖与归属 |
-
-Markdown 使用 **UTF-8（无 BOM）**。编辑规范见 Cursor User Rule `docs-utf8` 及 `.editorconfig`、`.vscode/settings.json`。
+See also [WORKFLOW.md](WORKFLOW.md), [PACKAGES.md](PACKAGES.md).

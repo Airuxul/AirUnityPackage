@@ -1,40 +1,49 @@
-# 多仓库工作流
+# Meta Repository Workflow
 
-元仓库只维护 **config / tools / docs** 与 **packages/ Submodule 指针**；UPM 源码在子仓库。
+**Last Updated:** 2026-06-02 · **Owner:** meta-repo · **Scope:** agent documentation (English)
 
-目录说明：[STRUCTURE.md](STRUCTURE.md)
+## Roles
 
-## 目录角色
+| Area | Responsibility |
+|------|----------------|
+| Meta repo (`CustomPackages`) | Submodule pointers, `config/registry.json`, install scripts, governance docs |
+| `packages/<name>` | UPM source; commit / tag / push in each submodule repository |
 
-| 路径 | 职责 |
-|------|------|
-| 根目录 | 入口 `*.bat` |
-| `config/registry.json` | 包索引、`installDefault`、远程 URL |
-| `tools/` | 安装脚本 |
-| `packages/` | Submodule（仅源码） |
-| `docs/` | 说明文档 |
-
-## 日常流程
-
-### 1. 克隆
+## Clone
 
 ```bash
 git clone --recurse-submodules https://github.com/Airuxul/AirUnityPackage.git CustomPackages
 cd CustomPackages
 ```
 
-或运行 `init-submodules.bat`。
+Or clone then run `init-submodules.bat`.
 
-### 2. 安装到 Unity
+## Install into Unity
 
 ```bat
-install-to-unity.bat C:\Project\GameDemo
+install-to-unity.bat C:\Path\To\UnityProject
 ```
 
-将 `installDefault: true` 的包写入 manifest；已存在的依赖不会覆盖。
+Reads `config/registry.json` for `installDefault` packages. Does not overwrite existing manifest entries.
 
-### 3. 改包并发布
+## Change a package and publish
 
-在各 `packages/<name>` 子仓内 commit / tag / push，再更新元仓 submodule 指针。
+1. Work inside the submodule under `packages/<folder>`.
+2. Commit, tag, and push in that package repository.
+3. In the meta repo, update the submodule pointer commit.
+4. Commit the meta repo pointer change.
 
-本地开发用 `install-to-unity.bat`（`file:` 依赖）。
+Local development uses `file:` dependencies via `install-to-unity.bat`.
+
+## Documentation updates
+
+1. Read [AGENTS.md](AGENTS.md) and [DOC_GOVERNANCE.md](DOC_GOVERNANCE.md).
+2. Use Cursor skills `doc-read-index` then `doc-generate-update` when applicable.
+3. Keep `README.md` and `README.zh-CN.md` in sync for user-facing changes.
+4. Record agent-side summaries in [CHANGELOG_AGENT.md](CHANGELOG_AGENT.md).
+
+Enable hooks once per clone:
+
+```powershell
+.\tools\install-git-hooks.ps1
+```

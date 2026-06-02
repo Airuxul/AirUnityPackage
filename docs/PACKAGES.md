@@ -1,5 +1,9 @@
 # packages/ 子模块索引
 
+**Last Updated:** 2026-06-02 · **Scope:** agent reference (Chinese)
+
+> **Source of truth for install:** [../config/registry.json](../config/registry.json). Keep this table aligned when adding or removing default packages.
+
 | 本地目录 | UPM `name` | GitHub 仓库 |
 |----------|------------|-------------|
 | `com.air.game-core` | `com.air.game-core` | [game-core](https://github.com/Airuxul/game-core) |
@@ -13,4 +17,6 @@
 
 本地目录带 `com.air.` 前缀；GitHub 仓库名通常不带此前缀。
 
-分层与代码归属见 [ARCHITECTURE.md](ARCHITECTURE.md)。
+分层与代码归属见 [.cursor/rules/PACKAGE_ARCHITECTURE.md](../.cursor/rules/PACKAGE_ARCHITECTURE.md)。
+
+各包用户文档：子模块根目录 `README.md`（英文）及可选 `README.zh-CN.md`；安装路径以 [../config/registry.json](../config/registry.json) 为准。

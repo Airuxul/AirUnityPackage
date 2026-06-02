@@ -1,24 +1,26 @@
 # Air Unity Packages
 
-Unity UPM 元仓库：**配置 / 工具 / 文档** 与 **`packages/` 子模块** 分离。
+[简体中文](README.zh-CN.md)
 
-**作者：** [airuxul](https://github.com/airuxul)
+**Last Updated:** 2026-06-02 · **Scope:** user documentation (English)
 
-## 目录一览
+Unity UPM **meta repository**: submodule pointers under `packages/`, install tooling, and agent governance under `docs/`.
+
+## Repository layout
 
 ```text
 CustomPackages/
-├── install-to-unity.bat      # 写入 Unity manifest
-├── init-submodules.bat         # 拉取 packages/ 下 Submodule
-├── packages/                   # 仅子模块（UPM 源码）
-├── config/registry.json        # 包注册表
-├── tools/                      # 脚本实现
-└── docs/                       # 说明文档
+├── packages/              # Git submodules (UPM source)
+├── config/                # registry & tags (tooling; see docs/AGENTS.md)
+├── tools/                 # install, doc validation, Unity compile helpers
+├── docs/                  # agent documentation (English)
+├── init-submodules.bat
+├── install-to-unity.bat
+├── README.md              # this file (English)
+└── README.zh-CN.md        # Chinese user docs
 ```
 
-详见 [docs/STRUCTURE.md](docs/STRUCTURE.md)。
-
-## 快速开始
+## Quick start
 
 ```bat
 cd C:\Project\GameDemo\CustomPackages
@@ -26,20 +28,45 @@ init-submodules.bat
 install-to-unity.bat C:\Project\GameDemo
 ```
 
-| 命令 | 作用 |
-|------|------|
-| `init-submodules.bat` | `git submodule update --init --recursive` |
-| `install-to-unity.bat [工程路径]` | 将 registry 中 `installDefault` 的包写入 manifest（已存在则跳过） |
+`install-to-unity.bat` adds packages marked `installDefault` in `config/registry.json` to the Unity project `Packages/manifest.json` as `file:` dependencies. Existing entries are not overwritten.
 
-## 包列表
+## Commands
 
-[docs/PACKAGES.md](docs/PACKAGES.md) · 架构：[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) · 功能 Tag：[docs/PACKAGE_TAGS.md](docs/PACKAGE_TAGS.md) · 约束：[docs/CONSTRAINTS.md](docs/CONSTRAINTS.md) · C# 规范：[docs/C_SHARP_STANDARDS.md](docs/C_SHARP_STANDARDS.md)
+| Command | Purpose |
+|---------|---------|
+| `init-submodules.bat` | `git submodule sync` + `update --init --recursive` for `packages/` |
+| `install-to-unity.bat [UnityProjectPath]` | Install default packages into Unity manifest |
 
-## 手动 manifest
+## Manual manifest
 
-[config/manifest.example.json](config/manifest.example.json)
+If you prefer hand-editing Unity dependencies, see [config/manifest.example.json](config/manifest.example.json) for `file:` path examples (adjust paths for your machine).
 
-## 更多
+## Tools (contributors)
 
-- 工作流：[docs/WORKFLOW.md](docs/WORKFLOW.md)
-- Submodule：[docs/SUBMODULE-SETUP.md](docs/SUBMODULE-SETUP.md)
+| Script | Purpose |
+|--------|---------|
+| [tools/install-packages.ps1](tools/install-packages.ps1) | Core logic used by `install-to-unity.bat` |
+| [tools/validate-docs.ps1](tools/validate-docs.ps1) | Pre-commit doc parity checks |
+| [tools/install-git-hooks.ps1](tools/install-git-hooks.ps1) | One-time: enable `.githooks/pre-commit` |
+| [tools/unity-compile-loop.ps1](tools/unity-compile-loop.ps1) | Unity compile + console check via `unity-cmd` |
+
+Details: [docs/TOOLS.md](docs/TOOLS.md).
+
+## Troubleshooting
+
+| Issue | What to try |
+|-------|-------------|
+| Submodule update failed | Re-run `init-submodules.bat`; check `.gitmodules`, network, and Git credentials |
+| Package folder missing | Submodules not initialized — run `init-submodules.bat` |
+| `install-to-unity.bat` failed | Pass a valid Unity project root (contains `Assets/` and `Packages/manifest.json`) |
+| Doc commit blocked by hook | Update `README.md` and `README.zh-CN.md` together when changing user docs; see [docs/DOC_GOVERNANCE.md](docs/DOC_GOVERNANCE.md) |
+
+## Agent documentation
+
+Agent-facing rules and technical references live under [docs/](docs/) (English). Entry point: [docs/AGENTS.md](docs/AGENTS.md).
+
+## User docs language policy
+
+- English: this file (`README.md`)
+- Chinese: [README.zh-CN.md](README.zh-CN.md)
+- Any user-facing doc change must update **both** files in sync

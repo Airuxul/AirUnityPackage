@@ -1,0 +1,66 @@
+---
+description: Unity UPM package C# development under packages/. Use when creating or editing packages/**/*.cs. Enforces rules in .cursor/rules/, unity-cmd for Editor automation, and mandatory compile verification.
+globs: packages/**/*.cs
+alwaysApply: false
+---
+
+# Unity package develop
+
+Applies to all `.cs` under `packages/`. All references below are under **`.cursor/rules/`** (not `docs/`).
+
+## Read first
+
+| Doc | Purpose |
+|-----|---------|
+| [C_SHARP_STANDARDS.md](C_SHARP_STANDARDS.md) | Folder templates (§4), naming, checklist (§9) |
+| [PACKAGE_CONSTRAINTS.md](PACKAGE_CONSTRAINTS.md) | Layer rules, v2 API |
+| [PACKAGE_ARCHITECTURE.md](PACKAGE_ARCHITECTURE.md) | Package ownership |
+
+Before new files: **C_SHARP_STANDARDS §4** + **PACKAGE_ARCHITECTURE** (correct package).
+
+## Implement
+
+- One main type per file; match namespace to folder and asmdef.
+- `Runtime/` vs `Editor/`; no `UnityEditor` in Runtime assemblies.
+- **game-core:** no `UnityEngine`. **UI:** no duplicate EventBus / resource loading.
+- Sync `package.json` and `.asmdef` when references change.
+- Match `.editorconfig` and neighboring files (4 spaces, LF, no blank line after every line).
+
+## Keep boundary docs in sync (required)
+
+Code changes that move, add, or redefine **package boundaries** are incomplete until the matching **`.cursor/rules/`** doc is updated in the **same task** (do not defer).
+
+| Change | Update |
+|--------|--------|
+| Type/API moved to another package; new ownership row | [PACKAGE_ARCHITECTURE.md](PACKAGE_ARCHITECTURE.md) — ownership table, dependency graph if edges changed |
+| Layer duty, forbidden dependency, or v2 API convention | [PACKAGE_CONSTRAINTS.md](PACKAGE_CONSTRAINTS.md) |
+| New/changed `Runtime/` / `Editor/` folder template for a package | [C_SHARP_STANDARDS.md](C_SHARP_STANDARDS.md) §4 (and §8 if placement rules change) |
+| New module path, `@tag`, or cross-package feature slice | [PACKAGE_TAGS.md](PACKAGE_TAGS.md) **and** [config/package-tags.json](../../config/package-tags.json) |
+| New UPM dependency between meta packages | `package.json` / asmdef **plus** ARCHITECTURE or CONSTRAINTS if the allowed graph changed |
+
+When you edit any of the files above, bump **Last Updated** at the top of that file.
+
+If the change is user-visible (install set, package list), also update meta `docs/PACKAGES.md` or `config/registry.json` per [`docs/AGENTS.md`](../../docs/AGENTS.md) — that is meta-repo docs, not a substitute for rules updates.
+
+## Unity automation (`unity-cmd` skill)
+
+When the task needs Editor or Play Mode actions (compile, play, console, screenshot, etc.):
+
+1. Follow **`.cursor/skills/unity-cmd/SKILL.md`** (`list` → match → `ping` → run). **Never invent** commands or flags.
+2. If **`list` has no suitable command**, stop and **ask the user** whether to add or extend a connector command in `com.air.unity-connector`. Do not substitute unrelated tools or guessed HTTP calls.
+
+## Finish (required)
+
+Every task that changes `packages/**/*.cs` is incomplete until:
+
+```powershell
+.\tools\unity-compile-loop.ps1 -IncludeWarnings -ConsoleLines 400
+```
+
+- Fix compile errors and relevant warnings caused by your changes; repeat until clean.
+- Boundary docs updated when the change affected layers, ownership, folders, tags, or allowed dependencies (see above).
+- Do not hand off after code edits only.
+
+If the script cannot run, use the same steps manually per the **unity-cmd** skill (`compile` + `console` on profile `editor`).
+
+Unsure where a type belongs → resolve via **C_SHARP_STANDARDS §8** before writing files.

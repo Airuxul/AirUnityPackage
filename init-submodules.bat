@@ -9,7 +9,7 @@ git submodule update --init --recursive
 if errorlevel 1 (
   echo.
   echo Submodule update failed. Check .gitmodules and network, then retry.
-  echo See docs\SUBMODULE-SETUP.md and docs\WORKFLOW.md
+  echo See README.md and README.zh-CN.md
   exit /b 1
 )
 echo.

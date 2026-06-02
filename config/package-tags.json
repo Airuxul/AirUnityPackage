@@ -1,52 +1,28 @@
 {
-
   "schemaVersion": 1,
-
   "description": "Feature tags for cross-package splits. See docs/PACKAGE_TAGS.md.",
-
   "tags": {
-
     "core-foundation": { "layer": "L0", "packages": ["com.air.game-core"] },
-
     "core-fsm": { "layer": "L0", "packages": ["com.air.game-core"] },
-
     "core-command": { "layer": "L0", "packages": ["com.air.game-core"] },
-
     "core-entity": { "layer": "L0", "packages": ["com.air.game-core"] },
-
     "unity-runtime": { "layer": "L1", "packages": ["com.air.unity-game-core"] },
-
     "unity-event": { "layer": "L1", "packages": ["com.air.unity-game-core"] },
-
     "unity-resource": { "layer": "L1", "packages": ["com.air.unity-game-core"] },
-
     "unity-timer": { "layer": "L1", "packages": ["com.air.unity-game-core"] },
-
     "unity-pool": { "layer": "L1", "packages": ["com.air.unity-game-core"] },
-
     "unity-serialization": { "layer": "L1", "packages": ["com.air.unity-game-core"] },
-
     "unity-input": { "layer": "L1", "packages": ["com.air.unity-game-core"] },
-
     "unity-entity": { "layer": "L1", "packages": ["com.air.unity-game-core"] },
     "unity-scene": { "layer": "L1", "packages": ["com.air.unity-game-core"] },
     "unity-save": { "layer": "L1", "packages": ["com.air.unity-game-core"] },
     "unity-audio": { "layer": "L1", "packages": ["com.air.unity-game-core"] },
     "ui-navigation": { "layer": "L2", "packages": ["com.air.unity-ui"] },
-
     "cli-param": { "layer": "connector", "packages": ["com.air.unity-connector"] },
-
     "cli-command": { "layer": "connector", "packages": ["com.air.unity-connector"] },
-
     "cli-http": { "layer": "connector", "packages": ["com.air.unity-connector"] },
-
     "cli-network": { "layer": "connector", "packages": ["com.air.unity-connector"] },
-
     "cli-http-host": { "layer": "connector", "packages": ["com.air.unity-connector"] },
-
     "cli-policy": { "layer": "connector", "packages": ["com.air.unity-connector"] }
-
   }
-
 }
-
