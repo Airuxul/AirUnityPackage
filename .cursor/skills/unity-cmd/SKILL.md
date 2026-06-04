@@ -29,7 +29,8 @@ Ensure profiles → list (+ match) → ping → run command → verify (e.g. con
 2. `unity-cmd --profile <name> list` — use returned `commands` and `params` only.
 3. `unity-cmd --profile <name> ping`
 4. Execute matched command with flags from catalog.
-5. For deferred commands (`202`), CLI polls `GET /commands/{id}` until done or timeout.
+5. CONN-10: `compile`/`play`/`stop` finish in **one POST** (no HTTP 202). On failure: `wait` → retry.
+6. Integration from `unity-cmd/`: set `UNITY_CMD_WORKSPACE` to the Unity project root (matches `instances` `projectPath` for `wait`).
 
 Catalog cache: `~/.unity-cmd/cache/catalog-<host>_<port>.json` (CLI-managed). Refresh with `list --refresh-catalog`. Do not maintain command tables in chat or markdown.
 
@@ -76,7 +77,7 @@ After connector C# changes: `unity-cmd --profile editor compile` (default timeou
 | `CATALOG_FETCH_FAILED` | Fix Unity / connector, retry `list` |
 | `SERVER_BUSY` | Wait; one command at a time per host |
 | `DOMAIN_RELOADING` | Retry after domain reload |
-| `DEFERRED_COMMAND_FAILED` / `COMMAND_STATUS_TIMEOUT` | Read `hint` in JSON output |
+| `COMMAND_FAILED` | Read `hint`; run `console` on editor profile |
 
 ## Examples
 
