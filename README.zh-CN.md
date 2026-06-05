@@ -2,7 +2,7 @@
 
 [English](README.md)
 
-**最后更新：** 2026-06-02 · **范围：** 用户文档（中文）
+**最后更新：** 2026-06-04 · **范围：** 用户文档（中文）
 
 Unity UPM **元仓库**：在 `packages/` 维护子模块指针，提供安装工具，Agent 规范见 `docs/`。
 
@@ -14,6 +14,7 @@ CustomPackages/
 ├── config/                # 注册表与 Tag（工具用；见 docs/AGENTS.md）
 ├── tools/                 # 安装、文档校验、Unity 编译辅助脚本
 ├── docs/                  # Agent 文档（英文）
+├── TODO.zh-CN.md          # 跨包优化待办（中文）
 ├── init-submodules.bat
 ├── install-to-unity.bat
 ├── README.md              # 英文用户文档
@@ -60,6 +61,10 @@ install-to-unity.bat C:\Project\GameDemo
 | 包目录不存在 | 子模块未初始化 — 先执行 `init-submodules.bat` |
 | `install-to-unity.bat` 失败 | 传入正确的 Unity 工程根目录（含 `Assets/` 与 `Packages/manifest.json`） |
 | 提交被 doc hook 拒绝 | 改用户文档时需同时更新 `README.md` 与 `README.zh-CN.md`；见 [docs/DOC_GOVERNANCE.md](docs/DOC_GOVERNANCE.md) |
+
+## 优化待办
+
+跨包后续优化（仅现有功能）：[TODO.zh-CN.md](TODO.zh-CN.md)。Agent 统筹（英文）：[docs/TODO_ROADMAP.md](docs/TODO_ROADMAP.md)。各子模块另有 `TODO.zh-CN.md` / `docs/TODO.md`。
 
 ## Agent 文档
 

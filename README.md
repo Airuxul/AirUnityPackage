@@ -2,7 +2,7 @@
 
 [简体中文](README.zh-CN.md)
 
-**Last Updated:** 2026-06-02 · **Scope:** user documentation (English)
+**Last Updated:** 2026-06-04 · **Scope:** user documentation (English)
 
 Unity UPM **meta repository**: submodule pointers under `packages/`, install tooling, and agent governance under `docs/`.
 
@@ -14,6 +14,7 @@ CustomPackages/
 ├── config/                # registry & tags (tooling; see docs/AGENTS.md)
 ├── tools/                 # install, doc validation, Unity compile helpers
 ├── docs/                  # agent documentation (English)
+├── TODO.zh-CN.md          # cross-package optimization backlog (Chinese)
 ├── init-submodules.bat
 ├── install-to-unity.bat
 ├── README.md              # this file (English)
@@ -60,6 +61,10 @@ Details: [docs/TOOLS.md](docs/TOOLS.md).
 | Package folder missing | Submodules not initialized — run `init-submodules.bat` |
 | `install-to-unity.bat` failed | Pass a valid Unity project root (contains `Assets/` and `Packages/manifest.json`) |
 | Doc commit blocked by hook | Update `README.md` and `README.zh-CN.md` together when changing user docs; see [docs/DOC_GOVERNANCE.md](docs/DOC_GOVERNANCE.md) |
+
+## Optimization backlog
+
+Cross-package follow-ups (existing features only): [TODO.zh-CN.md](TODO.zh-CN.md) (Chinese). Agent coordinator: [docs/TODO_ROADMAP.md](docs/TODO_ROADMAP.md). Per-package lists live in each submodule as `TODO.zh-CN.md` / `docs/TODO.md`.
 
 ## Agent documentation
 

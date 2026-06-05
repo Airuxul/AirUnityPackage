@@ -1,6 +1,6 @@
 # Documentation Governance
 
-**Last Updated:** 2026-06-02 · **Owner:** meta-repo · **Scope:** agent documentation (English)
+**Last Updated:** 2026-06-03 · **Owner:** meta-repo · **Scope:** agent documentation (English)
 
 ## Purpose
 
@@ -10,8 +10,8 @@ Define a stable, enforceable documentation workflow for both users and agents.
 
 | Track | Paths |
 |-------|--------|
-| User | `README.md` (EN), `README.zh-CN.md` (ZH) |
-| Agent markdown | `docs/*.md` |
+| User | `README.md` (EN), `README.zh-CN.md` (ZH), `TODO.zh-CN.md` (ZH backlog, repo root) |
+| Agent markdown | `docs/*.md` (English), including `docs/TODO.md` / `docs/TODO_ROADMAP.md` |
 | Agent data | `config/registry.json`, `config/package-tags.json`, `config/manifest.example.json` |
 | Skills | `.cursor/skills/doc-read-index`, `.cursor/skills/doc-generate-update`, `.cursor/skills/unity-cmd` |
 | Package C# rules | `.cursor/rules/` (outside `docs/` dual-track; see [README](../.cursor/rules/README.md)) |

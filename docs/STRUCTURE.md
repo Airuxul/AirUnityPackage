@@ -1,6 +1,6 @@
 # Repository Structure
 
-**Last Updated:** 2026-06-02 · **Owner:** meta-repo · **Scope:** agent documentation (English)
+**Last Updated:** 2026-06-03 · **Owner:** meta-repo · **Scope:** agent documentation (English)
 
 ```text
 CustomPackages/
@@ -14,7 +14,7 @@ CustomPackages/
 │   ├── validate-docs.ps1
 │   ├── install-git-hooks.ps1
 │   └── unity-compile-loop.ps1
-├── docs/                     # Meta-repo agent markdown (English)
+├── docs/                     # Meta-repo agent markdown (English); TODO_ROADMAP.md coordinates package docs/TODO.md
 ├── .cursor/rules/            # Unity package C# development (not docs/)
 ├── .cursor/skills/           # doc-read-index, doc-generate-update, unity-cmd
 ├── .githooks/pre-commit

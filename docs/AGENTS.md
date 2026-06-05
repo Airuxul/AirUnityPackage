@@ -1,6 +1,6 @@
 # AGENTS
 
-**Last Updated:** 2026-06-02 · **Owner:** meta-repo · **Scope:** canonical agent entrypoint (English)
+**Last Updated:** 2026-06-03 · **Owner:** meta-repo · **Scope:** canonical agent entrypoint (English)
 
 ## Canonical Agent Spec
 
@@ -11,8 +11,8 @@ If any other file conflicts with this file, this file wins.
 
 | Track | Location | Language |
 |-------|----------|----------|
-| User docs | `README.md`, `README.zh-CN.md` | English + Chinese (must stay in sync) |
-| Agent markdown | `docs/*.md` | English — **meta repo only** (clone, registry, doc governance) |
+| User docs | `README.md`, `README.zh-CN.md`, `TODO.zh-CN.md` | README: EN + ZH in sync; TODO: **Chinese only** at repo root |
+| Agent markdown | `docs/*.md` | English — **meta repo only** (clone, registry, doc governance, `docs/TODO_ROADMAP.md`) |
 | Package C# development | `.cursor/rules/*.md`, `unity-package-develop.mdc` | Standards for `packages/**/*.cs` — **not** under `docs/` |
 | Agent data | `config/*.json` | JSON (machine-readable) |
 
@@ -34,9 +34,11 @@ Each UPM **Git submodule** under `packages/` is its own repository and must incl
 |------|---------|
 | `README.md` | English user docs |
 | `README.zh-CN.md` | Chinese user docs (keep in sync with English) |
+| `TODO.zh-CN.md` | Chinese optimization backlog (same directory as README; keep IDs in sync with `docs/TODO.md`) |
 | `docs/AGENTS.md` | Canonical agent entry for **that repository** |
 | `docs/DOC_GOVERNANCE.md` | Doc workflow for that repository (links to meta standards) |
 | `docs/CHANGELOG_AGENT.md` | Agent-side changelog for that repository |
+| `docs/TODO.md` | Package-scoped optimization backlog (existing features only) |
 | `*/DESIGN.md` | Optional module design when README is too long |
 
 **Cursor skills** (`doc-read-index`, `doc-generate-update`) exist **only** in this meta repo (`.cursor/skills/`). Do **not** copy skills into package submodules. Package doc updates are driven from the meta repo using those skills.
@@ -54,6 +56,7 @@ Do not add `config/README.md` or `packages/README.md` in the meta repo. Avoid du
 | [TOOLS.md](TOOLS.md) | PowerShell tools reference |
 | [PACKAGES.md](PACKAGES.md) | Submodule index (human-readable; sync with registry) |
 | [CHANGELOG_AGENT.md](CHANGELOG_AGENT.md) | Agent-side change log |
+| [TODO_ROADMAP.md](TODO_ROADMAP.md) | Cross-package optimization backlog — agent (EN); user (ZH): [TODO.zh-CN.md](../TODO.zh-CN.md) |
 
 **Unity package C# development** (layers, constraints, C# layout, tags): [`.cursor/rules/README.md`](../.cursor/rules/README.md) — do not duplicate in `docs/`.
 
@@ -62,7 +65,7 @@ Do not add `config/README.md` or `packages/README.md` in the meta repo. Avoid du
 | Skill | Use |
 |-------|-----|
 | `doc-read-index` | Read-only inventory, gaps, language parity |
-| `doc-generate-update` | Apply doc changes with dual-track rules |
+| `doc-generate-update` | Apply doc changes with dual-track rules (README + TODO.zh-CN ↔ docs/TODO) |
 | `unity-cmd` | Unity Editor/Player automation via `unity-cmd` CLI |
 
 Project path: `.cursor/skills/<name>/SKILL.md` (all skills live here only; not under `packages/*/`)

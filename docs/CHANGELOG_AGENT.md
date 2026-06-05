@@ -1,5 +1,14 @@
 # Agent Changelog
 
+## 2026-06-03
+
+- TODO dual-track: user `TODO.zh-CN.md` (repo root, Chinese) ↔ agent `docs/TODO.md` / `docs/TODO_ROADMAP.md` (English); `doc-generate-update` and `doc-read-index` skills updated
+- Meta user rollup: root `TODO.zh-CN.md`; per-package `TODO.zh-CN.md` (8 packages) with synced IDs
+- Multi-agent pass: per-package `docs/TODO.md` (8 packages) for existing-feature optimization backlog with boundary tables
+- Meta coordinator: `docs/TODO_ROADMAP.md` — integrated P0 order, P1 themes, anti-patterns
+- `docs/AGENTS.md`: index entries for `TODO_ROADMAP.md` and per-package `docs/TODO.md` requirement
+- Package `docs/AGENTS.md` tables link local `TODO.md`
+
 ## 2026-06-02
 
 - Added canonical agent entrypoint: `docs/AGENTS.md`
