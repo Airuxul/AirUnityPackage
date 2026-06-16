@@ -7,6 +7,6 @@
     "com.air.unity-behavior-tree": "file:../CustomPackages/packages/com.air.unity-behavior-tree",
     "com.air.unity-timeline-kit": "file:../CustomPackages/packages/com.air.unity-timeline-kit",
     "com.alelievr.node-graph-processor": "file:../CustomPackages/packages/com.alelievr.node-graph-processor",
-    "com.air.unity-connector": "file:../CustomPackages/packages/unity-cli/com.air.unity-connector"
+    "com.air.ucp-agent": "file:../CustomPackages/packages/unity-command-platform/com.air.ucp-agent"
   }
 }

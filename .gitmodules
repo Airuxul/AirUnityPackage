@@ -19,6 +19,6 @@
 [submodule "packages/com.alelievr.node-graph-processor"]
 	path = packages/com.alelievr.node-graph-processor
 	url = https://github.com/Airuxul/node-graph-processor.git
-[submodule "packages/unity-cli"]
-	path = packages/unity-cli
-	url = https://github.com/Airuxul/unity-cli.git
+[submodule "packages/unity-command-platform"]
+	path = packages/unity-command-platform
+	url = https://github.com/Airuxul/unity-command-platform.git

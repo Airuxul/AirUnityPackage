@@ -47,10 +47,10 @@
       "installDefault": true
     },
     {
-      "id": "com.air.unity-connector",
-      "folder": "unity-cli/com.air.unity-connector",
-      "repository": "https://github.com/Airuxul/unity-cli.git",
-      "submodulePath": "unity-cli",
+      "id": "com.air.ucp-agent",
+      "folder": "unity-command-platform/com.air.ucp-agent",
+      "repository": "https://github.com/Airuxul/unity-command-platform.git",
+      "submodulePath": "unity-command-platform",
       "installDefault": true
     }
   ]
