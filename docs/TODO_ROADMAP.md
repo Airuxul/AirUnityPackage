@@ -10,8 +10,8 @@ This document **coordinates** package-level TODO files. It does not replace them
 
 | Layer | Package | Owns | Must not own |
 |-------|---------|------|----------------|
-| L0 | `com.air.game-core` | Pool, FSM/Procedure, GoF undo, entity **logic**, JSON contract | Unity, HTTP, UI, `GameRuntime` |
-| L1 | `com.air.unity-game-core` | `GameRuntime`, resources, Unity entities, timers, pools, scene/save/audio glue | UI panels, CLI handlers |
+| L0 | `com.air.game-core` | Pool, FSM/Procedure, GoF undo, entity **logic**, JSON contract, global events, time wheel | Unity, HTTP, UI, `GameRuntime` |
+| L1 | `com.air.unity-game-core` | `GameRuntime`, resources, Unity entities, PlayerLoop time driver, pools, scene/save/audio glue | UI panels, CLI handlers |
 | L2 UI | `com.air.unity-ui` | `UIFramework`, panels, navigator, scoped UI events | Duplicate bus/resources |
 | L2 CLI | `com.air.unity-connector` | HTTP invoke, jobs, `CliCommand` catalog | Game composition, UI |
 | Domain | gameplay-tag, behavior-tree, timeline-kit, node-graph | Each domain’s public API | Pulling L1 unless already required |
@@ -24,7 +24,7 @@ When an item touches two packages, split into **consumer** vs **provider** tasks
 | Package | Agent (EN) | User (ZH) | Open items (approx.) |
 |---------|------------|-----------|----------------------|
 | `com.air.game-core` | [docs/TODO.md](../packages/com.air.game-core/docs/TODO.md) | [TODO.zh-CN.md](../packages/com.air.game-core/TODO.zh-CN.md) | 11 |
-| `com.air.unity-game-core` | [docs/TODO.md](../packages/com.air.unity-game-core/docs/TODO.md) | [TODO.zh-CN.md](../packages/com.air.unity-game-core/TODO.zh-CN.md) | 15 |
+| `com.air.unity-game-core` | [docs/TODO.md](../packages/com.air.unity-game-core/docs/TODO.md) | [TODO.zh-CN.md](../packages/com.air.unity-game-core/TODO.zh-CN.md) | 13 |
 | `com.air.unity-ui` | [docs/TODO.md](../packages/com.air.unity-ui/docs/TODO.md) | [TODO.zh-CN.md](../packages/com.air.unity-ui/TODO.zh-CN.md) | 10 |
 | `com.air.gameplay-tag` | [docs/TODO.md](../packages/com.air.gameplay-tag/docs/TODO.md) | [TODO.zh-CN.md](../packages/com.air.gameplay-tag/TODO.zh-CN.md) | 10 |
 | `com.air.unity-behavior-tree` | [docs/TODO.md](../packages/com.air.unity-behavior-tree/docs/TODO.md) | [TODO.zh-CN.md](../packages/com.air.unity-behavior-tree/TODO.zh-CN.md) | 9 |
@@ -84,7 +84,7 @@ flowchart TB
 | Implement Newtonsoft in game-core | `com.air.unity-game-core` bootstrap |
 | Put Sequence/Selector nodes in NGP | `com.air.unity-behavior-tree` |
 | Timeline preload inside `SceneFlow` | timeline-kit loader injection at game layer |
-| Duplicate `EventBus` for UI-only events | `UIScopedEvents` on `Runtime.Events` |
+| Reimplement `EventManager` for UI-only events | Listen with a callback node; pure UI signals stay on the view |
 | Catalog commands in README tables | Live `POST /list` + unity-cmd cache |
 
 ## Meta-repo maintenance

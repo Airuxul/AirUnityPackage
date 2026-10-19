@@ -22,3 +22,6 @@
 [submodule "packages/unity-command-platform"]
 	path = packages/unity-command-platform
 	url = https://github.com/Airuxul/unity-command-platform.git
+[submodule "packages/com.code-philosophy.luban"]
+	path = packages/com.code-philosophy.luban
+	url = https://github.com/focus-creative-games/luban_unity.git
